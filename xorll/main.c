@@ -6,11 +6,21 @@
  *
  * arg1 arg2 arg3 ... argn
  *
- * the program will simply insert the n int arguments (please please please make
- * them ints unless you want to break something) into an xor linked list, and
- * then return the value of all the elements inserted in the linked list in
+ * the program will simply insert the n int arguments into an xor linked list
+ * and then return the value of all the elements inserted in the linked list in
  * reverse order, since in the program the head and tail pointers of the linked
  * list will be swapped. the size of the linked list will also be printed.
+ *
+ * Changelog:
+ *
+ * 06-09-2019
+ *
+ * added changelog and edited header comments; atoi() returns 0 anyways if it
+ * can't parse the string fed to it.
+ *
+ * 06-08-2019
+ *
+ * initial creation and completion date.
  */
 
 #include <stdio.h>
