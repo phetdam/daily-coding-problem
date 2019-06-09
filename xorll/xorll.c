@@ -7,6 +7,10 @@
  *
  * Changelog:
  *
+ * 06-09-2019
+ *
+ * fixed a single piece of spacing. hmm.
+ *
  * 06-08-2019
  *
  * initial creation. see xorll.py for the question statement. added all the
@@ -90,7 +94,7 @@ xor_node *xorll__getnode(xorll *xll, int k) {
 	prev = cur;
 	/* note that since cur->both == prev ^ next, next == prev ^ prev ^ next
 	 since prev ^ prev will be 0, and 0 ^ next will be next. */
-	cur = (xor_node *) ((uintptr_t) old_prev ^ (uintptr_t)cur->both);
+	cur = (xor_node *) ((uintptr_t) old_prev ^ (uintptr_t) cur->both);
     }
     // return cur
     return cur;
