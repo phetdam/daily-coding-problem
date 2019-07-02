@@ -2,6 +2,10 @@
 #
 # Changelog:
 #
+# 07-01-2019
+#
+# removed extraneous function definition
+#
 # 06-29-2019
 #
 # initial creation. uses stack to check if brackets are balanced. ignores angle
@@ -46,13 +50,6 @@ def check_brackets(bs):
             else: stack.append(e)
     # if the length of the stack is greater than 0, we did not match something
     return len(stack) == 0
-
-def g(x):
-    """
-    description of solution runtime and any other comments. usually necessary
-    because follow up question are often asked.
-    """
-    return False
 
 # main
 if __name__ == "__main__":
