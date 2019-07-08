@@ -68,8 +68,7 @@ def make_palin(s):
         return ps + s
     elif spr == n - 1:
         # append all characters from 0 to spl - 1 to the rear of s + return
-        for i in range(spl):
-            ps = s[i] + ps
+        for i in range(spl): ps = s[i] + ps
         return s + ps
     # else
     # if the left end is lower lexicographically (forward vs reverse string)
