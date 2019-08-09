@@ -76,7 +76,7 @@ def find_word(mat, wd):
 # main
 if __name__ == "__main__":
     func = find_word
-    # problem inputs
+    # problem inputs; answers are True, True
     mat = [['F', 'A', 'C', 'I'],
            ['O', 'B', 'Q', 'P'],
            ['A', 'N', 'O', 'B'],
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     wb = "MASS"
     ufunc_eval(func, mat, wa)
     ufunc_eval(func, mat, wb)
-    # more inputs
+    # more inputs; answers are True, True, True, False
     mat = [['a', 'h', 'f', 'c', 't'],
            ['c', 's', 'r', 'h', 'a'],
            ['a', 'r', 'a', 'e', 'h'],
