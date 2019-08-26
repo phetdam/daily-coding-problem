@@ -27,7 +27,10 @@ from ufunc_eval import ufunc_eval
 
 def all_maps(mp, s):
     """
-    poop
+    given a dict where keys are string digits and each value is a list of
+    characters that the digit can map to, and a string of digits, returns a list
+    of all the possible character mapping the digit string can map to. the only
+    tricky part was figuring out how to print all the different permutations.
     """
     assert (mp is not None) and (s is not None) and len(s) > 0
     # get length of string
