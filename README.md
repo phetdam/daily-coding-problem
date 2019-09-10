@@ -1,6 +1,6 @@
-![./dcp_banner.png](./dcp_banner.png)
-
 # daily coding problem
+
+![./dcp_banner.png](./dcp_banner.png)
 
 by Derek Huang
 
