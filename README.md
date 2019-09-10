@@ -1,4 +1,4 @@
-![./dcp_logo.png](./dcp_logo.png)
+![./dcp_banner.png](./dcp_banner.png)
 
 # daily coding problem
 
