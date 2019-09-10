@@ -1,8 +1,10 @@
+![./dcp_logo.png](./dcp_logo.png)
+
 # daily coding problem
 
 by Derek Huang
 
-_last updated: 06-08-2019_  
+_last updated: 09-10-2019_  
 _file created: 06-03-2019_
 
 This directory contains (mostly Python) solutions to problems from Daily Coding Problem.
