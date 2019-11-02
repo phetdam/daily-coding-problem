@@ -6,7 +6,9 @@
 #
 # initial creation. got a little fancy with this one; beyond answering the
 # question i also created a toy class to implement a random variable and have
-# some driver code that procues two pretty plots that verify the answers.
+# some driver code that procues two pretty plots that verify the answers. had
+# to change the figure size a couple of times since my original 16 x 8 in.
+# figure was not fully displaying on github correctly.
 
 __doc__ = """
 This problem was asked by Triplebyte.
@@ -81,22 +83,20 @@ if __name__ == "__main__":
     # seconds to run due to the importing of seaborn and matplotlib
     n = 60000
     # make a figure with multiple subplots
-    fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (6, 3))
+    fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (10, 4.5))
     # problem input
     vals, probs = [1, 2, 3, 4], [0.1, 0.5, 0.2, 0.2]
     drv = discrete_rv(vals = vals, probs = probs)
     # plot histogram on corresponding axis with axis label
     sns.distplot(n_realize(drv, n), hist = True, kde = False, bins = 4,
                  hist_kws = {"edgecolor": "black"}, ax = axs[0],
-                 axlabel = ("problem input, vals = {0}, probs = {1}"
-                            "").format(vals, probs))
+                 axlabel = "problem input. probs = {0}".format(probs))
     # another random variable; biased dice roll
     vals, probs = [1, 2, 3, 4, 5, 6], [0.35, 0.3, 0.15, 0.1, 0.05, 0.05]
     drv = discrete_rv(vals = vals, probs = probs)
     # plot histogram on corresponding axis with axis label
     sns.distplot(n_realize(drv, n), hist = True, kde = False, bins = 6,
                  hist_kws = {"edgecolor": "black"}, ax = axs[1],
-                 axlabel = ("biased die, vals = {0}, probs = {1}"
-                            "").format(vals, probs))
+                 axlabel = "biased die. probs = {0}".format(probs))
     # save figure
     fig.savefig("drv_plots.png")
