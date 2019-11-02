@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # seconds to run due to the importing of seaborn and matplotlib
     n = 60000
     # make a figure with multiple subplots
-    fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (16, 8))
+    fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (8, 4))
     # problem input
     vals, probs = [1, 2, 3, 4], [0.1, 0.5, 0.2, 0.2]
     drv = discrete_rv(vals = vals, probs = probs)
