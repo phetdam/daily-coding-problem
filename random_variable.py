@@ -2,11 +2,15 @@
 #
 # Changelog:
 #
+# 11-04-2019
+#
+# changed a type in the change log comments below. just happened to notice.
+#
 # 11-02-2019
 #
 # initial creation. got a little fancy with this one; beyond answering the
 # question i also created a toy class to implement a random variable and have
-# some driver code that procues two pretty plots that verify the answers. had
+# some driver code that produces two pretty plots that verify the answers. had
 # to change the figure size a couple of times since my original 16 x 8 in.
 # figure was not fully displaying on github correctly.
 
