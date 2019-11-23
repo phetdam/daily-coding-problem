@@ -13,4 +13,4 @@ Any errors are wholly my own. I make clear when I needed help on a problem and u
 
 *Tip for finding problems:* Use the `F3` key or `C-f` (`Ctrl-f`) and search by the problem number to find specific problems by the text of the commit message. However, the first six problems have the same commit message, "added first 6 problems i got from daily coding problem", so you will have to find them by hand. The first 6 problems are, in alphabetical order, with problem number in parentheses for your convenience,
 
-* `bt_serialize.py` (#3), `ksum.py` (#1), `missing_int`.py (#4), `pair.py` (#5), `xonesum.py` (#2), `xorll.py` (#6)
+* `bt_serialize.py` (#3), `ksum.py` (#1), `missing_int.py` (#4), `pair.py` (#5), `xonesum.py` (#2), `xorll.py` (#6)
