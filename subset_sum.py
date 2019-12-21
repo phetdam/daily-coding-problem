@@ -2,6 +2,13 @@
 #
 # Changelog:
 #
+# 12-21-2019
+#
+# edited changelog to make note of initial creation date, which was not listed
+# originally. i had to use the commit date to figure out the date of creation.
+#
+# 08-09-2019
+#
 # initial creation. this one took me forever to do initially because i didn't
 # remember how to do dp subset sum, but after some thinking, i got it. to do the
 # backtracking for the actual elements, i used the fact that the lookup array
