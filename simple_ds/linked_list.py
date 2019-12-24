@@ -39,10 +39,11 @@ def traverse(head):
     want to return elements as a list, use ll2ar instead.
     """
     fname = traverse.__name__
+    # trivial return
+    if head is None: return "empty list"
     # check type
     if not isinstance(head, ll_node):
         raise TypeError("{0}: head must be of type ll_node".format(fname))
-    if head is None: return "empty list"
     outs = ""
     sep = " ~> "
     cur = head
@@ -57,8 +58,14 @@ def ar2ll(ar):
     converts a list of elements into a linked list with insertion order being
     the original order of the list elements. if you want to get the original
     list of elements again, use the ll2ar function. can also work on iterables.
+    if None is passed, None will be returned with a warning.
     """
     fname = ar2ll.__name__
+    # warn if None
+    if ar is None:
+        print("{0}: warning: None passed, None returned".format(fname),
+              file = stderr)
+        return None
     # if not iterable, raise TypeError
     if "__iter__" not in dir(ar):
         raise TypeError("{0}: ar must be an iterable".format(fname))
@@ -84,12 +91,13 @@ def ll2ar(head):
     order. if None is passed, then an empty list is returned.
     """
     fname = traverse.__name__
+    # return empty list if None
+    if head is None: return []
     # check type
     if not isinstance(head, ll_node):
         raise TypeError("{0}: head must be of type ll_node".format(fname))
     # output list
     outl = []
-    if head is None: return outl
     # add all elements to outl and return
     cur = head
     while cur is not None:
