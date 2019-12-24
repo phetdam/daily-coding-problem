@@ -4,10 +4,10 @@
 
 by Derek Huang
 
-_last updated: 11-23-2019_  
+_last updated: 12-23-2019_  
 _file created: 06-03-2019_
 
-This directory contains (mostly Python) solutions to problems from Daily Coding Problem.
+This directory contains (mostly Python) solutions to problems from Daily Coding Problem, as well a package `simple_ds` that has simple implementations of common data structures and related helpful functions. `simple_ds` was created on 12-23-2019 for the purpose of streamlining the problem solving process in the spirit of `sol_template.py`. See the `README` for `simple_ds` in the package directory for more details on the package.
 
 Any errors are wholly my own. I make clear when I needed help on a problem and used or derived inspiration from someone else's solution. Most of the solutions are all in Python; each is well documented (with a `__doc__` string) and save for the first problem all in the standard format specified by `sol_template.py`.
 
