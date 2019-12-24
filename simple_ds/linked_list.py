@@ -13,7 +13,7 @@
 # from LinkedList.py to linked_list.py since i hate case changes.
 
 __doc__ = """
-simple_ds.LinkedList: module containing simple implementations of linked lists
+simple_ds.linked_list: module containing simple implementations of linked lists
 for software engineering interviews, and related helpful functions.
 """
 from sys import stderr
