@@ -17,6 +17,12 @@ annoying problem once and for all, and this is the result.
 
 contents
 
+binary_tree.py:
+
+    contains a simple binary tree implementation and a function to return the
+    elements of the tree as a list, with options for different orderings such as
+    inorder, preorder, postorder, and level order/breadth first traversal.
+
 linked_list.py:
 
     contains a simple singly-linked list implementation, a function to traverse
