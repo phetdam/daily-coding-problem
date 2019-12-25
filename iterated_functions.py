@@ -2,6 +2,10 @@
 #
 # Changelog:
 #
+# 12-25-2019
+#
+# corrected typo in docstring for make_functions. i meant does not, not does.
+#
 # 12-23-2019
 #
 # initial creation. there is a similar problem that was asked by dropbox, but i
@@ -39,7 +43,7 @@ from ufunc_eval import ufunc_eval
 
 def make_functions():
     """
-    the original function given in the problem. it does print "1\n2\n3\n" as
+    the original function given in the problem. it does not print "1\n2\n3\n" as
     expected, but rather "3\n3\n3\n" since i is not garbage collected.
     """
     flist = []
