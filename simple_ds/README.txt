@@ -1,5 +1,5 @@
+last updated:     12-25-2019
 initial creation: 12-23-2019
-last updated:     12-23-2019
 
 simple_ds: simple data structure implementations for hassle-free software
            engineering inverview preparation
@@ -19,9 +19,12 @@ contents
 
 binary_tree.py:
 
-    contains a simple binary tree implementation and a function to return the
+    contains a simple binary tree implementation, a function to return the
     elements of the tree as a list, with options for different orderings such as
-    inorder, preorder, postorder, and level order/breadth first traversal.
+    inorder, preorder, postorder, and level order/breadth first traversal, and a
+    function that allows the creation of binary trees of arbitrary size  with
+    elements filled from left to right, with the option to pass a function
+    specifying how to generate values for each of the nodes.
 
 linked_list.py:
 
