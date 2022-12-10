@@ -1,0 +1,6 @@
+# ignore Windows build artifacts
+**/*.exe
+**/*.ilk
+**/*.pdb
+# ignore __pycache__
+**/*__pycache__
