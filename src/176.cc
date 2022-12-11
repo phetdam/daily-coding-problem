@@ -61,11 +61,11 @@ using pair_type = std::pair<input_type, result_type>;
 /**
  * Test fixture class for parametrized testing.
  */
-class Daily176Test : public ::testing::TestWithParam<pair_type> {};
+class DailyTest176 : public ::testing::TestWithParam<pair_type> {};
 
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
-  Daily176Test,
+  DailyTest176,
   ::testing::Values(
     pair_type{{"abc", "bcd"}, true},
     pair_type{{"foo", "bar"}, false}
@@ -74,7 +74,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
-  Daily176Test,
+  DailyTest176,
   ::testing::Values(
     // 3 unique chars per string, different lengths
     pair_type{{"sdsdsooooo", "ppappaaaajjjj"}, true},
@@ -87,7 +87,7 @@ INSTANTIATE_TEST_SUITE_P(
 /**
  * Test that `bijective_map` works correctly.
  */
-TEST_P(Daily176Test, ParamTest)
+TEST_P(DailyTest176, ParamTest)
 {
   const auto& input = GetParam().first;
   const auto& output = GetParam().second;

@@ -7,11 +7,33 @@ project(
     LANGUAGES CXX
 )
 
+# default build type Debug
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(GTest 1.10 REQUIRED)
-include(Googletest)
-enable_testing()
+# compiler-specific options
+if(MSVC)
+    add_compile_options(/Wall)
+    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL Release)
+        add_compile_options(/O0 /DEBUG)
+    endif()
+else()
+    add_compile_options(-Wall)
+    if(NOT ${CMAKE_BUILD_TYPE} EQUAL Release)
+        add_compile_options(-O3)
+    else()
+        add_compile_options(-ggdb -O0)
+    endif()
+endif()
 
-add_subdirectory(src)
+find_package(GTest 1.10 REQUIRED)
+
+# path to src directory
+set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+add_subdirectory(${PDDCP_SRC_DIR})
+add_subdirectory(test)
