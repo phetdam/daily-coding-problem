@@ -7,3 +7,5 @@
 # ignore build directorires
 build
 build_windows
+# ignore VS Code settings
+.vscode
