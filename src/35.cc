@@ -19,6 +19,15 @@
 
 namespace {
 
+/**
+ * Swapping function.
+ *
+ * @tparam V_t *SequenceContainer*
+ *
+ * @param v *SequenceContainer* to perform swap for
+ * @param i first swap index
+ * @param j second swap index
+ */
 template <typename V_t>
 inline void swap(V_t& v, typename V_t::size_type i, typename V_t::size_type j)
 {
@@ -27,6 +36,17 @@ inline void swap(V_t& v, typename V_t::size_type i, typename V_t::size_type j)
   v[j] = t;
 }
 
+/**
+ * Segregate a *SequenceContainer* of `char` RGB into R, G, B ordered sections.
+ *
+ * This is done in linear time by noting that all we need to do is first make
+ * one linear pass to put all Rs in the front and then another linear pass in
+ * reverse to put all the Bs in the back. By default, Gs go into middle.
+ *
+ * @tparam V_t *SequenceContainer* with `value_type = char`
+ *
+ * @param rgb *SequenceContainer* of RGB `char` to perform segregation on.
+ */
 template <typename V_t>
 V_t rgb_segregate(const V_t& rgb)
 {
