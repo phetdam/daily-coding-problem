@@ -4,3 +4,6 @@
 **/*.pdb
 # ignore __pycache__
 **/*__pycache__
+# ignore build directorires
+build
+build_windows
