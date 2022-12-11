@@ -1,5 +1,8 @@
 /**
  * @file 35.cc
+ * @author Derek Huang
+ * @brief #35 from Daily Coding Problem
+ * @copyright MIT License
  *
  * This problem was asked by Google.
  *
@@ -10,31 +13,15 @@
  * 'R', 'G'], it should become ['R', 'R', 'R', 'G', 'G', 'B', 'B'].
  */
 
+#include <algorithm>
 #include <cstddef>
-#include <exception>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 namespace {
-
-/**
- * Swapping function.
- *
- * @tparam V_t *SequenceContainer*
- *
- * @param v *SequenceContainer* to perform swap for
- * @param i first swap index
- * @param j second swap index
- */
-template <typename V_t>
-inline void swap(V_t& v, typename V_t::size_type i, typename V_t::size_type j)
-{
-  auto t = v[i];
-  v[i] = v[j];
-  v[j] = t;
-}
 
 /**
  * Segregate a *SequenceContainer* of `char` RGB into R, G, B ordered sections.
@@ -61,12 +48,12 @@ V_t rgb_segregate(const V_t& rgb)
   // move all the Rs to the beginning of the array
   for (size_type i = 0; i < n; i++)
     if (rgb_seg[i] == 'R')
-      swap(rgb_seg, i, ii++);
+      std::swap(rgb_seg[i], rgb_seg[ii++]);
   // move all the Bs to the end of the array
   ii = n - 1;
   for (diff_type i = n - 1; i >= 0; i--)
     if (rgb_seg[i] == 'B')
-      swap(rgb_seg, i, ii--);
+      std::swap(rgb_seg[i], rgb_seg[ii--]);
   return rgb_seg;
 }
 
