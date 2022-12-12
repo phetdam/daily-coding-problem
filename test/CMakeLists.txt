@@ -5,6 +5,7 @@ enable_testing()
 add_executable(
     pddcp_test
     ${PDDCP_SRC_DIR}/35.cc
+    ${PDDCP_SRC_DIR}/51.cc
     ${PDDCP_SRC_DIR}/176.cc
 )
 target_link_libraries(pddcp_test GTest::gtest_main)
