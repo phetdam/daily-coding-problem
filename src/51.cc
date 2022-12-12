@@ -74,28 +74,15 @@ std::vector<IntType> permute(const std::vector<IntType>& deck, Rng rng)
  * @tparam IntType Integral type for a card's value
  *
  * @param deck `IntType` vector representing the deck
- * @param seed Seed value for the Mersenne Twister
+ * @param seed Seed value for the Mersenne Twister. If not specified, the
+ *  default value is retrieved using `std::random_device{}()`.
  */
 template <typename IntType>
 inline std::vector<IntType> permute(
-  const std::vector<IntType>& deck, std::uint_fast32_t seed)
+  const std::vector<IntType>& deck,
+  std::uint_fast32_t seed = std::random_device{}())
 {
   return permute(deck, std::mt19937{seed});
-}
-
-/**
- * Return a deck of cards shuffled in O(N) complexity through swaps.
- *
- * Uses the 32-bit Mersenne Twister as PRNG and `std::random_device` to seed.
- *
- * @tparam IntType Integral type for a card's value
- *
- * @param deck `IntType` vector representing the deck
- */
-template <typename IntType>
-inline std::vector<IntType> permute(const std::vector<IntType>& deck)
-{
-  return permute(deck, std::random_device{}());
 }
 
 // convenience type aliases
