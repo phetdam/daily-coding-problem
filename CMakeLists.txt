@@ -44,4 +44,6 @@ include(AddGTestStandalone)
 set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(${PDDCP_SRC_DIR})
+
+enable_testing()
 add_subdirectory(test)
