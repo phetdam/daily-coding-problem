@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 add_executable(
     pddcp_test
+    ${PDDCP_SRC_DIR}/7.cc
     ${PDDCP_SRC_DIR}/15.cc
     ${PDDCP_SRC_DIR}/35.cc
     ${PDDCP_SRC_DIR}/51.cc
