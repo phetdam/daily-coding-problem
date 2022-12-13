@@ -33,6 +33,12 @@ namespace {
  * sampled in [-1, 1] x [-1, 1] that fall in the unit circle, divide that by
  * the number of points sampled, and multiply by 4 to estimate pi.
  *
+ * It's possible to split the main loop counting the "inside" points into a
+ * separate routine and split the total number of samples amongst several calls
+ * to this routine amongst different threads. The returned counts can be added,
+ * divided by `n_samples`, and multiplied by 4 to again estimate pi. However,
+ * parallel work of course gives better runtime for large `n_samples`.
+ *
  * @tparam UintType unsigned integral type
  * @tparam Rng *UniformRandomBitGenerator*
  *
