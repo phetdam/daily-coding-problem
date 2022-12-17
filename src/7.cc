@@ -35,16 +35,16 @@ namespace detail {
  * number of decoding possibilities from the `n - 2` message.
  *
  * @tparam CharContainer *Container* with `char` as the `value_type`
- * @tparam UintType unsigned integral type
+ * @tparam UIntType unsigned integral type
  *
  * @param message `char` *Container* message to decode
  * @param length message length, must be <= `message.size()` (unchecked)
  */
-template <typename CharContainer, typename UintType>
-UintType possible_decodings_r(const CharContainer& message, UintType length)
+template <typename CharContainer, typename UIntType>
+UIntType possible_decodings_r(const CharContainer& message, UIntType length)
 {
   static_assert(std::is_same_v<typename CharContainer::value_type, char>);
-  static_assert(std::is_unsigned_v<UintType>);
+  static_assert(std::is_unsigned_v<UIntType>);
   // only one way to decode an empty string
   if (!length || length == 1)
      return 1;
@@ -65,22 +65,22 @@ UintType possible_decodings_r(const CharContainer& message, UintType length)
  * `possible_decodings_r` for an explanation of the recursive strategy.
  *
  * @tparam CharContainer *Container* with `char` as the `value_type`
- * @tparam UintType unsigned integral type
+ * @tparam UIntType unsigned integral type
  *
  * @param message `char` *Container* message to decode
  * @param length message length, must be <= `message.size()` (unchecked)
  * @param cache cache for storing intermediate calculations
  */
-template <typename CharContainer, typename UintType>
-UintType possible_decodings_dp(
+template <typename CharContainer, typename UIntType>
+UIntType possible_decodings_dp(
   const CharContainer& message,
-  UintType length,
-  std::unordered_map<UintType, UintType>& cache)
+  UIntType length,
+  std::unordered_map<UIntType, UIntType>& cache)
 {
   static_assert(std::is_same_v<typename CharContainer::value_type, char>);
-  static_assert(std::is_unsigned_v<UintType>);
-  // we would like the UintType to be able to index into the Container
-  static_assert(std::is_convertible_v<UintType, typename CharContainer::size_type>);
+  static_assert(std::is_unsigned_v<UIntType>);
+  // we would like the UIntType to be able to index into the Container
+  static_assert(std::is_convertible_v<UIntType, typename CharContainer::size_type>);
   // note addition of writing value to cache
   if (!length || length == 1) {
     cache[length] = 1;

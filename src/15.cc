@@ -39,20 +39,20 @@ namespace {
  * divided by `n_samples`, and multiplied by 4 to again estimate pi. However,
  * parallel work of course gives better runtime for large `n_samples`.
  *
- * @tparam UintType unsigned integral type
+ * @tparam UIntType unsigned integral type
  * @tparam Rng *UniformRandomBitGenerator*
  *
  * @param n_samples Number of random samples to draw
  * @param rng *UniformRandomBitGenerator* PRNG instance
  */
-template <typename UintType, typename Rng>
-double mcpi(UintType n_samples, Rng rng)
+template <typename UIntType, typename Rng>
+double mcpi(UIntType n_samples, Rng rng)
 {
-  static_assert(std::is_integral_v<UintType>);
+  static_assert(std::is_integral_v<UIntType>);
   std::uniform_real_distribution udist{-1., 1.};
   double x, y;
-  UintType n_inside = 0;
-  for (UintType i = 0; i < n_samples; i++) {
+  UIntType n_inside = 0;
+  for (UIntType i = 0; i < n_samples; i++) {
     x = udist(rng);
     y = udist(rng);
     if (x * x + y * y <= 1) n_inside++;
@@ -65,15 +65,15 @@ double mcpi(UintType n_samples, Rng rng)
  *
  * Uses the 32-bit Mersenne Twister as the PRNG.
  *
- * @tparam UintType unsigned integral type
+ * @tparam UIntType unsigned integral type
  *
  * @param n_samples Number of random samples to draw
  * @param seed Seed for the 32-bit Mersenne Twister, if not specified then
  *  `std::random_device{}()` is used to generate a seed.
  */
-template <typename UintType>
+template <typename UIntType>
 inline double mcpi(
-  UintType n_samples, std::uint_fast32_t seed = std::random_device{}())
+  UIntType n_samples, std::uint_fast32_t seed = std::random_device{}())
 {
   return mcpi(n_samples, std::mt19937{seed});
 }
@@ -83,7 +83,7 @@ inline double mcpi(
  *
  * Just to check that the `mcpi` function template works as expected.
  */
-template <typename UintType>
+template <typename UIntType>
 class DailyTest15 : public ::testing::Test {
 protected:
 // if we use C++20, we can use the exact value of pi
@@ -93,7 +93,7 @@ protected:
   static inline const double pi_{4 * std::atan(1.)};
 #endif  // __cplusplus < 202002L
   // ballpark minimum of samples needed to get within current tol_
-  static inline const UintType n_samples_ = 200000;
+  static inline const UIntType n_samples_ = 200000;
   // up to 3 decimals places -> 1e-3 tolerance
   static constexpr double tol_ = 1e-3;
   static inline const std::uint_fast32_t seed_{88};
