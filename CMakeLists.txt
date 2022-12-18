@@ -19,9 +19,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(MSVC)
     # MSVC doesn't report __cplusplus correctly unless you specify
     # /Zc:__cplusplus; it used to always be 199711L regardless of standard
-    add_compile_options(/Wall /Zc:__cplusplus)
+    add_compile_options(
+        /Wall /Zc:__cplusplus
+        # for Google Test ::testing::Test subclasses, these are reported a lot,
+        # i.e. for implicitly deleted copy/move ctor + operator=
+        /wd4625 /wd4626 /wd5026 /wd5027
+        # Google Test gtest-param-util.h triggers these warnings (braced
+        # initialization list eval order, Spectre mitigation)
+        /wd4868 /wd5045
+    )
     if(NOT ${CMAKE_BUILD_TYPE} STREQUAL Release)
-        add_compile_options(/O0 /DEBUG)
+        add_compile_options(/Od /DEBUG)
     endif()
 else()
     add_compile_options(-Wall)
@@ -40,7 +48,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # add pdccp_add_gtest_standalone function
 include(AddGTestStandalone)
 
-# path to src directory
+# path to src directory (we use this later when adding files to test runner)
 set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(${PDDCP_SRC_DIR})

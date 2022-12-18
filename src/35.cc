@@ -48,12 +48,27 @@ V_t rgb_segregate(const V_t& rgb)
   // move all the Rs to the beginning of the array
   for (size_type i = 0; i < n; i++)
     if (rgb_seg[i] == 'R')
+// MSVC complains about signed-unsigned mismatch (ii is signed)
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4365)
+#endif  // _MSC_VER
       std::swap(rgb_seg[i], rgb_seg[ii++]);
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
   // move all the Bs to the end of the array
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4365)
+#endif  // _MSC_VER
   ii = n - 1;
   for (diff_type i = n - 1; i >= 0; i--)
     if (rgb_seg[i] == 'B')
       std::swap(rgb_seg[i], rgb_seg[ii--]);
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
   return rgb_seg;
 }
 

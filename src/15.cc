@@ -57,7 +57,15 @@ double mcpi(UIntType n_samples, Rng rng)
     y = udist(rng);
     if (x * x + y * y <= 1) n_inside++;
   }
+// MSVC complains about implicit conversion resulting in loss of data
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 5219)
+#endif  // _MSC_VER
   return 4. * (static_cast<double>(n_inside) / n_samples);
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif // _MSC_VER
 }
 
 /**

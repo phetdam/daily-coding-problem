@@ -30,6 +30,13 @@
  * Move 1 to 3
  */
 
+// MSVC reports __STDC_WANT_SECURE_LIB__ not defined in limits.h, which it
+// replaces with an #if 0 for the conditional, so we manually suppress this
+#if _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4668)
+#endif  // _MSC_VER
+
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
@@ -37,6 +44,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
 
 namespace {
 
@@ -120,7 +131,15 @@ using pair_type = std::pair<input_type, result_type>;
 /**
  * Test fixture class for parametrized testing.
  */
+// MSVC complains about move, copy ctors + operator= implicitly being deleted
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4625 4626 5026 5027)
+#endif  // _MSC_VER
 class DailyTest128 : public ::testing::TestWithParam<pair_type> {};
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
 
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
@@ -137,20 +156,31 @@ INSTANTIATE_TEST_SUITE_P(
   )
 );
 
+// for larger numbers of disks, we add extra cases without output comparison.
+// we need to duplicate the GoogleTest macro call, otherwise MSVC errors out.
+// GCC allows us to insert the preprocessor directives in the middle of the
+// ::testing::Values call, but MSVC does not like that at all.
+#ifdef PDDCP_GTEST_STANDALONE
+INSTANTIATE_TEST_SUITE_P(
+  CustomPairs,
+  DailyTest128,
+  ::testing::Values(
+    pair_type{1, {1, "Move 1 to 3\n"}},
+    pair_type{2, {3, "Move 1 to 2\nMove 1 to 3\nMove 2 to 3\n"}},
+    pair_type{7, {127, ""}},
+    pair_type{11, {2047, ""}}
+  )
+);
+#else
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
   DailyTest128,
   ::testing::Values(
     pair_type{1, {1, "Move 1 to 3\n"}},
     pair_type{2, {3, "Move 1 to 2\nMove 1 to 3\nMove 2 to 3\n"}}
-// for larger numbers of disks, we add extra cases without output comparison
-#ifdef PDDCP_GTEST_STANDALONE
-  ,
-  pair_type{7, {127, ""}},
-  pair_type{11, {2047, ""}}
-#endif  // PDDCP_GTEST_STANDALONE
   )
 );
+#endif  // PDDCP_GTEST_STANDALONE
 
 /**
  * Test that `tower_of_hanoi` works correctly.
