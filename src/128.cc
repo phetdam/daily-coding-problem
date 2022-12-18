@@ -131,15 +131,7 @@ using pair_type = std::pair<input_type, result_type>;
 /**
  * Test fixture class for parametrized testing.
  */
-// MSVC complains about move, copy ctors + operator= implicitly being deleted
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable: 4625 4626 5026 5027)
-#endif  // _MSC_VER
 class DailyTest128 : public ::testing::TestWithParam<pair_type> {};
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif  // _MSC_VER
 
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
