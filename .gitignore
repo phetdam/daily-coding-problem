@@ -9,3 +9,5 @@ build
 build_windows
 # ignore VS Code settings
 .vscode
+# ignore top-level CMake testing directory
+/Testing
