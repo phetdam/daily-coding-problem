@@ -2,6 +2,7 @@
  * @file 128.cc
  * @author Derek Huang
  * @brief #128 from Daily Coding Problem
+ * @copyright MIT License
  *
  * The Tower of Hanoi is a puzzle game with three rods and n disks, each a
  * different size. All the disks start off on the first rod in a stack. They

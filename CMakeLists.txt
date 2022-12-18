@@ -61,6 +61,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # add pdccp_add_gtest_standalone function
 include(AddGTestStandalone)
 
+# path to include directory (include is a reserved CMake keyword)
+set(PDDCP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${PDDCP_INCLUDE_DIR})
 # path to src directory (we use this later when adding files to test runner)
 set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
