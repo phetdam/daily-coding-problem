@@ -56,6 +56,23 @@ std::ostream& operator<<(std::ostream& stream, hanoi_rod e)
   return stream;
 }
 
+/**
+ * Plays through the Tower of Hanoi game using a recursive solution.
+ *
+ * The idea is that for an n-disk problem, we first move the n - 1 disks on top
+ * to the auxiliary rod, move the nth (the largest) disk to the goal rod, and
+ * then move the n - 1 disks from the auxiliary to the goal rod.
+ *
+ * @tparam UIntType unsigned integral type
+ *
+ * @param n_disks number of disks
+ * @param start starting rod
+ * @param aux auxiliary rod
+ * @param goal goal rod
+ * @param stream stream to print moves to, if not specified is `std::cout`
+ *
+ * @returns number of moves used, should be 2^n - 1.
+ */
 template <typename UIntType>
 std::size_t tower_of_hanoi(
   UIntType n_disks,
@@ -76,6 +93,16 @@ std::size_t tower_of_hanoi(
   return 1 + n_moves + tower_of_hanoi(n_disks - 1, aux, start, goal, stream);
 }
 
+/**
+ * Plays through the Tower of Hanoi game using a recursive solution.
+ *
+ * @tparam UIntType unsigned integral type
+ *
+ * @param n_disks number of disks
+ * @param stream stream to print moves to, if not specified is `std::cout`
+ *
+ * @returns number of moves used, should be 2^n - 1.
+ */
 template <typename UIntType>
 inline std::size_t tower_of_hanoi(
   UIntType n_disks, std::ostream& stream = std::cout)
@@ -116,15 +143,32 @@ INSTANTIATE_TEST_SUITE_P(
   ::testing::Values(
     pair_type{1, {1, "Move 1 to 3\n"}},
     pair_type{2, {3, "Move 1 to 2\nMove 1 to 3\nMove 2 to 3\n"}}
+// for larger numbers of disks, we add extra cases without output comparison
+#ifdef PDDCP_GTEST_STANDALONE
+  ,
+  pair_type{7, {127, ""}},
+  pair_type{11, {2047, ""}}
+#endif  // PDDCP_GTEST_STANDALONE
   )
 );
 
+/**
+ * Test that `tower_of_hanoi` works correctly.
+ */
 TEST_P(DailyTest128, ParamTest)
 {
   const auto& [expected_n_moves, expected_output] = GetParam().second;
   std::stringstream stream;
   EXPECT_EQ(expected_n_moves, tower_of_hanoi(GetParam().first, stream));
+// don't perform output comparisons if n_disks > 3
+#ifdef PDDCP_GTEST_STANDALONE
+  if (GetParam().first <= 3) {
+#endif  // PDDCP_GTEST_STANDALONE
   EXPECT_EQ(expected_output, stream.str());
+// need braces to avoid warning about ambiguous else
+#ifdef PDDCP_GTEST_STANDALONE
+  }
+#endif  // PDDCP_GTEST_STANDALONE
 }
 
 }  // namespace
