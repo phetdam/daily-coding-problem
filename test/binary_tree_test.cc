@@ -7,6 +7,8 @@
 
 #include "pddcp/binary_tree.h"
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 namespace {
@@ -52,6 +54,8 @@ protected:
     new binary_tree_type{19},
     new binary_tree_type{20, new binary_tree_type{15}, new binary_tree_type{21}}
   };
+  // values that can be inserted into root_ for testing insert
+  static inline const std::vector<value_type> extra_values_{1, 5, 12, 20, 15};
 };
 
 /**
@@ -158,6 +162,17 @@ TEST_F(BinaryTreeTest, CheckTest)
   // but g_root_2_ and g_root_3_ are not roots for binary search trees
   EXPECT_FALSE(pddcp::bst::check(&g_root_2_));
   EXPECT_FALSE(pddcp::bst::check(&g_root_3_));
+}
+
+/**
+ * Test that the multiple `insert` overload produces binary search trees.
+ *
+ * This is indirectly tested in InsertSingleTest and InsertMultipleTest, but we
+ * use a separate test case since `extra_values_` has a bit more values.
+ */
+TEST_F(BinaryTreeTest, CheckInsertMultipleTest)
+{
+  EXPECT_TRUE(pddcp::bst::check(pddcp::bst::insert(&root_, extra_values_)));
 }
 
 }  // namespace
