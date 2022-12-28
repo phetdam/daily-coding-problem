@@ -1,101 +1,96 @@
 /**
- * xorll.c
+ * @file xorll/xorll.c
+ * @author Derek Huang
+ * @brief C XOR linked list implementation
+ * @copyright MIT License
  *
- * implementation of a simple xor linked list. for simplicity we assume that it
- * is only capable of storing integer data. note that stdint.h is required to
- * include a declared type that can store the int value of a pointer.
+ * Implementation of a simple XOR linked list that can only take doubles for
+ * simplicity since thsi is an interview question.
  *
  * Changelog:
  *
- * 06-09-2019
+ * 2022-12-27
+ *  Modernization. I have become a much better C/C++ programmer since.
  *
- * fixed a single piece of spacing. hmm.
+ * 2019-06-09
+ *  Fixed a single piece of spacing. Hmm.
  *
- * 06-08-2019
- *
- * initial creation. see xorll.py for the question statement. added all the
- * necessary append and get (by index) functions required by the question,
- * as well as constructors for the xorll and xor_node.
+ * 2019-06-08
+ *  Initial creation. See xorll.py for the question statement. Added all the
+ *  necessary append and get (by index) functions required by the question,
+ *  as well as constructors for the xorll and xor_node.
  */
 
-#include <stdio.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "xorll.h"
+#include "pddcp/xorll/xorll.h"
 
-/* constructor for the xorll; returns xorll * */
-xorll *xorll__new(void) {
-    xorll *xll;
-    xll = (xorll *) malloc(sizeof(xorll));
-    xll->head = xll->tail = NULL;
-    xll->siz = 0;
-    return xll;
+/**
+ * Append a new XOR linked list node.
+ *
+ * @param xll Original XOR linked list
+ * @param value New node value
+ * @returns `PDDCP_XORLL_OK` on success, `PDDCP_XORLL_ERR_*` otherwise.
+ */
+pddcp_xorll_error
+pddcp_xorll_append(pddcp_xorll *xll, double value)
+{
+  if (!xll)
+    return PDDCP_XORLL_ERR_POINTER_NULL;
+  // make new XOR node
+  pddcp_xor_node *xn = pddcp_xor_node_alloc(value);
+  if (!xn)
+    return PDDCP_XORLL_ERR_MALLOC_NULL;
+  // if list is empty, set both the head and tail pointer
+  if (!xll->n_nodes) {
+    xll->head = xll->tail = xn;
+    xll->n_nodes = 1;
+    return PDDCP_XORLL_OK;
+  }
+  // otherwise, we need to modify tail's both field. since a ^ 0 = a,
+  // tail->both is just the address of tail's previous node (next is NULL). in
+  // the case where xll->n_nodes == 1, head == tail, with head->both and
+  // tail->both both NULL, so we just need to set xll->tail->both to xn.
+  uintptr_t both = (uintptr_t) xll->tail->both ^ (uintptr_t) xn;
+  xll->tail->both = (pddcp_xor_node *) both;
+  // we set xn->both to be tail ^ 0, which is tail, and update tail and n_nodes
+  xn->both = xll->tail;
+  xll->tail = xn;
+  xll->n_nodes++;
+  return PDDCP_XORLL_OK;
 }
-/* constructor for the xor_node; returns xor_node *, requires int */
-xor_node *xor_node_new(int val) {
-    xor_node *xn;
-    xn = (xor_node *) malloc(sizeof(xor_node));
-    xn->both = NULL;
-    xn->data = val;
-    return xn;
-}
-/* appends a node to the end of an xor linked list. requires xorll *, int. */
-void xorll__append(xorll *xll, int val) {
-    if (xll == NULL) {
-	fprintf(stderr, "%s: error: xorll * expected, NULL received\n", \
-		XORLL__APPEND_N);
-	exit(1);
-    }
-    // make new xor_node
-    xor_node *xn;
-    xn = xor_node_new(val);
-    /* if the xll is empty, head and tail pointers will both be NULL, so just
-       check that the tail pointer is NULL. set size to 1. */
-    if (xll->tail == NULL) {
-	xll->head = xll->tail = xn;
-	xll->siz = 1;
-	return;
-    }
-    /* we need to modify tail's both field. since tail->both == tail's prev,
-       we see that tail->both ^ xn == tail's prev ^ xn (tail's next). in the
-       case that there is only one element, xll->tail and xll->head refer to
-       the same thing, and xll->head->both == xll->tail->both == 0, so it is
-       the same as setting xll->tail->both to xn. note that we need to use
-       uintptr_t from stdint.h to have an integer type that is exactly the size
-       of a pointer. */
-    xll->tail->both = (xor_node *) ( \
-	(uintptr_t) xll->tail->both ^ (uintptr_t) xn);
-    // we set xn->both to be tail ^ 0, which is tail.
-    xn->both = xll->tail;
-    // now we set tail to be xn, since it is the new tail
-    xll->tail = xn;
-    // increase size by 1
-    xll->siz = xll->siz + 1;
-}
-/* returns the xor_node * at the given index k in the linked list. */
-xor_node *xorll__getnode(xorll *xll, int k) {
-    if (xll == NULL) {
-	fprintf(stderr, "%s: error: xorll * expected, NULL received\n", \
-		XORLL__GETNODE_N);
-	exit(1);
-    }
-    /* we need prev and cur nodes to traverse xor linked list; old_prev will
-       save the previous value of prev */
-    xor_node *prev, *cur, *old_prev;
-    prev = NULL;
-    cur = xll->head;
-    /* while k > 0 and cur is not NULL (note that if k > number of nodes in xll,
-       NULL will be returned. decrease k after loop comparison */
-    while ((k-- > 0) && (cur != NULL)) {
-	// save the value of prev in old_prev
-	old_prev = prev;
-	// update prev to cur since cur will change soon
-	prev = cur;
-	/* note that since cur->both == prev ^ next, next == prev ^ prev ^ next
-	 since prev ^ prev will be 0, and 0 ^ next will be next. */
-	cur = (xor_node *) ((uintptr_t) old_prev ^ (uintptr_t) cur->both);
-    }
-    // return cur
-    return cur;
+
+/**
+ * Returns the specified node in linked list.
+ *
+ * If the list is `NULL` or contains less than k + 1 nodes, returns an error.
+ *
+ * @param xll Original XOR linked list
+ * @param k Node index
+ * @param out Address to the `pddcp_xor_node *` we write the result to
+ */
+pddcp_xorll_error
+pddcp_xorll_get(pddcp_xorll *xll, size_t k, pddcp_xor_node **out)
+{
+  if (!xll || !out)
+    return PDDCP_XORLL_ERR_POINTER_NULL;
+  if (k >= xll->n_nodes)
+    return PDDCP_XORLL_ERR_OUT_OF_BOUNDS;
+  // previous, current, old previous value of the node address
+  pddcp_xor_node *prev, *cur, *old_prev;
+  prev = NULL;
+  cur = xll->head;
+  // loop until we reach the kth node
+  size_t i = 0;
+  while (cur && i++ < k) {
+    // save the value of prev in old_prev + update prev (cur will change soon)
+    old_prev = prev;
+    prev = cur;
+    // note: cur->both == prev ^ next, next == prev ^ prev ^  next
+    cur = (pddcp_xor_node *) ((uintptr_t) old_prev ^ (uintptr_t) cur->both);
+  }
+  *out = cur;
+  return PDDCP_XORLL_OK;
 }

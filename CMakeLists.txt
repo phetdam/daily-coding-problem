@@ -17,7 +17,7 @@ project(
     pddcp
     VERSION 0.1.0
     DESCRIPTION "Solutions written for Daily Coding Problem exercises"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 # default build type Debug
@@ -69,6 +69,8 @@ include_directories(${PDDCP_INCLUDE_DIR})
 set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(${PDDCP_SRC_DIR})
+# XOR linked list implementation used for #6, also used by legacy Python driver
+add_subdirectory(xorll)
 
 enable_testing()
 add_subdirectory(test)
