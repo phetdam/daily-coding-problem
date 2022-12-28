@@ -36,8 +36,7 @@
 #define HELP_FLAG_SHORT "-h"
 #define HELP_FLAG_LONG "--help"
 #define HELP_STR \
-  "Usage: " PROGNAME " arg1 arg2 ... argn\n" \
-  "       " PROGNAME " [" HELP_FLAG_SHORT " | " HELP_FLAG_LONG "]" \
+  "Usage: " PROGNAME " [" HELP_FLAG_SHORT "] " " arg1 arg2 ... argn" \
   "\n\n" \
   "Takes n integers from the command line. Will initialize an XOR linked\n" \
   "list, print its size, and then print out all the inserted elements in\n" \
@@ -49,7 +48,7 @@
 int
 main(int argc, char **argv)
 {
-  // quick and dirty error parsing
+  // print message if no arguments
   if (argc == 1) {
     fprintf(
       stderr,
@@ -58,8 +57,8 @@ main(int argc, char **argv)
     );
     return EXIT_SUCCESS;
   }
-  else if (argc == 2) {
-    // if one is the help flag, then print the usage information
+  // check if help flag(s) were passed
+  for (int i = 1; i < argc; i++) {
     if (
       !strcmp(argv[1], HELP_FLAG_SHORT) ||
       !strcmp(argv[1], HELP_FLAG_LONG)
@@ -67,14 +66,12 @@ main(int argc, char **argv)
       printf("%s\n", HELP_STR);
       return EXIT_SUCCESS;
     }
-    // else pass
   }
   // get n, the number of arguments, from argc. i is counter
-  size_t n, i;
-  n = argc - 1;
+  size_t n = argc - 1;
   // create new xorll, and append all the elements to it
   pddcp_xorll *xll = pddcp_xorll_alloc();
-  for (i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     // note that any invalid (non-int) args will become 0
     if (pddcp_xorll_append(xll, atoi(argv[i + 1])))
       return EXIT_FAILURE;
@@ -89,7 +86,7 @@ main(int argc, char **argv)
   xll->tail = temp;
   // print elements in reverse order as a space-separated list
   printf("reversed list: ");
-  for (i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     if(pddcp_xorll_get(xll, i, &temp))
       return EXIT_FAILURE;
     printf("%.2g", temp->data);
