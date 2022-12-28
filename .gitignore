@@ -1,6 +1,8 @@
 # ignore Windows build artifacts
+**/*.dll
 **/*.exe
 **/*.ilk
+**/*.lib
 **/*.pdb
 # ignore __pycache__
 **/*__pycache__
@@ -11,3 +13,5 @@ build_windows
 .vscode
 # ignore top-level CMake testing directory
 /Testing
+# ignore xorll driver program name
+/xorll/xorll_driver
