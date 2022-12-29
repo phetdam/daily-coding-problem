@@ -63,5 +63,10 @@ Building from source
 
 TBA. For now, see the comments in the top-level ``CMakeLists.txt``. Note that
 standalone runners built from the sources in ``src`` are compiled with
-``PDDCP_GTEST_STANDALONE`` defined, which may result in extra tests or
-functionality being enabled in each standalone runner.
+``PDDCP_GTEST_STANDALONE`` defined, enabling any code within constructs like
+
+.. code:: cpp
+
+   #ifdef PDDCP_GTEST_STANDALONE
+   // ...
+   #endif  // PDDCP_GTEST_STANDALONE
