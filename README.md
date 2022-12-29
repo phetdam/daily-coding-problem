@@ -5,7 +5,7 @@
 > *Note:* This `README.md` is only relevant for the `legacy` directory and will
 > be renamed to `legacy/README.md` soon.
 
-## Historical note
+## History
 
 Three years ago in 2019, during my sophomore year in college, I first
 subscribed to Daily Coding Problem to get some interview practice. Now that I
