@@ -1,9 +1,6 @@
 # daily coding problem
 
-![./dcp_banner.png](./dcp_banner.png)
-
-> *Note:* This `README.md` is only relevant for the `legacy` directory and will
-> be renamed to `legacy/README.md` soon.
+![../dcp_banner.png](../dcp_banner.png)
 
 ## History
 
