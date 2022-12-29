@@ -41,8 +41,8 @@ Contents
 
 ``test``
    Unit tests for shared code, with a ``CMakeLists.txt`` that also uses the
-   source files from ``src`` to build a overarching `Google Test`_ unit test
-   runner.
+   source files from ``src`` to build an overarching `Google Test`_ unit test
+   runner with all the tests.
 
 ``xorll``
    An XOR linked list C implementation with a driver program used by
