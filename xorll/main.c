@@ -3,7 +3,7 @@
  * @author Derek Huang
  * @brief C XOR linked list main wrapper for running XOR linked list demo
  *
- * Main wrapper for running the xor linked list program. Uses atoi() to take
+ * Main wrapper for running the xor linked list program. Uses atof() to take
  * arguments from the command line as a space-separated list.
  *
  * The program will simply insert the n int arguments into an XOR linked list
@@ -15,7 +15,8 @@
  *
  * 2022-12-27
  *  Modernization. I have become a much better C/C++ programmer since. Includes
- *  stylistic changes to the code and comments and better error handling.
+ *  stylistic changes to the code and comments and better error handling. Also,
+ *  note that atof() is used instead of atoi() now.
  *
  * 2019-06-09
  *  Added changelog and edited header comments; atoi() returns 0 anyways if it
@@ -25,6 +26,7 @@
  *  Initial creation and completion date.
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,11 +44,19 @@
   "list, print its size, and then print out all the inserted elements in\n" \
   "reverse order (head and tail pointers in the list struct are swapped)." \
   "\n\n" \
-  "Note that this program uses atoi(), so don't feed it anything exceeding\n" \
-  "INT_MAX. If any of the arguments are not int, atoi() will return 0."
+  "This program uses atof(), which returns 0.0 if conversion is not possible."
 
-int
-main(int argc, char **argv)
+/**
+ * Check args for help flags.
+ *
+ * If no arguments were provided, i.e. argc == 1, then also prints message.
+ *
+ * @param argc `argc` arg count
+ * @param argv `argv` argument array
+ * @returns `true` if we should exit early, `false` for normal operation
+ */
+static bool
+check_args(int argc, char **argv)
 {
   // print message if no arguments
   if (argc == 1) {
@@ -55,7 +65,7 @@ main(int argc, char **argv)
       "%s: no arguments. type \'%s %s\' for usage\n",
       PROGNAME, PROGNAME, HELP_FLAG_LONG
     );
-    return EXIT_SUCCESS;
+    return true;
   }
   // check if help flag(s) were passed
   for (int i = 1; i < argc; i++) {
@@ -64,23 +74,30 @@ main(int argc, char **argv)
       !strcmp(argv[1], HELP_FLAG_LONG)
     ) {
       printf("%s\n", HELP_STR);
-      return EXIT_SUCCESS;
+      return true;
     }
   }
-  // get n, the number of arguments, from argc. i is counter
+  return false;
+}
+
+int
+main(int argc, char **argv)
+{
+  // return early if we shouldn't run the main program logic
+  if(check_args(argc, argv))
+    return EXIT_SUCCESS;
+  // get n, the number of arguments, from argc
   size_t n = argc - 1;
   // create new xorll, and append all the elements to it
   pddcp_xorll *xll = pddcp_xorll_alloc();
   for (size_t i = 0; i < n; i++) {
-    // note that any invalid (non-int) args will become 0
-    if (pddcp_xorll_append(xll, atoi(argv[i + 1])))
+    if (pddcp_xorll_append(xll, atof(argv[i + 1])))
       return EXIT_FAILURE;
   }
   // print the size of the linked list
   printf("size of XOR linked list at %p: %zu\n", xll, xll->n_nodes);
-  // temp xor_node
+  // temp xor_node + swap head and tail pointers
   pddcp_xor_node *temp;
-  // swap head and tail pointers
   temp = xll->head;
   xll->head = xll->tail;
   xll->tail = temp;
