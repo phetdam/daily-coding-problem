@@ -70,4 +70,14 @@ def xorll_test(exe_name: str, values: List[int]) -> str:
 
 if __name__ == "__main__":
     arr = [3, 4, 2, 34, -2, 43, -98, 11]
-    ufunc_eval(xorll_test, os.path.join(".", "xorll", "xorll_driver"), arr)
+    ufunc_eval(
+        xorll_test,
+        os.path.join(
+            # use absolute path to be independent of calling directory
+            os.path.dirname(os.path.abspath(__file__)),
+            "..",
+            "xorll",
+            "xorll_driver"
+        ),
+        arr
+    )
