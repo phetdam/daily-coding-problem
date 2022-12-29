@@ -84,7 +84,7 @@ int
 main(int argc, char **argv)
 {
   // return early if we shouldn't run the main program logic
-  if(check_args(argc, argv))
+  if (check_args(argc, argv))
     return EXIT_SUCCESS;
   // get n, the number of arguments, from argc
   size_t n = argc - 1;
