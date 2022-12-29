@@ -3,15 +3,16 @@
 ![./dcp_banner.png](./dcp_banner.png)
 
 > *Note:* This `README.md` is only relevant for the `legacy` directory and will
-> be migrated as `legacy/README.md` in the future.
+> be renamed to `legacy/README.md` soon.
 
 ## Historical note
 
 Three years ago in 2019, during my sophomore year in college, I first
 subscribed to Daily Coding Problem to get some interview practice. Now that I
 am a "working adult", I have decided to rework some of these problems just to
-refresh my brain and to practice writing some C++, although I have recently
-cleaned up some legacy C and Python code in this repo as well.
+refresh my brain and to practice writing some C++, which has become my
+preferred language, although I have recently cleaned up some legacy C and
+Python code in this repo as well.
 
 ## About
 
@@ -30,4 +31,4 @@ for the first problem all in the standard format specified by `sol_template.py`.
 *Tip for finding problems:* ~~Use the `F3` key or `C-f` (`Ctrl-f`)~~ Daily
 Coding Problem doesn't really title problems and the numerical order is based
 on when you subscribed, so specific problems are a bit difficult to find. It's
-best to just pick some random numbers out of a hat when browsing.
+best to just pick some random numbers out of a hat when browsing for problems.
