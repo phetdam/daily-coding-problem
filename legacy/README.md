@@ -18,14 +18,15 @@ Problem, as well a package `simple_ds` that has simple implementations of
 common data structures and related helpful functions. `simple_ds` was created
 on 12-23-2019 for the purpose of streamlining the problem solving process in
 the spirit of `sol_template.py`. See the `README` for `simple_ds` in the
-package directory for more details on the package.
+package directory.
 
 Any errors are wholly my own. I make clear when I needed help on a problem and
 used or derived inspiration from someone else's solution. Most of the solutions
 are all in Python; each is well documented (with a `__doc__` string) and save
-for the first problem all in the standard format specified by `sol_template.py`.
+for the first problem all in the standard format specified by
+`sol_template.py`, although in hindsight I could have used a template generator.
 
 *Tip for finding problems:* ~~Use the `F3` key or `C-f` (`Ctrl-f`)~~ Daily
 Coding Problem doesn't really title problems and the numerical order is based
 on when you subscribed, so specific problems are a bit difficult to find. It's
-best to just pick some random numbers out of a hat when browsing for problems.
+best to just pick some random numbers out of a hat.
