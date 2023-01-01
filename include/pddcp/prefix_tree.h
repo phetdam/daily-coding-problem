@@ -8,6 +8,11 @@
 #ifndef PDDCP_PREFIX_TREE_H_
 #define PDDCP_PREFIX_TREE_H_
 
+#include <algorithm>
+#include <memory>
+#include <unordered_map>
+#include <vector>
+
 namespace pddcp {
 
 /**
