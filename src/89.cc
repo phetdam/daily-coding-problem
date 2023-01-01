@@ -90,7 +90,7 @@ protected:
  * Defines a test to check that `pddcp::bst::check` works as expected.
  *
  * Trying to reduce some fingerwork since we have to manually parametrize, as
- * the `binary_tree<T>` is not `constexpr` due to use of `std::unique_ptr`.
+ * the `binary_tree<T>` is not copyable due to use of `std::unique_ptr`.
  *
  * @param n integer case number
  */
@@ -98,7 +98,7 @@ protected:
   TEST_F(DailyTest89, CaseTest ## n) \
   { \
     const auto& [root, truth] = case_ ## n ## _; \
-    EXPECT_EQ(pddcp::bst::check(&root), truth); \
+    EXPECT_EQ(truth, pddcp::bst::check(&root)); \
   }
 
 namespace {
