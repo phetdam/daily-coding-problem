@@ -31,11 +31,11 @@ using pair_type = std::pair<input_type, result_type>;
 /**
  * Test fixture for parametrized unit testing.
  */
-class Daily11Test : public ::testing::TestWithParam<pair_type> {};
+class DailyTest11 : public ::testing::TestWithParam<pair_type> {};
 
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
-  Daily11Test,
+  DailyTest11,
   ::testing::Values(
     pair_type{
       {"de", {"dog", "deer", "deal"}},
@@ -46,7 +46,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
-  Daily11Test,
+  DailyTest11,
   ::testing::Values(
     pair_type{
       {"bre", {"breeze", "brash", "breeder", "brilliant"}},
@@ -66,7 +66,7 @@ INSTANTIATE_TEST_SUITE_P(
 /**
  * Test that `pddcp::trie::autocomplete` works as expected.
  */
-TEST_P(Daily11Test, ParamTest)
+TEST_P(DailyTest11, ParamTest)
 {
   const auto& [prefix, values] = GetParam().first;
   const auto& true_autocomplete = GetParam().second;
