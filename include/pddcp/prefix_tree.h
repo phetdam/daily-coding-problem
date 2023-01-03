@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -64,9 +65,11 @@ public:
   /**
    * Return reference to node pointer associated with key.
    *
+   * Wrapper over `operator[]` of the unordered map.
+   *
    * @param key Search key
    */
-  auto& at(const T& key) { return lookup_.at(key); }
+  auto& at(const T& key) { return lookup_[key]; }
   auto& operator[](const T& key) { return at(key); }
 
   /**
@@ -109,16 +112,17 @@ auto from(const StringContainer& string_container)
   using StringType = typename StringContainer::value_type;
   using TrieType = prefix_tree<StringType>;
   TrieType root;
-  TrieType* temp = &root;
+  auto temp = &root;
   // for each char for each string
   for (const auto& s : string_container) {
     for (const auto& c : s) {
       StringType prefix{c};
-      // build the trie node by node and update temp
+      // build the trie node by node if it doesn't exist
       if (!temp->contains(prefix)) {
         temp->at(prefix) = std::make_unique<TrieType>(prefix);
-        temp = temp->at(prefix).get();
       }
+      // update to continue our insertion
+      temp = temp->at(prefix).get();
     }
     // reset temp
     temp = &root;
@@ -142,8 +146,9 @@ auto contains(prefix_tree<StringType>* root, const StringType& prefix)
   decltype(root) sub_root = root;
   // traverse tree depth until all characters are matched
   for (const auto& c : prefix) {
-    if (sub_root->contains(c))
-      sub_root = sub_root->at(c).get();
+    StringType sub_prefix{c};
+    if (sub_root->contains(sub_prefix))
+      sub_root = sub_root->at(sub_prefix).get();
     // don't return early to allow auto deduction
     else {
       sub_root = nullptr;
@@ -154,24 +159,32 @@ auto contains(prefix_tree<StringType>* root, const StringType& prefix)
 }
 
 /**
- * Return trie contents as a vector of values.
+ * Return a vector of the values inserted into the trie using `from()`.
  *
  * Each element in the vector is the result of concatenating all the values
  * encountered in a path from the root to a leaf in the trie.
+ *
+ * If `root` is the address of a default-constructed `prefix_tree` or `nullptr`
+ * then the returned vector is empty. Uses recursive DFS to retrieve values.
  *
  * @tparam StringType `basic_string` specialization
  *
  * @param root Trie root
  */
 template <typename StringType>
-auto contents(prefix_tree<StringType>* root)
+auto to_vector(prefix_tree<StringType>* root)
 {
   std::vector<StringType> values;
+  // just return empty if root is nullptr
   if (!root)
     return values;
-  // work recurisvely for each child
+  // work recursively for each child, getting values stored in each path
   for (const auto& [key, child] : *root) {
-    auto child_values = contents(child.get());
+    auto child_values = to_vector(child.get());
+    // if child_values is empty, then that has no children. make child_values
+    // just contain the empty string so we can prepend key properly
+    if (child_values.empty())
+      child_values = {{}};
     // need to prepend current search key to the child suffixes
     std::for_each(
       child_values.begin(),
@@ -180,34 +193,51 @@ auto contents(prefix_tree<StringType>* root)
     );
     values.insert(values.cend(), child_values.cbegin(), child_values.cend());
   }
-  // need to prepend current node value to child suffixes
-  std::for_each(
-    values.begin(),
-    values.end(),
-    [&](auto& frag) { frag = root->value() + frag; }
-  );
   return values;
 }
 
 /**
- * Return autocomplete available given a trie and a prefix.
+ * Return a set containing the values inserted into the trie using `from()`.
+ *
+ * Creates a `std::set` from the vector returned by `to_vector()`.
+ *
+ * @tparam StringType `basic_string` specialization
+ *
+ * @param root Trie root
+ */
+template <typename StringType>
+inline auto to_set(prefix_tree<StringType>* root)
+{
+  auto value_vector = to_vector(root);
+  return std::set<StringType>{value_vector.cbegin(), value_vector.cend()};
+}
+
+/**
+ * Return autocomplete set available given a trie and a prefix.
  *
  * @tparam StringType `basic_string` specialization
  *
  * @param root Trie root
  * @param prefix Prefix to autocomplete
- * @returns `std::vector<StringType>` of possible autocompletes
+ * @returns `std::set<StringType>` of possible autocompletes
  */
 template <typename StringType>
 auto autocomplete(prefix_tree<StringType>* root, const StringType& prefix)
 {
-  std::vector<StringType> values;
+  using result_type = std::set<StringType>;
   // check if prefix exists in the trie. if not, then no autocomplete
   auto search_root = contains(root, prefix);
   if (!search_root)
-    return values;
-  // otherwise, traverse depth-first to find all the values
-  return contents(search_root);
+    return result_type{};
+  // otherwise, traverse depth-first to find all the value suffixes before
+  // prepending the search prefix to them to get the full value
+  auto child_values = to_vector(search_root);
+  std::for_each(
+    child_values.begin(),
+    child_values.end(),
+    [&](auto& frag) { frag = prefix + frag; }
+  );
+  return result_type{child_values.cbegin(), child_values.cend()};
 }
 
 }  // namespace trie
