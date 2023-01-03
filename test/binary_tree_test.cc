@@ -56,6 +56,10 @@ protected:
   };
   // values that can be inserted into root_ for testing insert
   static inline const std::vector<value_type> extra_values_{1, 5, 12, 20, 15};
+  // min path costs for g_root_* trees when traveling from root to leaf
+  static inline const value_type g_min_path_1_{10};
+  static inline const value_type g_min_path_2_{25};
+  static inline const value_type g_min_path_3_{29};
 };
 
 /**
@@ -127,6 +131,16 @@ TEST_F(BinaryTreeTest, SetRightValueTest)
   // create and set right child of left child
   EXPECT_FALSE(root_.left()->set_right_value(6));
   EXPECT_EQ(6, root_.left()->right_value());
+}
+
+/**
+ * Test that `min_path` works as expected.
+ */
+TEST_F(BinaryTreeTest, MinPathTest)
+{
+  EXPECT_EQ(g_min_path_1_, pddcp::bt::min_path(&g_root_1_));
+  EXPECT_EQ(g_min_path_2_, pddcp::bt::min_path(&g_root_2_));
+  EXPECT_EQ(g_min_path_3_, pddcp::bt::min_path(&g_root_3_));
 }
 
 /**
