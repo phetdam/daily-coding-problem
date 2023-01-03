@@ -42,7 +42,7 @@ Contents
 ``test``
    Unit tests for shared code, with a ``CMakeLists.txt`` that also uses the
    source files from ``src`` to build an overarching `Google Test`_ unit test
-   runner with all the tests.
+   runner with [almost] [#]_ all the available unit tests.
 
 ``xorll``
    An XOR linked list C implementation with a driver program used by
@@ -52,6 +52,9 @@ Contents
 .. _CMake: https://cmake.org/cmake/help/latest/
 
 .. _`Google Test`: https://google.github.io/googletest/
+
+.. [#] Standalone runners may have additional tests. See
+   `Building from source`_ for details.
 
 Dependencies
 ------------
@@ -70,3 +73,6 @@ standalone runners built from the sources in ``src`` are compiled with
    #ifdef PDDCP_GTEST_STANDALONE
    // ...
    #endif  // PDDCP_GTEST_STANDALONE
+
+Some standalone runners define additional `Google Test`_ tests within these
+blocks.
