@@ -8,6 +8,7 @@
 #ifndef PDDCP_BINARY_TREE_H_
 #define PDDCP_BINARY_TREE_H_
 
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -133,6 +134,35 @@ private:
   std::unique_ptr<self_type> right_;
 };
 
+namespace bt {
+
+/**
+ * Returns the minimum cost of travelling from root to leaf in a binary tree.
+ *
+ * @tparam T value type
+ *
+ * @param root binary tree root
+ */
+template <typename T>
+auto min_path(const binary_tree<T>* root)
+{
+  // assume no cost for nullptr
+  if (!root)
+    return T{};
+  // left and right subtree cost can be zero if the subtree is missing
+  auto left_cost = min_path(root->left());
+  auto right_cost = min_path(root->right());
+  // in which case, we return cost using the other subtree's possibly 0 cost
+  if (!root->left())
+    return root->value() + right_cost;
+  if (!root->right())
+    return root->value() + left_cost;
+  // otherwise, we choose the lower subtree cost
+  return root->value() + std::min(left_cost, right_cost);
+}
+
+}  // namespace bt
+
 namespace bst {
 
 /**
@@ -142,6 +172,7 @@ namespace bst {
  *
  * @tparam T value type
  *
+ * @param root binary tree root
  * @param value value to insert
  * @returns `root` to allow method chaining
  */
@@ -175,6 +206,7 @@ auto insert(binary_tree<T>* root, T value)
  *
  * @tparam T value type
  *
+ * @param root binary tree root
  * @param values vector of `T` values to insert
  * @returns `this` to allow method chaining
  */
