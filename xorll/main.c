@@ -38,7 +38,7 @@
 #define HELP_FLAG_SHORT "-h"
 #define HELP_FLAG_LONG "--help"
 #define HELP_STR \
-  "Usage: " PROGNAME " [" HELP_FLAG_SHORT "] " " arg1 arg2 ... argn" \
+  "Usage: " PROGNAME " [" HELP_FLAG_SHORT "] arg1 arg2 ... argn" \
   "\n\n" \
   "Takes n integers from the command line. Will initialize an XOR linked\n" \
   "list, print its size, and then print out all the inserted elements in\n" \
