@@ -9,6 +9,7 @@
 #define PDDCP_BINARY_TREE_H_
 
 #include <algorithm>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -205,17 +206,36 @@ auto insert(binary_tree<T>* root, T value)
  * Duplicate values are always inserted as right children.
  *
  * @tparam T value type
+ * @tparam ContainerType *Container* with `T` as `value_type`
  *
  * @param root binary tree root
- * @param values vector of `T` values to insert
+ * @param values *Container* of `T` values to insert
  * @returns `this` to allow method chaining
  */
-template <typename T>
-inline auto insert(binary_tree<T>* root, const std::vector<T>& values)
+template <typename T, typename ContainerType>
+inline auto insert(binary_tree<T>* root, const ContainerType& values)
 {
+  static_assert(std::is_same_v<T, typename ContainerType::value_type>);
   for (const auto& value : values)
     insert(root, value);
   return root;
+}
+
+/**
+ * Insert multiple values into the binary search tree.
+ *
+ * Duplicate values are always inserted as right children.
+ *
+ * @tparam T value type
+ *
+ * @param root binary tree root
+ * @param values initializer list of `T` values to insert
+ * @returns `this` to allow method chaining
+ */
+template <typename T>
+inline auto insert(binary_tree<T>* root, const std::initializer_list<T>& values)
+{
+  return insert(root, std::vector<T>{values});
 }
 
 /**
