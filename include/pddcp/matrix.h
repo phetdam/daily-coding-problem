@@ -229,10 +229,6 @@ public:
     return res;
   }
 
-  /**
-   * Matrix-matrix elementwise and operator for bools.
-   */
-
 private:
    std::vector<T> values_;
 };
