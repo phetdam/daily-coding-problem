@@ -16,6 +16,7 @@ add_executable(
     ${PDDCP_SRC_DIR}/176.cc
     # tests from shared library unit tests
     binary_tree_test.cc
+    matrix_test.cc
     prefix_tree_test.cc
 )
 target_link_libraries(pddcp_test GTest::gtest_main)
