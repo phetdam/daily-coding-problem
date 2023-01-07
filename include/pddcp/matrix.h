@@ -298,7 +298,7 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
  * @param mat matrix
  */
 template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
-inline auto operator+(T value, matrix<n_rows, n_cols, U>& mat)
+inline auto operator+(T value, const matrix<n_rows, n_cols, U>& mat)
 {
   return mat + value;
 }
@@ -321,13 +321,35 @@ auto operator-(
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
   matrix<n_rows, n_cols, double> c;
-// use OpenMP if possible
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
   for (std::size_t i = 0; i < n_rows; i++)
     for (std::size_t j = 0; j < n_cols; j++)
       c(i, j) = a(i, j) - b(i, j);
+  return c;
+}
+
+/**
+ * Elementwise AND operator for boolean matrices.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols>
+auto operator&(
+  const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
+{
+  matrix<n_rows, n_cols, bool>& c;
+#ifdef _OPENMP
+  #pragma omp parallel for collapse(2)
+#endif  // _OPENMP
+  for (std::size_t i = 0; i < n_rows; i++)
+    for (std::size_t j = 0; j < n_rows; j++)
+      c(i, j) = a(i, j) && b(i, j);
   return c;
 }
 
