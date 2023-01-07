@@ -293,6 +293,7 @@ inline auto operator+(T value, const matrix<n_rows, n_cols, U>& mat)
 template <std::size_t n_rows, std::size_t n_cols, typename T>
 auto operator-(const matrix<n_rows, n_cols, T>& mat)
 {
+  static_assert(std::is_unsigned_v<T>, "T must be a signed type");
   matrix<n_rows, n_cols, T> out;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
@@ -408,20 +409,54 @@ inline auto operator-(const matrix<n_rows, n_cols, T>& mat, T value)
 /**
  * Return difference of a scalar and a non-boolean matrix.
  *
- * Implemented in terms of unary `operator-` and binary `operator+`.
+ * Cannot be implemented in terms of unary `operator-` and binary `operator+`,
+ * as otherwise that will fail if the matrix has an unsigned `value_type`.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
  * @tparam T first `value_type`
  * @tparam U second `value_type`
+ * @tparam V returned matrix `value_type`
  *
  * @param value scalar value
  * @param mat matrix
  */
-template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
-inline auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
+template <
+  std::size_t n_rows,
+  std::size_t n_cols,
+  typename T,
+  typename U,
+  typename V = double>
+auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
 {
-  return -mat + value;
+  static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
+  static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
+  matrix<n_rows, n_cols, V> out;
+#ifdef _OPENMP
+  #pragma omp parallel for collapse(2)
+#endif  // _OPENMP
+  for (std::size_t i = 0; i < n_rows; i++)
+    for (std::size_t j = 0; j < n_cols; j++)
+      out(i, j) = value - mat(i, j);
+  return out;
+}
+
+/**
+ * Return difference of a scalar and a non-boolean matrix.
+ *
+ * This overload is selected if matrix `value_type` and scalar type are same.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T input and returned matrix `value_type`
+ *
+ * @param value scalar value
+ * @param mat matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+inline auto operator-(T value, const matrix<n_rows, n_cols, T>& mat)
+{
+  return operator-<n_rows, n_cols, T, T, T>(value, mat);
 }
 
 /**

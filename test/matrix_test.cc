@@ -138,7 +138,7 @@ TYPED_TEST(MatrixTest, PlusOverloadTest)
 }
 
 /**
- * Test that matrix `operator-` overloads are selected as expected.
+ * Test that matrix binary `operator-` overloads are selected as expected.
  */
 TYPED_TEST(MatrixTest, MinusOverloadTest)
 {
@@ -170,5 +170,11 @@ TYPED_TEST(MatrixTest, MinusOverloadTest)
     )
   );
 }
+
+/**
+ * Test that matrix unary `operator-` works as expected.
+ *
+ * Nothing is done for unsigned types, as we would get a compile error.
+ */
 
 }  // namespace
