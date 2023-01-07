@@ -36,6 +36,8 @@ if(MSVC)
     # /Zc:__cplusplus; it used to always be 199711L regardless of standard
     add_compile_options(
         /Wall /Zc:__cplusplus
+        # typically don't care if unreferenced inline functions are removed
+        /wd4514
         # for Google Test ::testing::Test subclasses, these are reported a lot,
         # i.e. for implicitly deleted copy/move ctor + operator=
         /wd4625 /wd4626 /wd5026 /wd5027
