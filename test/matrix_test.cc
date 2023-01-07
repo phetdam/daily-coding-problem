@@ -101,11 +101,14 @@ TYPED_TEST(MatrixTest, IndexWriteTest)
 }
 
 /**
- * Test that matrix `operator+` member overload is selected as expected.
+ * Test that matrix `operator+` overloads are selected as expected.
+ *
+ * Macros use extra parentheses to keep macro from interpreting template
+ * arguments as separate macro arguments.
  */
-TYPED_TEST(MatrixTest, MemberPlusOverloadTest)
+TYPED_TEST(MatrixTest, PlusOverloadTest)
 {
-  // extra parentheses to keep macro from interpreting commas as args
+  // matrix + matrix
   EXPECT_TRUE(
     (
       std::is_same_v<
@@ -114,6 +117,7 @@ TYPED_TEST(MatrixTest, MemberPlusOverloadTest)
       >
     )
   );
+  // matrix + value_type scalar
   EXPECT_TRUE(
     (
       std::is_same_v<
@@ -122,6 +126,7 @@ TYPED_TEST(MatrixTest, MemberPlusOverloadTest)
       >
     )
   );
+  // value_type scalar + matrix
   EXPECT_TRUE(
     (
       std::is_same_v<
@@ -133,12 +138,37 @@ TYPED_TEST(MatrixTest, MemberPlusOverloadTest)
 }
 
 /**
- * Test that matrix `operator+` member overload works as expected.
+ * Test that matrix `operator-` overloads are selected as expected.
  */
-// TYPED_TEST(MatrixTest, MemberPlusTest)
-// {
-//   // 0 + 0 is 0
-//   EXPECT_EQ(this->mat_default_, this->mat_default_ + this->mat_default_);
-// }
+TYPED_TEST(MatrixTest, MinusOverloadTest)
+{
+  // matrix - matrix
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        TypeParam,
+        typename decltype(this->mat_square_ - this->mat_square_)::value_type
+      >
+    )
+  );
+  // matrix - value_type scalar
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        TypeParam,
+        typename decltype(this->mat_default_ - TypeParam{14})::value_type
+      >
+    )
+  );
+  // value_type scalar - matrix
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        TypeParam,
+        typename decltype(TypeParam{100} - this->mat_vector_)::value_type
+      >
+    )
+  );
+}
 
 }  // namespace

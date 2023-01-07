@@ -158,99 +158,34 @@ public:
 #endif  // __cplusplus >= 202002L
   T& operator()(size_type row, size_type col) { return at(row, col); }
 
-  /**
-   * Matrix-matrix addition operator.
-   *
-   * Returned matrix has `T` for `value_type`.
-   */
-  auto operator+(const matrix<row_count, col_count, T>& other) const
-  {
-    static_assert(!std::is_same_v<T, bool>, "do not use + for bool matrices");
-    matrix<row_count, col_count, T> res;
-// use OpenMP if possible
-#ifdef _OPENMP
-    #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
-    for (size_type i = 0; i < row_count; i++)
-      for (size_type j = 0; j < col_count; j++)
-        res(i, j) = this->at(i, j) + other(i, j);
-    return res;
-  }
-
-  /**
-   * Matrix-scalar addition operator.
-   *
-   * Returned matrix has `T` for `value_type`.
-   */
-  auto operator+(T value) const
-  {
-    matrix<row_count, col_count, T> res;
-#ifdef _OPENMP
-    #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
-    for (size_type i = 0; i < row_count; i++)
-      for (size_type j = 0; j < col_count; j++)
-        res(i, j) = this->at(i, j) + value;
-    return res;
-  }
-
-  /**
-   * Matrix-matrix subtraction operator.
-   *
-   * Returned matrix has `T` for `value_type`.
-   */
-  auto operator-(const matrix<row_count, col_count, T>& other) const
-  {
-    static_assert(!std::is_same_v<T, bool>, "do not use - for bool matrices");
-    matrix<row_count, col_count, T> res;
-#ifdef _OPENMP
-    #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
-    for (size_type i = 0; i < row_count; i++)
-      for (size_type j = 0; j < col_count; j++)
-        res(i, j) = this->at(i, j) - other(i, j);
-    return res;
-  }
-
-  /**
-   * Matrix-scalar subtraction operator.
-   *
-   * Returned matrix has `T` for `value_type`.
-   */
-  auto operator-(T value) const
-  {
-    matrix<row_count, col_count, T> res;
-#ifdef _OPENMP
-    #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
-    for (size_type i = 0; i < row_count; i++)
-      for (size_type j = 0; j < col_count; j++)
-        res(i, j) = this->at(i, j) - value;
-    return res;
-  }
-
 private:
    std::vector<T> values_;
 };
 
 /**
- * Return sum of two non-boolean matrices as a `double` matrix.
+ * Return sum of two non-boolean matrices as a matrix with same shape.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
  * @tparam T first `value_type`
  * @tparam U second `value_type`
+ * @tparam V returned matrix `value_type`
  *
  * @param a first matrix
  * @param b second matrix
  */
-template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
+template <
+  std::size_t n_rows,
+  std::size_t n_cols,
+  typename T,
+  typename U,
+  typename V = double>
 auto operator+(
   const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, U>& b)
 {
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
-  matrix<n_rows, n_cols, double> c;
+  matrix<n_rows, n_cols, V> c;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
@@ -261,22 +196,47 @@ auto operator+(
 }
 
 /**
- * Return sum a non-boolean matrix + scalar as a `double` matrix.
+ * Return sum of two non-boolean matrices as a matrix with same shape.
+ *
+ * This overload is selected if matrix `value_type` and scalar type are same.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T input and return matrix `value_type`
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+inline auto operator+(
+  const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, T>& b)
+{
+  return operator+<n_rows, n_cols, T, T, T>(a, b);
+}
+
+/**
+ * Return sum a non-boolean matrix + scalar.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
  * @tparam T matrix `value_type`
  * @tparam U scalar type
+ * @tparam V returned matrix `value_type`
  *
  * @param mat matrix
  * @param value scalar value
  */
-template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
+template <
+  std::size_t n_rows,
+  std::size_t n_cols,
+  typename T,
+  typename U,
+  typename V = double>
 auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
 {
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
-  matrix<n_rows, n_cols, double> out;
+  matrix<n_rows, n_cols, V> out;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
@@ -287,7 +247,25 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
 }
 
 /**
- * Return sum of non-boolean scalar + matrix as a `double` matrix.
+ * Return sum a non-boolean matrix + scalar.
+ *
+ * This overload is selected if matrix `value_type` and scalar type are same.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T input and return matrix `value_type`
+ *
+ * @param mat matrix
+ * @param value scalar value
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+inline auto operator+(const matrix<n_rows, n_cols, T>& mat, T value)
+{
+  return operator+<n_rows, n_cols, T, T, T>(mat, value);
+}
+
+/**
+ * Return sum of scalar + non-boolean matrix.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
@@ -304,23 +282,51 @@ inline auto operator+(T value, const matrix<n_rows, n_cols, U>& mat)
 }
 
 /**
- * Return difference of two non-boolean matrices as a `double` matrix.
+ * Unary negation operator.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T matrix `value_type`
+ *
+ * @param mat matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+auto operator-(const matrix<n_rows, n_cols, T>& mat)
+{
+  matrix<n_rows, n_cols, T> out;
+#ifdef _OPENMP
+  #pragma omp parallel for collapse(2)
+#endif  // _OPENMP
+  for (std::size_t i = 0; i < n_rows; i++)
+    for (std::size_t j = 0; j < n_cols; j++)
+      out(i, j) = -mat(i, j);
+  return out;
+}
+
+/**
+ * Return difference of two non-boolean matrices as matrix with same shape.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
  * @tparam T first `value_type`
  * @tparam U second `value_type`
+ * @tparam V returned matrix `value_type`
  *
  * @param a first matrix
  * @param b second matrix
  */
-template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
+template <
+  std::size_t n_rows,
+  std::size_t n_cols,
+  typename T,
+  typename U,
+  typename V = double>
 auto operator-(
   const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, U>& b)
 {
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
-  matrix<n_rows, n_cols, double> c;
+  matrix<n_rows, n_cols, V> c;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
@@ -328,6 +334,94 @@ auto operator-(
     for (std::size_t j = 0; j < n_cols; j++)
       c(i, j) = a(i, j) - b(i, j);
   return c;
+}
+
+/**
+ * Return difference of two non-boolean matrices as a matrix with same shape.
+ *
+ * This overload is selected if matrix `value_type` and scalar type are same.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T input and return matrix `value_type`
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+inline auto operator-(
+  const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, T>& b)
+{
+  return operator-<n_rows, n_cols, T, T, T>(a, b);
+}
+
+/**
+ * Return difference of non-boolean matrix and a scalar.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T first `value_type`
+ * @tparam U second `value_type`
+ * @tparam V returned matrix `value_type`
+ *
+ * @param mat matrix
+ * @param value scalar value
+ */
+template <
+  std::size_t n_rows,
+  std::size_t n_cols,
+  typename T,
+  typename U,
+  typename V = double>
+auto operator-(const matrix<n_rows, n_cols, T>& mat, U value)
+{
+  static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
+  static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
+  matrix<n_rows, n_cols, V> out;
+#ifdef _OPENMP
+  #pragma omp parallel for collapse(2)
+#endif  // _OPENMP
+  for (std::size_t i = 0; i < n_rows; i++)
+    for (std::size_t j = 0; j < n_cols; j++)
+      out(i, j) = mat(i, j) - value;
+  return out;
+}
+
+/**
+ * Return difference of non-boolean matrix and a scalar.
+ *
+ * This overload is selected if matrix `value_type` and scalar type are same.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T input and return matrix `value_type`
+ *
+ * @param mat  matrix
+ * @param value second matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T>
+inline auto operator-(const matrix<n_rows, n_cols, T>& mat, T value)
+{
+  return operator-<n_rows, n_cols, T, T, T>(mat, value);
+}
+
+/**
+ * Return difference of a scalar and a non-boolean matrix.
+ *
+ * Implemented in terms of unary `operator-` and binary `operator+`.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T first `value_type`
+ * @tparam U second `value_type`
+ *
+ * @param value scalar value
+ * @param mat matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
+inline auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
+{
+  return -mat + value;
 }
 
 /**
