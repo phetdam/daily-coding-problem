@@ -8,9 +8,12 @@
 #ifndef PDDCP_MATRIX_H_
 #define PDDCP_MATRIX_H_
 
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdint>
 #include <initializer_list>
+#include <limits>
 #include <type_traits>
 #include <vector>
 
@@ -163,6 +166,41 @@ private:
 };
 
 /**
+ * Check if two integer type matrices are exactly equal.
+ *
+ * Uses exact equality only for non-floating types, where for floating types
+ * Knuth's formulas are used. See https://stackoverflow.com/a/253874/14227825.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T first `value_type`
+ * @tparam U second `value_type`
+ */
+template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
+bool operator==(
+  const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, U>& b)
+{
+  for (std::size_t i = 0; i < n_rows; i++)
+    for (std::size_t j = 0; j < n_rows; j++) {
+      auto& v_a = a(i, j);
+      auto& v_b = b(i, j);
+      // only use float comparison for floating types
+      if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
+        // use smaller epsilon if possible
+        constexpr auto eps = std::min(
+          std::numeric_limits<T>::epsilon(), std::numeric_limits<U>::epsilon()
+        );
+        // negation of checking relative tolerance to smaller value
+        if (std::fabs(v_a - v_b) > std::min(v_a, v_b) * eps)
+          return false;
+      }
+      else if (v_a != v_b)
+        return false;
+    }
+  return true;
+}
+
+/**
  * Return sum of two non-boolean matrices as a matrix with same shape.
  *
  * @tparam n_rows number of matrix rows
@@ -293,7 +331,7 @@ inline auto operator+(T value, const matrix<n_rows, n_cols, U>& mat)
 template <std::size_t n_rows, std::size_t n_cols, typename T>
 auto operator-(const matrix<n_rows, n_cols, T>& mat)
 {
-  static_assert(std::is_unsigned_v<T>, "T must be a signed type");
+  static_assert(std::is_signed_v<T>, "T must be a signed type");
   matrix<n_rows, n_cols, T> out;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
