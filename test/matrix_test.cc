@@ -175,7 +175,7 @@ TYPED_TEST(MatrixTest, MinusOverloadTest)
  * Test that matrix unary `operator-` works as expected.
  *
  * Nothing is done for unsigned types, as we would get a compile error. Also
- * indirectly tests `operator+`, as we check a + (-a) + a == a for equality.
+ * indirectly tests `operator+`, `operator==`, as we check a + (-a) + a == a.
  */
 TYPED_TEST(MatrixTest, NegationTest)
 {
