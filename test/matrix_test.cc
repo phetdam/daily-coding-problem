@@ -188,9 +188,8 @@ TYPED_TEST(MatrixTest, NegationTest)
       this->mat_square_ + (-this->mat_square_) + this->mat_square_
     );
   }
-  else {
+  else
     GTEST_SKIP() << "skipping negation of unsigned type";
-  }
 }
 
 }  // namespace
