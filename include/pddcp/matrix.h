@@ -166,10 +166,32 @@ private:
 };
 
 /**
- * Check if two integer type matrices are exactly equal.
+ * Loop through matrix indices in row-major order.
+ *
+ * @param n_rows number of matrix rows
+ * @param n_cols number of matrix cols
+ */
+#define PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) \
+  for (std::size_t i = 0; i < n_rows; i++) \
+    for (std::size_t j = 0; j < n_cols; j++)
+
+/**
+ * Loop through matrix indices in column-major order.
+ *
+ * @param n_rows number of matrix rows
+ * @param n_cols number of matrix cols
+ */
+#define PDDCP_MATRIX_COL_MAJOR_LOOP(n_rows, n_cols) \
+  for (std::size_t j = 0; j < n_cols; j++) \
+    for (std::size_t i = 0; i < n_rows; i++)
+
+/**
+ * Check if two matrices are exactly equal.
  *
  * Uses exact equality only for non-floating types, where for floating types
  * Knuth's formulas are used. See https://stackoverflow.com/a/253874/14227825.
+ *
+ * If types `T`, `U` are not the same, they are cast to `double`.
  *
  * @tparam n_rows number of matrix rows
  * @tparam n_cols number of matrix cols
@@ -180,23 +202,35 @@ template <std::size_t n_rows, std::size_t n_cols, typename T, typename U>
 bool operator==(
   const matrix<n_rows, n_cols, T>& a, const matrix<n_rows, n_cols, U>& b)
 {
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_rows; j++) {
-      auto& v_a = a(i, j);
-      auto& v_b = b(i, j);
-      // only use float comparison for floating types
-      if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
-        // use smaller epsilon if possible
-        constexpr auto eps = std::min(
-          std::numeric_limits<T>::epsilon(), std::numeric_limits<U>::epsilon()
-        );
+  // compute constexpr epsilon (no runtime cost anyways) for float comparison
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) {
+    auto& v_a = a(i, j);
+    auto& v_b = b(i, j);
+    // only use float comparison for floating types
+    if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
+      // when types are same
+      if constexpr (std::is_same_v<T, U>) {
+        constexpr auto eps = std::numeric_limits<T>::epsilon();
         // negation of checking relative tolerance to smaller value
         if (std::fabs(v_a - v_b) > std::min(v_a, v_b) * eps)
           return false;
       }
-      else if (v_a != v_b)
-        return false;
+      // when types differ -- cast everything to double instead
+      else {
+        constexpr auto eps = std::min(
+          static_cast<double>(std::numeric_limits<T>::epsilon()),
+          static_cast<double>(std::numeric_limits<U>::epsilon())
+        );
+        if (
+          std::fabs(v_a - v_b) >
+          std::min(static_cast<double>(v_a), static_cast<double>(v_b)) * eps
+        )
+          return false;
+      }
     }
+    else if (v_a != v_b)
+      return false;
+  }
   return true;
 }
 
@@ -227,9 +261,8 @@ auto operator+(
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      c(i, j) = a(i, j) + b(i, j);
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    c(i, j) = a(i, j) + b(i, j);
   return c;
 }
 
@@ -278,9 +311,8 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      out(i, j) = mat(i, j) + value;
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    out(i, j) = mat(i, j) + value;
   return out;
 }
 
@@ -336,9 +368,8 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat)
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      out(i, j) = -mat(i, j);
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    out(i, j) = -mat(i, j);
   return out;
 }
 
@@ -369,9 +400,8 @@ auto operator-(
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      c(i, j) = a(i, j) - b(i, j);
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    c(i, j) = a(i, j) - b(i, j);
   return c;
 }
 
@@ -420,9 +450,8 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat, U value)
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      out(i, j) = mat(i, j) - value;
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    out(i, j) = mat(i, j) - value;
   return out;
 }
 
@@ -473,9 +502,8 @@ auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_cols; j++)
-      out(i, j) = value - mat(i, j);
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    out(i, j) = value - mat(i, j);
   return out;
 }
 
@@ -514,9 +542,30 @@ auto operator&(
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
-  for (std::size_t i = 0; i < n_rows; i++)
-    for (std::size_t j = 0; j < n_rows; j++)
-      c(i, j) = a(i, j) && b(i, j);
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    c(i, j) = a(i, j) && b(i, j);
+  return c;
+}
+
+/**
+ * Elementwise OR operator for boolean matrices.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <std::size_t n_rows, std::size_t n_cols>
+auto operator|(
+  const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
+{
+  matrix<n_rows, n_cols, bool>& c;
+#ifdef _OPENMP
+  #pragma omp parallel for collapse(2)
+#endif  // _OPENMP
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
+    c(i, j) = a(i, j) || b(i, j);
   return c;
 }
 

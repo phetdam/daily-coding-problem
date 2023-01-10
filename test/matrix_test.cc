@@ -192,4 +192,23 @@ TYPED_TEST(MatrixTest, NegationTest)
     GTEST_SKIP() << "skipping negation of unsigned type";
 }
 
+/**
+ * Test that binary matrix `operator+`, `operator-` work as expected.
+ *
+ * Indirectly also tests `operator==` for comparison. Tests matrix/matrix,
+ * scalar/matrix, matrix/scalar operations together.
+ */
+TYPED_TEST(MatrixTest, PlusMinusTest)
+{
+  // 0 == 0 + 0
+  EXPECT_EQ(this->mat_default_, this->mat_default_ + this->mat_default_);
+  // a == a + a - a, where we are not using unary operator-
+  EXPECT_EQ(
+    this->mat_square_,
+    this->mat_square_ + this->mat_square_ - this->mat_square_
+  );
+  // b == 1 + b - 1
+  EXPECT_EQ(this->mat_vector_, 1 + this->mat_vector_ - 1);
+}
+
 }  // namespace
