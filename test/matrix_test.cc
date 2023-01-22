@@ -230,7 +230,6 @@ TYPED_TEST(MatrixTest, FBoundTest)
   // skip this test for unsigned type (can't use unary operator-)
   if constexpr (std::is_signed_v<TypeParam>)
     EXPECT_EQ(cheese, cheese + (-cheese) + cheese);
-
 }
 
 }  // namespace
