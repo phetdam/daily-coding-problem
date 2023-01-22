@@ -282,6 +282,151 @@ private:
 };
 
 /**
+ * Sparse fixed-size 2D matrix implementation using an `unordered_map`.
+ *
+ * @tparam n_rows_ number of rows
+ * @tparam n_cols_ number of columns
+ * @tparam T value type
+ */
+template <PDDCP_MATRIX_TEMPLATE_PARAMS>
+class sparse_matrix : pddcp::matrix_base<sparse_matrix<n_rows_, n_cols_, T>> {
+public:
+  PDDCP_MATRIX_BASE_MEMBERS(sparse_matrix);
+  using index_type = std::pair<size_type, size_type>;
+  using storage_type = std::unordered_map<index_type, value_type>;
+
+  /**
+   * Default ctor.
+   */
+  sparse_matrix() : values_{} {}
+
+  /**
+   * Template ctor to construct from a container of index-value pairs.
+   *
+   * @tparam ValueContainer *Container* with `value_type` equal to the
+   *  `value_type` of the `sparse_matrix` `storage_type`
+   *
+   * @param pairs *Container* of `typename storage_type::value_type` objects
+   */
+  template <typename ValueContainer>
+  sparse_matrix(const ValueContainer& pairs)
+  {
+    static_assert(
+      std::is_same_v<
+        typename storage_type::value_type, typename ValueContainer::value_type
+      >,
+      "Container value_type must be std::pair<const index_type, value_type>"
+    );
+    // check that none of the indices is inserting "outside" the matrix
+    std::for_each(
+      pairs.cbegin(),
+      pairs.cend(),
+      [](const auto& p) { valid_index(p.first, true); }
+    );
+    values_.insert(pairs.cbegin(), pairs.cend());
+  }
+
+  /**
+   * Return number of non-zero elements in the sparse matrix.
+   *
+   * If `value_type` is `bool`, this is the number of `true` elements.
+   */
+  const auto size() const { return values_.size(); }
+
+  /**
+   * Return const reference to the index-value map.
+   */
+  const auto& values() const { return values_; }
+
+  /**
+   * Return reference to the (i, j) matrix value.
+   *
+   * @param row row index
+   * @param col col index
+   */
+  T& at(size_type row, size_type col)
+  {
+    // hard check to prevent setting outside the matrix bounds
+    valid_index(row, col, true);
+    return values_[{row, col}];
+  }
+
+  /**
+   * Return const reference to the (i, j) matrix value.
+   *
+   * @param row row index
+   * @param col col index
+   */
+  const T& at(size_type row, size_type col) const
+  {
+    // soft check -- if missing this index, return default value
+    index_type index{row, col};
+    if (valid_index(index))
+      if (values_.find(index) == values_.cend())
+        return T{};
+    // otherwise just return the value. if outside of bounds, this throws
+    return values_.at(index);
+  }
+
+  /**
+   * Return reference to the (i, j) matrix value.
+   *
+   * @param row row index
+   * @param col col index
+   */
+  T& operator()(size_type row, size_type col) { return at(row, col); }
+
+  /**
+   * Return const reference to the (i, j) matrix value.
+   *
+   * @param row row index
+   * @param col col index
+   */
+  const T& operator()(size_type row, size_type col) const
+  {
+    return at(row, col);
+  }
+
+private:
+  storage_type values_;
+
+  /**
+   * Check if we are indexing inside the bounds of the matrix.
+   *
+   * @param index row, column index
+   * @param hard_check `true` to assert if out of bounds, `false` not to
+   * @returns `true` if valid index, `false` if invalid
+   */
+  bool valid_index(const index_type& index, bool hard_check = false)
+  {
+    if (index.first >= row_count) {
+      if (hard_check)
+        assert(false && "row index must be less than row_count");
+      return false;
+    }
+    if (index.second >= col_count) {
+      if (hard_check)
+        assert(false && "col index must be less than col_count");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Check if we are indexing inside the bounds of the matrix.
+   *
+   * @param row row index
+   * @param col col index
+   * @param hard_check `true` to assert if out of bounds, `false` not to
+   * @returns `true` if valid index, `false` if invalid
+   */
+  bool valid_index(size_type row, size_type col, bool hard_check = false)
+  {
+    return valid_index({row, col});
+  }
+};
+
+/**
  * Loop through matrix indices in row-major order.
  *
  * @param n_rows number of matrix rows
