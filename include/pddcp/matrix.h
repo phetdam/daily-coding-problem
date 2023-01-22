@@ -16,6 +16,7 @@
 #include <limits>
 #include <type_traits>
 #include <vector>
+#include <unordered_map>
 
 namespace pddcp {
 
@@ -55,7 +56,7 @@ struct matrix_traits;
  * Forward declaration and type traits specialization for `dense_matrix`.
  */
 template <PDDCP_MATRIX_TEMPLATE_PARAMS>
-struct dense_matrix;
+class dense_matrix;
 
 template <PDDCP_MATRIX_TEMPLATE_PARAMS>
 struct matrix_traits<dense_matrix<n_rows_, n_cols_, T>> {
@@ -66,7 +67,7 @@ struct matrix_traits<dense_matrix<n_rows_, n_cols_, T>> {
  * Forward declaration and type traits specialization for `sparse_matrix`.
  */
 template <PDDCP_MATRIX_TEMPLATE_PARAMS>
-struct sparse_matrix;
+class sparse_matrix;
 
 template <PDDCP_MATRIX_TEMPLATE_PARAMS>
 struct matrix_traits<sparse_matrix<n_rows_, n_cols_, T>> {
@@ -321,7 +322,8 @@ public:
     std::for_each(
       pairs.cbegin(),
       pairs.cend(),
-      [](const auto& p) { valid_index(p.first, true); }
+      // Clang errors as "this" cannot be implicitly captured (GCC allows)
+      [this](const auto& p) { valid_index(p.first, true); }
     );
     values_.insert(pairs.cbegin(), pairs.cend());
   }
@@ -1011,8 +1013,16 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
+// MSVC issues implicit conversion warning
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 5219)
+#endif  // _MSC_VER
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = mat(i, j) + value;
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
   return out;
 }
 
@@ -1238,7 +1248,7 @@ template <std::size_t n_rows, std::size_t n_cols>
 auto operator&(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
-  matrix<n_rows, n_cols, bool>& c;
+  matrix<n_rows, n_cols, bool> c;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP
@@ -1260,7 +1270,7 @@ template <std::size_t n_rows, std::size_t n_cols>
 auto operator|(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
-  matrix<n_rows, n_cols, bool>& c;
+  matrix<n_rows, n_cols, bool> c;
 #ifdef _OPENMP
   #pragma omp parallel for collapse(2)
 #endif  // _OPENMP

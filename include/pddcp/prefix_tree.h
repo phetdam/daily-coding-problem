@@ -189,7 +189,14 @@ auto to_vector(prefix_tree<StringType>* root)
     std::for_each(
       child_values.begin(),
       child_values.end(),
-      [&](auto& frag) { frag = key + frag; }
+      // Clang errors as cannot implicitly capture structured binding in C++17.
+      // this is allowed by GCC, but technically is not standard compliant.
+#if __cplusplus >= 202002L
+      []
+#else
+      [key = key]
+#endif
+      (auto& frag) { frag = key + frag; }
     );
     values.insert(values.cend(), child_values.cbegin(), child_values.cend());
   }
