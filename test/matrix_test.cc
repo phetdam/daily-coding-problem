@@ -219,17 +219,17 @@ TYPED_TEST(MatrixTest, PlusMinusTest)
 TYPED_TEST(MatrixTest, FBoundTest)
 {
   // note: right now only dense_matrix is implemented
-  pddcp::dense_matrix<4, 5, TypeParam> cheese;
+  pddcp::dense_matrix<4, 5, TypeParam> mat;
   static_assert(
-    std::is_same_v<TypeParam, typename decltype(cheese)::value_type>,
-    "cheese value_type must equal TypeParam"
+    std::is_same_v<TypeParam, typename decltype(mat)::value_type>,
+    "mat value_type must equal TypeParam"
   );
-  EXPECT_EQ(cheese.col_count, cheese.n_cols());
-  EXPECT_EQ(cheese(0, 3), cheese.at(0, 3));
-  EXPECT_EQ(cheese, cheese);
+  EXPECT_EQ(mat.col_count, mat.n_cols());
+  EXPECT_EQ(mat(0, 3), mat.at(0, 3));
+  EXPECT_EQ(mat, mat);
   // skip this test for unsigned type (can't use unary operator-)
   if constexpr (std::is_signed_v<TypeParam>)
-    EXPECT_EQ(cheese, cheese + (-cheese) + cheese);
+    EXPECT_EQ(mat, mat + (-mat) + mat);
 }
 
 }  // namespace
