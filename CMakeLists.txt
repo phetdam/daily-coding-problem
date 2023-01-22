@@ -13,6 +13,19 @@ cmake_minimum_required(VERSION 3.21)
 # Developer Prompt for x86 output, x64 Native Tools prompt for x64 output
 #
 
+# if C++ compiler is not defined, we automatically choose Clang on Linux. GCC
+# 11.3 is required at the minimum and not all *nix system have this yet.
+if(NOT MSVC)
+    if(NOT DEFINED CMAKE_C_COMPILER)
+        set(MESSAGE "CMAKE_C_COMPILER not defined, using clang as default")
+        set(CMAKE_C_COMPILER clang)
+    endif()
+    if(NOT DEFINED CMAKE_CXX_COMPILER)
+    set(MESSAGE "CMAKE_CXX_COMPILER not defined, using clang++ as default")
+        set(CMAKE_CXX_COMPILER clang++)
+    endif()
+endif()
+
 project(
     pddcp
     VERSION 0.1.0
