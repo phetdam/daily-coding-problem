@@ -82,10 +82,10 @@ auto min_steps(
     // otherwise, continue searching from non-diagonal adjacent tiles
     for (const auto& row_offset : {-1, 1})
       for (const auto& col_offset : {-1, 1}) {
-        // skip if we are going out of bounds. since size_type is unsigned, -1
-        // is its max value, which is an illegal index value anyways.
         auto new_row_i = row_i + row_offset;
         auto new_col_i = col_i + col_offset;
+        // skip if we are going out of bounds. since size_type is unsigned, -1
+        // is its max value, which is an illegal index value anyways.
         if (new_row_i >= board.row_count || new_col_i >= board.col_count)
           continue;
         queue.push({{new_row_i, new_col_i}, steps + 1});
@@ -94,6 +94,9 @@ auto min_steps(
   return n_steps;
 }
 
-// class DailyTest23 : public ::testing::Test {};
+// convenience type aliases
+// using input_type = pddcp::sparse_matrix
+
+// class DailyTest23 : public ::testing::TestWithParam<> {};
 
 }  // namespace

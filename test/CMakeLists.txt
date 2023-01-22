@@ -6,6 +6,7 @@ add_executable(
     ${PDDCP_SRC_DIR}/7.cc
     ${PDDCP_SRC_DIR}/11.cc
     ${PDDCP_SRC_DIR}/15.cc
+    ${PDDCP_SRC_DIR}/23.cc
     ${PDDCP_SRC_DIR}/35.cc
     ${PDDCP_SRC_DIR}/51.cc
     ${PDDCP_SRC_DIR}/89.cc
