@@ -73,7 +73,7 @@ public:
     );
   }
 
-  auto size() const { return values_.psize(); }
+  auto size() const { return values_.size(); }
   auto n_values() const { return size(); }
   auto n_stacks() const { return ends_.size(); }
   const auto& values() const { return values_; }
