@@ -192,7 +192,6 @@ template <PDDCP_MATRIX_TEMPLATE_PARAMS>
 class dense_matrix : public matrix_base<dense_matrix<n_rows_, n_cols_, T>> {
 public:
   PDDCP_MATRIX_BASE_MEMBERS(dense_matrix);
-  static constexpr bool is_sparse = false;
 
   /**
    * Default ctor.
