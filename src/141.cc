@@ -68,8 +68,11 @@ public:
       {
         // GCC 9.3 bug -- internal compiler error. Godbolt reveals that GCC
         // 11.3 is minimum required version for this static_assert to compile
-        // correctly, while any C++17 supporting Clang has no issues.
-#if !defined(__clang__) && defined(__GNUG__) && \
+        // correctly, while any C++17 supporting Clang has no issues. note the
+        // __INTELLISENSE__ check is to suppress the VS Code red squiggle.
+#if \
+  !defined(__INTELLISENSE__) && \
+  !defined(__clang__) && defined(__GNUG__) && \
   (__GNUG__ < 11 || (__GNUG__ == 11 && __GNUC_MINOR__ < 3))
 #error "GCC >=11.3 required for correct compilation of line 76"
 #else
