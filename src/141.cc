@@ -19,6 +19,8 @@
  *        pass
  */
 
+#include <array>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -64,7 +66,15 @@ public:
       ,
       [&]
       {
+        // GCC 9.3 bug -- internal compiler error. Godbolt reveals that GCC
+        // 11.3 is minimum required version for this static_assert to compile
+        // correctly, while any C++17 supporting Clang has no issues.
+#if !defined(__clang__) && defined(__GNUG__) && \
+  (__GNUG__ < 11 || (__GNUG__ == 11 && __GNUC_MINOR__ < 3))
+#error "GCC >=11.3 required for correct compilation of line 76"
+#else
         static_assert(std::is_same_v<T, typename Cs::value_type>);
+#endif
         values_.insert(values_.cend(), init_values.cbegin(), init_values.cend());
         total_offset += init_values.size();
         // track where each stack ends
@@ -73,10 +83,29 @@ public:
     );
   }
 
+  /**
+   * Return number of values held in the multi stack.
+   */
   auto size() const { return values_.size(); }
+
+  /**
+   * Returns number of values held in the multi stack.
+   */
   auto n_values() const { return size(); }
+
+  /**
+   * Return number of stacks managed by the multi stack.
+   */
   auto n_stacks() const { return ends_.size(); }
+
+  /**
+   * Return const ref to underlying vector managing the stack values.
+   */
   const auto& values() const { return values_; }
+
+  /**
+   * Return const ref to vector holding indices indicating the stacks' ends.
+   */
   const auto& ends() const { return ends_; }
 
   /**
@@ -147,5 +176,44 @@ private:
       throw std::runtime_error("multi_stack is empty");
   }
 };
+
+/**
+ * Test fixture template for testing the multi stack.
+ *
+ * @tparam T value type
+ */
+template <typename T>
+class DailyTest141 : public ::testing::Test {
+protected:
+  // three different Container objects to populate 3 different stacks
+  static inline const std::vector<T> first_values_{1, 4, 23, 5, 777};
+  static inline const std::set<T> second_values_{6, 7, 8};
+  static inline const std::array<T, 4> third_values_{0, 8, 16, 32};
+};
+
+using DailyTest141Types = ::testing::Types<unsigned long, double, int>;
+TYPED_TEST_SUITE(DailyTest141, DailyTest141Types);
+
+/**
+ * Test that default and multi-container ctors work as expected.
+ */
+TYPED_TEST(DailyTest141, CtorTest)
+{
+  // default has no elements, and only one stack
+  multi_stack<TypeParam> empty_stack;
+  EXPECT_EQ(1, empty_stack.n_stacks());
+  EXPECT_EQ(0, empty_stack.n_values());
+  // multi-container will have 3 stacks
+  multi_stack<TypeParam> full_stack{
+    this->first_values_, this->second_values_, this->third_values_
+  };
+  EXPECT_EQ(3, full_stack.n_stacks());
+  EXPECT_EQ(
+    this->first_values_.size() +
+    this->second_values_.size() +
+    this->third_values_.size(),
+    full_stack.n_values()
+  );
+}
 
 }  // namespace
