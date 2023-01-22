@@ -80,6 +80,18 @@ public:
   const auto& ends() const { return ends_; }
 
   /**
+   * Peek the value at the top of specified stack.
+   *
+   * @param stack_number stack to peek at
+   */
+  const auto& peek(size_type stack_number)
+  {
+    check_stack_nonempty();
+    check_stack_number(stack_number);
+    return values_[ends_[stack_number] - 1];
+  }
+
+  /**
    * Pop a value from a specified stack 0-index.
    *
    * @param stack_number stack to pop a value from
@@ -87,10 +99,8 @@ public:
    */
   auto pop(size_type stack_number)
   {
-    if (stack_number >= ends_.size())
-      throw std::runtime_error("stack number must be < " + ends_.size());
-    if (!values_.size())
-      throw std::runtime_error("multi_stack is empty");
+    check_stack_nonempty();
+    check_stack_number(stack_number);
     auto value = values_.erase(values_.cbegin() + (ends_[stack_number] - 1));
     for (size_type i = stack_number; i < ends_.size(); i++)
       ends_[i]--;
@@ -106,8 +116,7 @@ public:
    */
   const auto& push(T value, size_type stack_number)
   {
-    if (stack_number >= ends_.size())
-      throw std::runtime_error("stack number must be < " + ends_.size());
+    check_stack_number(stack_number);
     values_.insert(values_.cbegin() + ends_[stack_number], value);
     for (size_type i = stack_number; i < ends_.size(); i++)
       ends_[i]++;
@@ -117,6 +126,26 @@ public:
 private:
   std::vector<T> values_;
   std::vector<size_type> ends_;
+
+  /**
+   * Check that the specified stack number is valid.
+   *
+   * @param stack_number stack index
+   */
+  void check_stack_number(size_type stack_number)
+  {
+    if (stack_number >= ends_.size())
+      throw std::runtime_error("stack number must be < " + ends_.size());
+  }
+
+  /**
+   * Check that the stack is not empty.
+   */
+  void check_stack_nonempty()
+  {
+    if (!values_.size())
+      throw std::runtime_error("multi_stack is empty");
+  }
 };
 
 }  // namespace
