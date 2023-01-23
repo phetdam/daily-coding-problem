@@ -14,9 +14,9 @@
 #include <cstdint>
 #include <initializer_list>
 #include <limits>
+#include <map>
 #include <type_traits>
 #include <vector>
-#include <unordered_map>
 
 namespace pddcp {
 
@@ -283,7 +283,10 @@ private:
 };
 
 /**
- * Sparse fixed-size 2D matrix implementation using an `unordered_map`.
+ * Sparse fixed-size 2D matrix implementation using a `map`.
+ *
+ * Although an `unordered_map` would have better performance, we would need a
+ * custom hashing function to hash the `index_type` used for indexing.
  *
  * @tparam n_rows_ number of rows
  * @tparam n_cols_ number of columns
@@ -294,12 +297,12 @@ class sparse_matrix : pddcp::matrix_base<sparse_matrix<n_rows_, n_cols_, T>> {
 public:
   PDDCP_MATRIX_BASE_MEMBERS(sparse_matrix);
   using index_type = std::pair<size_type, size_type>;
-  using storage_type = std::unordered_map<index_type, value_type>;
+  using storage_type = std::map<index_type, value_type>;
 
   /**
    * Default ctor.
    */
-  sparse_matrix() : values_{} {}
+  sparse_matrix() : values_{}, empty_value_{} {}
 
   /**
    * Template ctor to construct from a container of index-value pairs.
@@ -310,7 +313,7 @@ public:
    * @param pairs *Container* of `typename storage_type::value_type` objects
    */
   template <typename ValueContainer>
-  sparse_matrix(const ValueContainer& pairs)
+  sparse_matrix(const ValueContainer& pairs) : sparse_matrix()
   {
     static_assert(
       std::is_same_v<
@@ -322,8 +325,8 @@ public:
     std::for_each(
       pairs.cbegin(),
       pairs.cend(),
-      // Clang errors as "this" cannot be implicitly captured (GCC allows)
-      [this](const auto& p) { valid_index(p.first, true); }
+      // Clang error: "this" is not implicitly captured (without &, GCC allows)
+      [&](const auto& p) { valid_index(p.first, true); }
     );
     values_.insert(pairs.cbegin(), pairs.cend());
   }
@@ -361,11 +364,11 @@ public:
    */
   const T& at(size_type row, size_type col) const
   {
-    // soft check -- if missing this index, return default value
+    // soft check -- if missing this index, return reference to default value
     index_type index{row, col};
     if (valid_index(index))
       if (values_.find(index) == values_.cend())
-        return T{};
+        return empty_value_;
     // otherwise just return the value. if outside of bounds, this throws
     return values_.at(index);
   }
@@ -391,6 +394,7 @@ public:
 
 private:
   storage_type values_;
+  T empty_value_;
 
   /**
    * Check if we are indexing inside the bounds of the matrix.
@@ -399,7 +403,7 @@ private:
    * @param hard_check `true` to assert if out of bounds, `false` not to
    * @returns `true` if valid index, `false` if invalid
    */
-  bool valid_index(const index_type& index, bool hard_check = false)
+  static bool valid_index(const index_type& index, bool hard_check = false)
   {
     if (index.first >= row_count) {
       if (hard_check)
@@ -422,7 +426,7 @@ private:
    * @param hard_check `true` to assert if out of bounds, `false` not to
    * @returns `true` if valid index, `false` if invalid
    */
-  bool valid_index(size_type row, size_type col, bool hard_check = false)
+  static bool valid_index(size_type row, size_type col, bool hard_check = false)
   {
     return valid_index({row, col});
   }
