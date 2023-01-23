@@ -46,18 +46,20 @@ namespace {
  * Return minimum step count needed to reach the end from the start point.
  *
  * @tparam Matrix Matrix type with `row_count`, `col_count` attributes
+ * @tparam size_type Unsigned integral type, default `Matrix::size_type`
+ * @tparam index_type Pair-like type where both elements are `size_type`
  *
  * @param board Coordinate grid to traverse
  * @param start Start point on grid
  * @param end Destination point on grid
  */
-template <typename Matrix, typename size_type = typename Matrix::size_type>
+template <
+  typename Matrix,
+  typename size_type = typename Matrix::size_type,
+  typename index_type = std::pair<size_type, size_type>>
 auto min_steps(
-  const Matrix& board,
-  const std::pair<size_type, size_type>& start,
-  const std::pair<size_type, size_type>& end)
+  const Matrix& board, const index_type& start, const index_type& end)
 {
-  using index_type = std::pair<size_type, size_type>;
   using result_type = std::size_t;
   static_assert(
     std::is_same_v<bool, typename Matrix::value_type>,
