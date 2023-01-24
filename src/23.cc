@@ -28,7 +28,6 @@
  * through (1, 2) because there is a wall everywhere else on the second row.
  */
 
-#include <algorithm>
 #include <cstdint>
 #include <limits>
 #include <queue>
