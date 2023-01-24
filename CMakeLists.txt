@@ -51,6 +51,8 @@ if(MSVC)
         /Wall /Zc:__cplusplus
         # typically don't care if unreferenced inline functions are removed
         /wd4514
+        # silence warnings about padding (we don't care for this project)
+        /wd4820
         # for Google Test ::testing::Test subclasses, these are reported a lot,
         # i.e. for implicitly deleted copy/move ctor + operator=
         /wd4625 /wd4626 /wd5026 /wd5027

@@ -428,7 +428,7 @@ private:
    */
   static bool valid_index(size_type row, size_type col, bool hard_check = false)
   {
-    return valid_index({row, col});
+    return valid_index({row, col}, hard_check);
   }
 };
 
