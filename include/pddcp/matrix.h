@@ -293,7 +293,7 @@ private:
  * @tparam T value type
  */
 template <PDDCP_MATRIX_TEMPLATE_PARAMS>
-class sparse_matrix : pddcp::matrix_base<sparse_matrix<n_rows_, n_cols_, T>> {
+class sparse_matrix : public matrix_base<sparse_matrix<n_rows_, n_cols_, T>> {
 public:
   PDDCP_MATRIX_BASE_MEMBERS(sparse_matrix);
   using index_type = std::pair<size_type, size_type>;
