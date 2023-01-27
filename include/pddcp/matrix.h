@@ -565,7 +565,8 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
  * @param b second matrix
  */
 template <typename OutMatrix, typename InMatrixA, typename InMatrixB>
-auto operator+(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b)
+auto add_matrix_matrix(
+  const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
   static_assert(!std::is_same_v<Ta, bool>, "left matrix has bool value_type");
@@ -601,7 +602,7 @@ inline auto operator+(
     dense_matrix<row_count, col_count, Ta>,
     dense_matrix<row_count, col_count, double>
   >;
-  return operator+<OutMatrix, InMatrixA, InMatrixB>(a, b);
+  return add_matrix_matrix<OutMatrix>(a, b);
 }
 
 /**
@@ -623,12 +624,12 @@ inline auto operator+(
   const sparse_matrix<n_rows_, n_cols_, T>& a,
   const sparse_matrix<n_rows_, n_cols_, U>& b)
 {
-  using InMatrixA = std::decay_t<decltype(a)>;
-  using InMatrixB = std::decay_t<decltype(b)>;
   using OutMatrix = std::conditional_t<
-    std::is_same_v<T, U>, InMatrixA, sparse_matrix<n_rows_, n_cols_, double>
+    std::is_same_v<T, U>,
+    std::decay_t<decltype(a)>,
+    sparse_matrix<n_rows_, n_cols_, double>
   >;
-  return operator+<OutMatrix, InMatrixA, InMatrixB>(a, b);
+  return add_matrix_matrix<OutMatrix>(a, b);
 }
 
 /**
@@ -647,7 +648,7 @@ template <
   typename OutMatrix,
   typename InMatrix,
   typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(T)>
-auto operator+(const matrix_base<InMatrix>& mat, T value)
+auto add_matrix_scalar(const matrix_base<InMatrix>& mat, T value)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrix, OutMatrix);
   static_assert(!std::is_same_v<Ta, bool>, "matrix has bool value_type");
@@ -678,7 +679,7 @@ inline auto operator+(const matrix_base<InMatrix>& mat, T value)
     dense_matrix<InMatrix::row_count, InMatrix::col_count, T>,
     dense_matrix<InMatrix::row_count, InMatrix::col_count, double>
   >;
-  return operator+<OutMatrix, InMatrix, T>(mat, value);
+  return add_matrix_scalar<OutMatrix>(mat, value);
 }
 
 /**
@@ -715,11 +716,12 @@ template <
   typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
 inline auto operator+(const sparse_matrix<n_rows_, n_cols_, T>& mat, U value)
 {
-  using InMatrix = std::decay_t<decltype(mat)>;
   using OutMatrix = std::conditional_t<
-    std::is_same_v<T, U>, InMatrix, sparse_matrix<n_rows_, n_cols_, double>
+    std::is_same_v<T, U>,
+    std::decay_t<decltype(mat)>,
+    sparse_matrix<n_rows_, n_cols_, double>
   >;
-  return operator+<OutMatrix, InMatrix, U>(mat, value);
+  return add_matrix_scalar<OutMatrix>(mat, value);
 }
 
 /**
