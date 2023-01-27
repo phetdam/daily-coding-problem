@@ -298,9 +298,12 @@ public:
   PDDCP_MATRIX_BASE_MEMBERS(sparse_matrix);
   using index_type = std::pair<size_type, size_type>;
   using storage_type = std::map<index_type, value_type>;
+  using storage_value_type = typename storage_type::value_type;
 
   /**
    * Default ctor.
+   *
+   * Note explicit initialization is for safety with builtin types.
    */
   sparse_matrix() : values_{}, empty_value_{} {}
 
@@ -313,13 +316,11 @@ public:
    * @param pairs *Container* of `typename storage_type::value_type` objects
    */
   template <typename ValueContainer>
-  sparse_matrix(const ValueContainer& pairs) : sparse_matrix()
+  sparse_matrix(const ValueContainer& pairs) : sparse_matrix{}
   {
     static_assert(
-      std::is_same_v<
-        typename storage_type::value_type, typename ValueContainer::value_type
-      >,
-      "Container value_type must be std::pair<const index_type, value_type>"
+      std::is_same_v<storage_value_type, typename ValueContainer::value_type>,
+      "Container value_type must be storage_value_type"
     );
     // check that none of the indices is inserting "outside" the matrix
     std::for_each(
@@ -329,6 +330,25 @@ public:
       [&](const auto& p) { valid_index(p.first, true); }
     );
     values_.insert(pairs.cbegin(), pairs.cend());
+  }
+
+  /**
+   * Ctor to construct from a initializer list of index-value pairs.
+   *
+   * This needs to be separate from the ctor template, as the compiler
+   * typically tries to use the move/copy ctor instead.
+   *
+   * @param pairs Initializer list of `storage_value_type` objects
+   */
+  sparse_matrix(const std::initializer_list<storage_value_type>& pairs)
+    : sparse_matrix{}
+  {
+    std::for_each(
+      pairs.begin(),
+      pairs.end(),
+      [&](const auto& p) { valid_index(p.first, true); }
+    );
+    values_.insert(pairs.begin(), pairs.end());
   }
 
   /**
