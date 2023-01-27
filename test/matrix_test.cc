@@ -415,4 +415,25 @@ TYPED_TEST(IMatrixTest, PlusOverloadTest)
   );
 }
 
+/**
+ * Test that matrix unary `operator-` works as expected.
+ *
+ * Nothing is done for unsigned types, as we would get a compile error. Also
+ * indirectly tests `operator+`, `operator==`, as we check a + (-a) + a == a.
+ */
+TYPED_TEST(IMatrixTest, NegationTest)
+{
+  if constexpr (std::is_signed_v<TypeParam>) {
+    // 0 == -0
+    EXPECT_EQ(this->mat_default_, -this->mat_default_);
+    // a + (-a) + a == a
+    EXPECT_EQ(
+      this->mat_square_,
+      this->mat_square_ + (-this->mat_square_) + this->mat_square_
+    );
+  }
+  else
+    GTEST_SKIP() << "skipping negation of unsigned type";
+}
+
 }  // namespace
