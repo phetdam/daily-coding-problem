@@ -15,8 +15,42 @@
 #include <initializer_list>
 #include <limits>
 #include <map>
+
+#ifdef _OPENMP
+#include <mutex>
+#endif  // _OPENMP
+
 #include <type_traits>
 #include <vector>
+
+// macro indicating that we're using MSVC's OpenMP, which is stuck at 2.0
+#if defined(_OPENMP) && defined(_MSC_VER)
+#define PDDCP_OMP_MSVC
+#endif  // !defined(_OPENMP) || !defined(_MSC_VER)
+
+// macros for disabling and reenabling MSVC signed/unsigned mismatch warnings
+// when indexing matrices when PDDCP_OMP_MSVC is defined
+#ifdef PDDCP_OMP_MSVC
+#define PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE() \
+  _Pragma("warning (push)") \
+  _Pragma("warning (disable: 4365)")
+#define PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE() _Pragma("warning (pop)")
+#else
+#define PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
+#define PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
+#endif  // PDDCP_OMP_MSVC
+
+// macro for OpenMP parallel for matrix loop annotation. MSVC only supports
+// OpenMP 2.0 and so can only parallelize the outer loop (no collapse() clause)
+#ifdef _OPENMP
+#ifdef _MSC_VER
+#define PDDCP_OMP_PARALLEL_MATRIX_FOR __pragma(omp parallel for)
+#else
+#define PDDCP_OMP_PARALLEL_MATRIX_FOR _Pragma("omp parallel for collapse(2)")
+#endif  // _MSC_VER
+#else
+#define PDDCP_OMP_PARALLEL_MATRIX_FOR
+#endif  // _OPENMP
 
 namespace pddcp {
 
@@ -288,6 +322,9 @@ private:
  * Although an `unordered_map` would have better performance, we would need a
  * custom hashing function to hash the `index_type` used for indexing.
  *
+ * This sparse matrix is still thread-safe when compiling with OpenMP since it
+ * locks the value map to force state consistency through sequential writes.
+ *
  * @tparam n_rows_ number of rows
  * @tparam n_cols_ number of columns
  * @tparam T value type
@@ -306,6 +343,19 @@ public:
    * Note explicit initialization is for safety with builtin types.
    */
   sparse_matrix() : values_{}, empty_value_{} {}
+
+#ifdef _OPENMP
+  /**
+   * Custom copy ctor.
+   *
+   * Needed when compiling with OpenMP since `std::mutex` is not copyable.
+   *
+   * @param other Other sparse matrix to copy from
+   */
+  sparse_matrix(const sparse_matrix<row_count, col_count, value_type>& other)
+    : values_{other.values()}, empty_value_{}
+  {}
+#endif  // _OPENMP
 
   /**
    * Template ctor to construct from a container of index-value pairs.
@@ -374,6 +424,10 @@ public:
   {
     // hard check to prevent setting outside the matrix bounds
     valid_index(row, col, true);
+// mutex acquisition if using OpenMP
+#ifdef _OPENMP
+    std::lock_guard locker{values_mutex_};
+#endif  // _OPENMP
     return values_[{row, col}];
   }
 
@@ -416,6 +470,9 @@ public:
 private:
   storage_type values_;
   T empty_value_;
+#ifdef _OPENMP
+  std::mutex values_mutex_;
+#endif  // _OPENMP
 
   /**
    * Check if we are indexing inside the bounds of the matrix.
@@ -456,22 +513,44 @@ private:
 /**
  * Loop through matrix indices in row-major order.
  *
- * @param n_rows number of matrix rows
- * @param n_cols number of matrix cols
- */
-#define PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) \
-  for (std::size_t i = 0; i < n_rows; i++) \
-    for (std::size_t j = 0; j < n_cols; j++)
-
-/**
- * Loop through matrix indices in column-major order.
+ * Signed loop variables are used if compiled with OpenMP by MSVC, in which
+ * case the `PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()` and
+ * `PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()` macros should be used to silence
+ * any signed/unsigned mismatch warnings that would arise.
  *
  * @param n_rows number of matrix rows
  * @param n_cols number of matrix cols
  */
+#ifdef PDDCP_OMP_MSVC
+#define PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) \
+  for (std::ptrdiff_t i = 0; i < n_rows; i++) \
+    for (std::ptrdiff_t j = 0; j < n_cols; j++)
+#else
+#define PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) \
+  for (std::size_t i = 0; i < n_rows; i++) \
+    for (std::size_t j = 0; j < n_cols; j++)
+#endif  // PDDCP_OMP_MSVC
+
+/**
+ * Loop through matrix indices in column-major order.
+ *
+ * Signed loop variables are used if compiled with OpenMP by MSVC, in which
+ * case the `PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()` and
+ * `PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()` macros should be used to silence
+ * any signed/unsigned mismatch warnings that would arise.
+ *
+ * @param n_rows number of matrix rows
+ * @param n_cols number of matrix cols
+ */
+#ifdef PDDCP_OMP_MSVC
+#define PDDCP_MATRIX_COL_MAJOR_LOOP(n_rows, n_cols) \
+  for (std::ptrdiff_t j = 0; j < n_cols; j++) \
+    for (std::ptrdiff_t i = 0; i < n_rows; i++)
+#else
 #define PDDCP_MATRIX_COL_MAJOR_LOOP(n_rows, n_cols) \
   for (std::size_t j = 0; j < n_cols; j++) \
     for (std::size_t i = 0; i < n_rows; i++)
+#endif  // PDDCP_OMP_MSVC
 
 /**
  * Macro used for matrix binary operators to check shapes and alias types.
@@ -532,8 +611,10 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
   using eps_type = std::conditional_t<std::is_same_v<Ta, Tb>, Ta, double>;
   // perform elementwise comparison
   PDDCP_MATRIX_ROW_MAJOR_LOOP(InMatrixA::row_count, InMatrixA::col_count) {
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
     auto& v_a = a(i, j);
     auto& v_b = b(i, j);
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
     // only use float comparison for floating types
     if constexpr (std::is_floating_point_v<Ta> || std::is_floating_point_v<Tb>) {
       // constexpr epsilon (no runtime cost) for float comparison
@@ -573,11 +654,11 @@ auto add_matrix_matrix(
   static_assert(!std::is_same_v<Ta, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<Tb, bool>, "right matrix has bool value_type");
   OutMatrix c;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
     c(i, j) = a(i, j) + b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return c;
 }
 
@@ -655,11 +736,11 @@ auto add_matrix_scalar(const matrix_base<InMatrix>& mat, T value)
   static_assert(!std::is_same_v<Ta, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<T, bool>, "scalar has bool value_type");
   OutMatrix out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
     out(i, j) = mat(i, j) + value;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -760,11 +841,11 @@ auto operator-(const matrix_base<MatrixI>& mat)
   using T = typename MatrixI::value_type;
   static_assert(std::is_signed_v<T>, "T must be a signed type");
   MatrixI out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(MatrixI::row_count, MatrixI::col_count)
     out(i, j) = -mat(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -933,8 +1014,10 @@ bool operator==(
 {
   // compute constexpr epsilon (no runtime cost anyways) for float comparison
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) {
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
     auto& v_a = a(i, j);
     auto& v_b = b(i, j);
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
     // only use float comparison for floating types
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
       // when types are same
@@ -987,11 +1070,11 @@ auto operator+(
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
   matrix<n_rows, n_cols, V> c;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) + b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return c;
 }
 
@@ -1037,19 +1120,19 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
-// MSVC issues implicit conversion warning
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+// MSVC issues implicit conversion warning in the addition operation
 #ifdef _MSC_VER
 #pragma warning (push)
 #pragma warning (disable: 5219)
 #endif  // _MSC_VER
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = mat(i, j) + value;
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif  // _MSC_VER
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -1102,11 +1185,11 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat)
 {
   static_assert(std::is_signed_v<T>, "T must be a signed type");
   matrix<n_rows, n_cols, T> out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = -mat(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -1134,11 +1217,11 @@ auto operator-(
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
   matrix<n_rows, n_cols, V> c;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) - b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return c;
 }
 
@@ -1184,11 +1267,11 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat, U value)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = mat(i, j) - value;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -1236,11 +1319,11 @@ auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = value - mat(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return out;
 }
 
@@ -1276,11 +1359,11 @@ auto operator&(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
   matrix<n_rows, n_cols, bool> c;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) && b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return c;
 }
 
@@ -1298,11 +1381,11 @@ auto operator|(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
   matrix<n_rows, n_cols, bool> c;
-#ifdef _OPENMP
-  #pragma omp parallel for collapse(2)
-#endif  // _OPENMP
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) || b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
   return c;
 }
 

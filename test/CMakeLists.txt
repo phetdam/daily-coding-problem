@@ -20,7 +20,11 @@ add_executable(
     matrix_test.cc
     prefix_tree_test.cc
 )
-target_link_libraries(pddcp_test GTest::gtest_main)
+# use OpenMP if available
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(pddcp_test PRIVATE OpenMP::OpenMP_CXX)
+endif()
+target_link_libraries(pddcp_test PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(pddcp_test)
