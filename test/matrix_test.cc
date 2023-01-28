@@ -212,27 +212,6 @@ TYPED_TEST(MatrixTest, PlusMinusTest)
 }
 
 /**
- * Temporary test for the `dense_matrix` template implemented using CRTP.
- *
- * CRTP is also formally known as "F-bounded quantification".
- */
-TYPED_TEST(MatrixTest, FBoundTest)
-{
-  // note: right now only dense_matrix is implemented
-  pddcp::dense_matrix<4, 5, TypeParam> mat;
-  static_assert(
-    std::is_same_v<TypeParam, typename decltype(mat)::value_type>,
-    "mat value_type must equal TypeParam"
-  );
-  EXPECT_EQ(mat.col_count, mat.n_cols());
-  EXPECT_EQ(mat(0, 3), mat.at(0, 3));
-  EXPECT_EQ(mat, mat);
-  // skip this test for unsigned type (can't use unary operator-)
-  if constexpr (std::is_signed_v<TypeParam>)
-    EXPECT_EQ(mat, mat + (-mat) + mat);
-}
-
-/**
  * Traits classes that defines matrix types based on shape and enum value.
  */
 /**
