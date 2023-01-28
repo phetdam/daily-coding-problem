@@ -423,7 +423,7 @@ TYPED_TEST(IMatrixTest, PlusOverloadTest)
  */
 TYPED_TEST(IMatrixTest, NegationTest)
 {
-  if constexpr (std::is_signed_v<TypeParam>) {
+  if constexpr (std::is_signed_v<typename TestFixture::value_type>) {
     // 0 == -0
     EXPECT_EQ(this->mat_default_, -this->mat_default_);
     // a + (-a) + a == a
