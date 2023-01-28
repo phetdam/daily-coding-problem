@@ -343,6 +343,7 @@ public:
   sparse_matrix(const std::initializer_list<storage_value_type>& pairs)
     : sparse_matrix{}
   {
+    // no use of cbegin, cend as initializer_list doesn't have them
     std::for_each(
       pairs.begin(),
       pairs.end(),
