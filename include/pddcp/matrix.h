@@ -44,6 +44,8 @@
 // OpenMP 2.0 and so can only parallelize the outer loop (no collapse() clause)
 #ifdef _OPENMP
 #ifdef _MSC_VER
+// must use MSVC __pragma here instead of _Pragma otherwise you get an internal
+// compiler error. still an issue in Visual Studio 2022
 #define PDDCP_OMP_PARALLEL_MATRIX_FOR __pragma(omp parallel for)
 #else
 #define PDDCP_OMP_PARALLEL_MATRIX_FOR _Pragma("omp parallel for collapse(2)")
