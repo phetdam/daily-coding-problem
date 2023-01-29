@@ -613,10 +613,10 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
   using eps_type = std::conditional_t<std::is_same_v<Ta, Tb>, Ta, double>;
   // perform elementwise comparison
   PDDCP_MATRIX_ROW_MAJOR_LOOP(InMatrixA::row_count, InMatrixA::col_count) {
-    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
     auto& v_a = a(i, j);
     auto& v_b = b(i, j);
-    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
     // only use float comparison for floating types
     if constexpr (std::is_floating_point_v<Ta> || std::is_floating_point_v<Tb>) {
       // constexpr epsilon (no runtime cost) for float comparison
@@ -656,11 +656,11 @@ auto add_matrix_matrix(
   static_assert(!std::is_same_v<Ta, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<Tb, bool>, "right matrix has bool value_type");
   OutMatrix c;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
     c(i, j) = a(i, j) + b(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return c;
 }
 
@@ -738,11 +738,11 @@ auto add_matrix_scalar(const matrix_base<InMatrix>& mat, T value)
   static_assert(!std::is_same_v<Ta, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<T, bool>, "scalar has bool value_type");
   OutMatrix out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
     out(i, j) = mat(i, j) + value;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -843,11 +843,11 @@ auto operator-(const matrix_base<MatrixI>& mat)
   using T = typename MatrixI::value_type;
   static_assert(std::is_signed_v<T>, "T must be a signed type");
   MatrixI out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(MatrixI::row_count, MatrixI::col_count)
     out(i, j) = -mat(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -1016,10 +1016,10 @@ bool operator==(
 {
   // compute constexpr epsilon (no runtime cost anyways) for float comparison
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols) {
-    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
     auto& v_a = a(i, j);
     auto& v_b = b(i, j);
-    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+    PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
     // only use float comparison for floating types
     if constexpr (std::is_floating_point_v<T> || std::is_floating_point_v<U>) {
       // when types are same
@@ -1072,11 +1072,11 @@ auto operator+(
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
   matrix<n_rows, n_cols, V> c;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) + b(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return c;
 }
 
@@ -1122,7 +1122,7 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
 // MSVC issues implicit conversion warning in the addition operation
 #ifdef _MSC_VER
 #pragma warning (push)
@@ -1134,7 +1134,7 @@ auto operator+(const matrix<n_rows, n_cols, T>& mat, U value)
 #ifdef _MSC_VER
 #pragma warning (pop)
 #endif  // _MSC_VER
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -1187,11 +1187,11 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat)
 {
   static_assert(std::is_signed_v<T>, "T must be a signed type");
   matrix<n_rows, n_cols, T> out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = -mat(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -1219,11 +1219,11 @@ auto operator-(
   static_assert(!std::is_same_v<T, bool>, "left matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "right matrix has bool value_type");
   matrix<n_rows, n_cols, V> c;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) - b(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return c;
 }
 
@@ -1269,11 +1269,11 @@ auto operator-(const matrix<n_rows, n_cols, T>& mat, U value)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = mat(i, j) - value;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -1321,11 +1321,11 @@ auto operator-(T value, const matrix<n_rows, n_cols, U>& mat)
   static_assert(!std::is_same_v<T, bool>, "matrix has bool value_type");
   static_assert(!std::is_same_v<U, bool>, "scalar has bool value_type");
   matrix<n_rows, n_cols, V> out;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     out(i, j) = value - mat(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
 
@@ -1361,11 +1361,11 @@ auto operator&(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
   matrix<n_rows, n_cols, bool> c;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) && b(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return c;
 }
 
@@ -1383,11 +1383,11 @@ auto operator|(
   const matrix<n_rows, n_cols, bool>& a, const matrix<n_rows, n_cols, bool>& b)
 {
   matrix<n_rows, n_cols, bool> c;
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
   PDDCP_MATRIX_ROW_MAJOR_LOOP(n_rows, n_cols)
     c(i, j) = a(i, j) || b(i, j);
-  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE();
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return c;
 }
 
