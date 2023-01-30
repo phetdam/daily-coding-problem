@@ -555,7 +555,9 @@ private:
 #endif  // PDDCP_OMP_MSVC
 
 /**
- * Macro used for matrix binary operators to check shapes and alias types.
+ * Check that two matrix types have the same shapes and create type aliases.
+ *
+ * Usually used by matrix/matrix binary operators for convenience.
  *
  * Defines the type aliases `T` for `typename matrix_a::value_type`, `U` for
  * `typename matrix_b::value_type`, `row_count` and `col_count` dimensions.
@@ -576,6 +578,37 @@ private:
   constexpr auto col_count = matrix_a::col_count; \
   (void) row_count; \
   (void) col_count
+
+/**
+ * Check that the `value_type` fields of two matrices are not `bool`.
+ *
+ * @param matrix_a Type of the first matrix
+ * @param matrix_b Type of the second matrix
+ */
+#define PDDCP_MATRIX_CHECK_NON_BOOLEAN(matrix_a, matrix_b) \
+  static_assert( \
+    !std::is_same_v<typename matrix_a::value_type, bool>, \
+    "left matrix has bool value_type" \
+  ); \
+  static_assert( \
+    !std::is_same_v<typename matrix_b::value_type, bool>, \
+    "right matrix has bool value_type" \
+  )
+
+/**
+ * Check that a matrix type's `value_type` and a scalar type are not `bool`.
+ *
+ * @param matrix_type Matrix type
+ * @param scalar_type Scalar type
+ */
+#define PDDCP_MATRIX_SCALAR_CHECK_NON_BOOLEAN(matrix_type, scalar_type) \
+  static_assert( \
+    !std::is_same_v<typename matrix_type::value_type, bool>, \
+    "matrix has bool value_type" \
+  ); \
+  static_assert( \
+    !std::is_same_v<scalar_type, bool>, "scalar has bool value_type" \
+  )
 
 /**
  * Macro for scalar template type parameter for binary operator overloads.
@@ -637,7 +670,7 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
 }
 
 /**
- * Return sum of two non-boolean matrices as a dense matrix with same shape.
+ * Return sum of two non-boolean matrices as a matrix with same shape.
  *
  * This is typically called from one of the other `operator+` overloads.
  *
@@ -649,12 +682,11 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
  * @param b second matrix
  */
 template <typename OutMatrix, typename InMatrixA, typename InMatrixB>
-auto add_matrix_matrix(
+auto matrix_plus_matrix(
   const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
-  static_assert(!std::is_same_v<Ta, bool>, "left matrix has bool value_type");
-  static_assert(!std::is_same_v<Tb, bool>, "right matrix has bool value_type");
+  PDDCP_MATRIX_CHECK_NON_BOOLEAN(InMatrixA, InMatrixB);
   OutMatrix c;
   PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
@@ -686,7 +718,7 @@ inline auto operator+(
     dense_matrix<row_count, col_count, Ta>,
     dense_matrix<row_count, col_count, double>
   >;
-  return add_matrix_matrix<OutMatrix>(a, b);
+  return matrix_plus_matrix<OutMatrix>(a, b);
 }
 
 /**
@@ -713,7 +745,7 @@ inline auto operator+(
     std::decay_t<decltype(a)>,
     sparse_matrix<n_rows_, n_cols_, double>
   >;
-  return add_matrix_matrix<OutMatrix>(a, b);
+  return matrix_plus_matrix<OutMatrix>(a, b);
 }
 
 /**
@@ -728,15 +760,11 @@ inline auto operator+(
  * @param mat matrix
  * @param value scalar value
  */
-template <
-  typename OutMatrix,
-  typename InMatrix,
-  typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(T)>
-auto add_matrix_scalar(const matrix_base<InMatrix>& mat, T value)
+template <typename OutMatrix, typename InMatrix, typename T>
+auto matrix_plus_scalar(const matrix_base<InMatrix>& mat, T value)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrix, OutMatrix);
-  static_assert(!std::is_same_v<Ta, bool>, "matrix has bool value_type");
-  static_assert(!std::is_same_v<T, bool>, "scalar has bool value_type");
+  PDDCP_MATRIX_SCALAR_CHECK_NON_BOOLEAN(InMatrix, T);
   OutMatrix out;
   PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
@@ -763,7 +791,7 @@ inline auto operator+(const matrix_base<InMatrix>& mat, T value)
     dense_matrix<InMatrix::row_count, InMatrix::col_count, T>,
     dense_matrix<InMatrix::row_count, InMatrix::col_count, double>
   >;
-  return add_matrix_scalar<OutMatrix>(mat, value);
+  return matrix_plus_scalar<OutMatrix>(mat, value);
 }
 
 /**
@@ -796,8 +824,7 @@ inline auto operator+(T value, const matrix_base<InMatrix>& mat)
  * @param value scalar value
  */
 template <
-  PDDCP_MATRIX_TEMPLATE_PARAMS,
-  typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
+  PDDCP_MATRIX_TEMPLATE_PARAMS, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
 inline auto operator+(const sparse_matrix<n_rows_, n_cols_, T>& mat, U value)
 {
   using OutMatrix = std::conditional_t<
@@ -805,7 +832,7 @@ inline auto operator+(const sparse_matrix<n_rows_, n_cols_, T>& mat, U value)
     std::decay_t<decltype(mat)>,
     sparse_matrix<n_rows_, n_cols_, double>
   >;
-  return add_matrix_scalar<OutMatrix>(mat, value);
+  return matrix_plus_scalar<OutMatrix>(mat, value);
 }
 
 /**
@@ -823,8 +850,7 @@ inline auto operator+(const sparse_matrix<n_rows_, n_cols_, T>& mat, U value)
  * @param value scalar value
  */
 template <
-  PDDCP_MATRIX_TEMPLATE_PARAMS,
-  typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
+  PDDCP_MATRIX_TEMPLATE_PARAMS, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
 inline auto operator+(U value, const sparse_matrix<n_rows_, n_cols_, T>& mat)
 {
   return mat + value;
@@ -841,7 +867,7 @@ template <typename MatrixI>
 auto operator-(const matrix_base<MatrixI>& mat)
 {
   using T = typename MatrixI::value_type;
-  static_assert(std::is_signed_v<T>, "T must be a signed type");
+  static_assert(std::is_signed_v<T>, "matrix value_type must be a signed type");
   MatrixI out;
   PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
@@ -849,6 +875,56 @@ auto operator-(const matrix_base<MatrixI>& mat)
     out(i, j) = -mat(i, j);
   PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
+}
+
+/**
+ * Return difference of two non-boolean matrices as matrix with same shape.
+ *
+ * This is typically called from one of the other `operator-` overloads.
+ *
+ * @tparam OutMatrix Output matrix type
+ * @tparam InMatrixA First matrix type
+ * @tparam InMatrixB Second matrix type
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <typename OutMatrix, typename InMatrixA, typename InMatrixB>
+auto matrix_minus_matrix(const InMatrixA& a, const InMatrixB& b)
+{
+  PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
+  PDDCP_MATRIX_CHECK_NON_BOOLEAN(InMatrixA, InMatrixB);
+  OutMatrix c;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
+    c(i, j) = a(i, j) - b(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
+  return c;
+}
+
+/**
+ * Return difference of two non-boolean matrices as a matrix with same shape.
+ *
+ * Base case for matrix summation that returns a `dense_matrix` of doubles if
+ * the value types differ, otherwise a `dense_matrix` of the shared type.
+ *
+ * @tparam InMatrixA First matrix type
+ * @tparam InMatrixB Second matrix type
+ *
+ * @param a first matrix
+ * @param b second matrix
+ */
+template <typename InMatrixA, typename InMatrixB>
+auto operator-(const InMatrixA& a, const InMatrixB& b)
+{
+  PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<Ta, Tb>,
+    dense_matrix<row_count, col_count, Ta>,
+    dense_matrix<row_count, col_count, double>
+  >;
+  return matrix_minus_matrix<OutMatrix>(a, b);
 }
 
 /**
