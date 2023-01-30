@@ -415,4 +415,58 @@ TYPED_TEST(IMatrixTest, NegationTest)
     GTEST_SKIP() << "skipping negation of unsigned type";
 }
 
+/**
+ * Test that matrix binary `operator-` overloads are selected as expected.
+ */
+TYPED_TEST(IMatrixTest, MinusOverloadTest)
+{
+  using value_type = typename TestFixture::value_type;
+  // matrix - matrix
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        value_type,
+        typename decltype(this->mat_square_ - this->mat_square_)::value_type
+      >
+    )
+  );
+  // matrix - value_type scalar
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        value_type,
+        typename decltype(this->mat_default_ - value_type{14})::value_type
+      >
+    )
+  );
+  // value_type scalar - matrix
+  EXPECT_TRUE(
+    (
+      std::is_same_v<
+        value_type,
+        typename decltype(value_type{100} - this->mat_vector_)::value_type
+      >
+    )
+  );
+}
+
+/**
+ * Test that binary matrix `operator+`, `operator-` work as expected.
+ *
+ * Indirectly also tests `operator==` for comparison. Tests matrix/matrix,
+ * scalar/matrix, matrix/scalar operations together.
+ */
+TYPED_TEST(IMatrixTest, PlusMinusTest)
+{
+  // 0 == 0 + 0
+  EXPECT_EQ(this->mat_default_, this->mat_default_ + this->mat_default_);
+  // a == a + a - a, where we are not using unary operator-
+  EXPECT_EQ(
+    this->mat_square_,
+    this->mat_square_ + this->mat_square_ - this->mat_square_
+  );
+  // b == 1 + b - 1
+  EXPECT_EQ(this->mat_vector_, 1 + this->mat_vector_ - 1);
+}
+
 }  // namespace

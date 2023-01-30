@@ -670,7 +670,7 @@ bool operator==(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b
 }
 
 /**
- * Return sum of two non-boolean matrices as a matrix with same shape.
+ * Return sum of two non-boolean matrices.
  *
  * This is typically called from one of the other `operator+` overloads.
  *
@@ -697,7 +697,7 @@ auto matrix_plus_matrix(
 }
 
 /**
- * Return sum of two non-boolean matrices as a matrix with same shape.
+ * Return sum of two non-boolean matrices.
  *
  * Base case for matrix summation that returns a `dense_matrix` of doubles if
  * the value types differ, otherwise a `dense_matrix` of the shared type.
@@ -722,7 +722,7 @@ inline auto operator+(
 }
 
 /**
- * Return sum of two non-boolean sparse matrices as a matrix with same shape.
+ * Return sum of two non-boolean sparse matrices.
  *
  * Special case for sparse matrices that returns a sparse matrix. The return
  * `value_type` is `double` if `a` and `b` have different `value_type` members.
@@ -768,8 +768,16 @@ auto matrix_plus_scalar(const matrix_base<InMatrix>& mat, T value)
   OutMatrix out;
   PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
   PDDCP_OMP_PARALLEL_MATRIX_FOR
+// MSVC issues implicit conversion warning in the addition operation
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 5219)
+#endif  // _MSC_VER
   PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
     out(i, j) = mat(i, j) + value;
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif  // _MSC_VER
   PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
   return out;
 }
@@ -878,7 +886,7 @@ auto operator-(const matrix_base<MatrixI>& mat)
 }
 
 /**
- * Return difference of two non-boolean matrices as matrix with same shape.
+ * Return difference of two non-boolean matrices.
  *
  * This is typically called from one of the other `operator-` overloads.
  *
@@ -890,7 +898,8 @@ auto operator-(const matrix_base<MatrixI>& mat)
  * @param b second matrix
  */
 template <typename OutMatrix, typename InMatrixA, typename InMatrixB>
-auto matrix_minus_matrix(const InMatrixA& a, const InMatrixB& b)
+auto matrix_minus_matrix(
+  const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
   PDDCP_MATRIX_CHECK_NON_BOOLEAN(InMatrixA, InMatrixB);
@@ -904,7 +913,7 @@ auto matrix_minus_matrix(const InMatrixA& a, const InMatrixB& b)
 }
 
 /**
- * Return difference of two non-boolean matrices as a matrix with same shape.
+ * Return difference of two non-boolean matrices.
  *
  * Base case for matrix summation that returns a `dense_matrix` of doubles if
  * the value types differ, otherwise a `dense_matrix` of the shared type.
@@ -916,7 +925,7 @@ auto matrix_minus_matrix(const InMatrixA& a, const InMatrixB& b)
  * @param b second matrix
  */
 template <typename InMatrixA, typename InMatrixB>
-auto operator-(const InMatrixA& a, const InMatrixB& b)
+auto operator-(const matrix_base<InMatrixA>& a, const matrix_base<InMatrixB>& b)
 {
   PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrixA, InMatrixB);
   using OutMatrix = std::conditional_t<
@@ -925,6 +934,180 @@ auto operator-(const InMatrixA& a, const InMatrixB& b)
     dense_matrix<row_count, col_count, double>
   >;
   return matrix_minus_matrix<OutMatrix>(a, b);
+}
+
+/**
+ * Return difference of two non-boolean sparse matrices.
+ *
+ * Special case for sparse matrices that returns a sparse matrix. The return
+ * `value_type` is `double` if `a` and `b` have different `value_type` members.
+ *
+ * @tparam n_rows_ number of rows
+ * @tparam n_cols_ number of columns
+ * @tparam T value type
+ * @tparam U value type
+ *
+ * @param a first sparse matrix
+ * @param b second sparse matrix
+ */
+template <PDDCP_MATRIX_TEMPLATE_PARAMS, typename U>
+inline auto operator-(
+  const sparse_matrix<n_rows_, n_cols_, T>& a,
+  const sparse_matrix<n_rows_, n_cols_, U>& b)
+{
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<T, U>,
+    std::decay_t<decltype(a)>,
+    sparse_matrix<n_rows_, n_cols_, double>
+  >;
+  return matrix_minus_matrix<OutMatrix>(a, b);
+}
+
+/**
+ * Return difference of a non-boolean matrix + scalar.
+ *
+ * This is typically called from one of the other `operator-` overloads.
+ *
+ * @tparam OutMatrix Output matrix type
+ * @tparam InMatrix Input matrix type
+ * @tparam T scalar type
+ *
+ * @param mat matrix
+ * @param value scalar value
+ */
+template <typename OutMatrix, typename InMatrix, typename T>
+auto matrix_minus_scalar(const matrix_base<InMatrix>& mat, T value)
+{
+  PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrix, OutMatrix);
+  PDDCP_MATRIX_SCALAR_CHECK_NON_BOOLEAN(InMatrix, T);
+  OutMatrix out;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
+    out(i, j) = mat(i, j) - value;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
+  return out;
+}
+
+/**
+ * Return difference of a non-boolean matrix + scalar.
+ *
+ * Base overload selected that returns a `dense_matrix` of `T` if the matrix
+ * `value_type` is `T`, otherwise `dense_matrix` of doubles.
+ *
+ * @tparam InMatrix Input matrix type
+ * @tparam T scalar type
+ */
+template <typename InMatrix, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(T)>
+inline auto operator-(const matrix_base<InMatrix>& mat, T value)
+{
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<T, typename InMatrix::value_type>,
+    dense_matrix<InMatrix::row_count, InMatrix::col_count, T>,
+    dense_matrix<InMatrix::row_count, InMatrix::col_count, double>
+  >;
+  return matrix_minus_scalar<OutMatrix>(mat, value);
+}
+
+/**
+ * Return difference of non-boolean sparse matrix + scalar.
+ *
+ * The returned `sparse_matrix` has `value_type` `T` if it is the same as `U`,
+ * otherwise its `value_type` will be `double`.
+ *
+ * @tparam n_rows_ number of matrix rows
+ * @tparam n_cols_ number of matrix cols
+ * @tparam T sparse matrix `value_type`
+ * @tparam U scalar type
+ *
+ * @param mat sparse matrix
+ * @param value scalar value
+ */
+template <
+  PDDCP_MATRIX_TEMPLATE_PARAMS, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
+inline auto operator-(const sparse_matrix<n_rows_, n_cols_, T>& mat, U value)
+{
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<T, U>,
+    std::decay_t<decltype(mat)>,
+    sparse_matrix<n_rows_, n_cols_, double>
+  >;
+  return matrix_minus_scalar<OutMatrix>(mat, value);
+}
+
+/**
+ * Return difference of a scalar and a non-boolean matrix.
+ *
+ * Cannot be implemented in terms of unary `operator-` and binary `operator+`,
+ * as otherwise that will fail if the matrix has an unsigned `value_type`.
+ *
+ * @tparam n_rows number of matrix rows
+ * @tparam n_cols number of matrix cols
+ * @tparam T first `value_type`
+ * @tparam U second `value_type`
+ * @tparam V returned matrix `value_type`
+ *
+ * @param value scalar value
+ * @param mat matrix
+ */
+template <typename OutMatrix, typename InMatrix, typename T>
+auto scalar_minus_matrix(T value, const matrix_base<InMatrix>& mat)
+{
+  PDDCP_MATRIX_CHECK_SIZE_TYPES(InMatrix, OutMatrix);
+  PDDCP_MATRIX_SCALAR_CHECK_NON_BOOLEAN(InMatrix, T);
+  OutMatrix out;
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
+  PDDCP_OMP_PARALLEL_MATRIX_FOR
+  PDDCP_MATRIX_ROW_MAJOR_LOOP(row_count, col_count)
+    out(i, j) = value - mat(i, j);
+  PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
+  return out;
+}
+
+/**
+ * Return difference of a scalar + non-boolean matrix.
+ *
+ * Base overload selected that returns a `dense_matrix` of `T` if the matrix
+ * `value_type` is `T`, otherwise `dense_matrix` of doubles.
+ *
+ * @tparam InMatrix Input matrix type
+ * @tparam T scalar type
+ */
+template <typename InMatrix, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(T)>
+inline auto operator-(T value, const matrix_base<InMatrix>& mat)
+{
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<T, typename InMatrix::value_type>,
+    dense_matrix<InMatrix::row_count, InMatrix::col_count, T>,
+    dense_matrix<InMatrix::row_count, InMatrix::col_count, double>
+  >;
+  return scalar_minus_matrix<OutMatrix>(value, mat);
+}
+
+/**
+ * Return difference of scalar + non-boolean sparse matrix.
+ *
+ * The returned `sparse_matrix` has `value_type` `T` if it is the same as `U`,
+ * otherwise its `value_type` will be `double`.
+ *
+ * @tparam n_rows_ number of matrix rows
+ * @tparam n_cols_ number of matrix cols
+ * @tparam T sparse matrix `value_type`
+ * @tparam U scalar type
+ *
+ * @param mat sparse matrix
+ * @param value scalar value
+ */
+template <
+  PDDCP_MATRIX_TEMPLATE_PARAMS, typename PDDCP_MATRIX_ENABLE_IF_ARITHMETIC(U)>
+inline auto operator-(U value, const sparse_matrix<n_rows_, n_cols_, T>& mat)
+{
+  using OutMatrix = std::conditional_t<
+    std::is_same_v<T, U>,
+    std::decay_t<decltype(mat)>,
+    sparse_matrix<n_rows_, n_cols_, double>
+  >;
+  return scalar_minus_matrix<OutMatrix>(value, mat);
 }
 
 /**
