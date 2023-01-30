@@ -23,22 +23,7 @@
 #include <type_traits>
 #include <vector>
 
-// macro indicating that we're using MSVC's OpenMP, which is stuck at 2.0
-#if defined(_OPENMP) && defined(_MSC_VER)
-#define PDDCP_OMP_MSVC
-#endif  // !defined(_OPENMP) || !defined(_MSC_VER)
-
-// macros for disabling and reenabling MSVC signed/unsigned mismatch warnings
-// when indexing matrices when PDDCP_OMP_MSVC is defined
-#ifdef PDDCP_OMP_MSVC
-#define PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE() \
-  _Pragma("warning (push)") \
-  _Pragma("warning (disable: 4365)")
-#define PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE() _Pragma("warning (pop)")
-#else
-#define PDDCP_OMP_MSVC_SIGN_MISMATCH_DISABLE()
-#define PDDCP_OMP_MSVC_SIGN_MISMATCH_ENABLE()
-#endif  // PDDCP_OMP_MSVC
+#include "pddcp/omp.h"
 
 // macro for OpenMP parallel for matrix loop annotation. MSVC only supports
 // OpenMP 2.0 and so can only parallelize the outer loop (no collapse() clause)
