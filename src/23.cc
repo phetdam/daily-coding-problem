@@ -196,7 +196,7 @@ INSTANTIATE_TEST_SUITE_P(
  */
 TEST_P(DailyTest23, ParamTest)
 {
-  // stepts are the expected number of steps
+  // steps are the expected number of steps
   const auto& [steps, input] = GetParam();
   // start point, end point, and the [index, bool] pairs sent to the board
   const auto& [start, end, value_pairs] = input;
