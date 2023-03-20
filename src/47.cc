@@ -24,6 +24,19 @@
 
 namespace {
 
+/**
+ * Return max possible profit of a single buy and sell given price history.
+ *
+ * Solution works in O(N) time by moving in reverse to collect a running max
+ * of the max profit and max sell price. This implementation works with
+ * negative prices as well, and if only losses are possible, returns the
+ * smallest possible loss given the losing price history.
+ *
+ * @tparam InputIt *LegacyRandomAccessIterator* and *LegacyContiguousIterator*
+ *
+ * @param first Iterator to first price
+ * @param last Iterator to one past the last price
+ */
 template <typename InputIt>
 auto max_profit(InputIt first, InputIt last)
 {
@@ -50,6 +63,15 @@ auto max_profit(InputIt first, InputIt last)
   return profit;
 }
 
+/**
+ * Return max possible profit of a single buy and sell given price history.
+ *
+ * Main overload that should be used with common *Container* classes.
+ *
+ * @tparam Container *Container* with arithmetic `value_type`
+ *
+ * @param values Container of price values in chronological order
+ */
 template <typename Container>
 inline auto max_profit(const Container& values)
 {
