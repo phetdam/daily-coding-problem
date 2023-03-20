@@ -42,10 +42,7 @@ auto max_profit(InputIt first, InputIt last)
 {
   // shorthand for the iterator value type + type check
   using result_type = typename std::iterator_traits<InputIt>::value_type;
-  static_assert(
-    std::is_arithmetic_v<result_type>,
-    "InputIt value_type must be arithmetic type"
-  );
+  static_assert(std::is_arithmetic_v<result_type>);
   // if these are equal, no prices, so return 0
   if (first == last)
     return result_type{0};
