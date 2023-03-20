@@ -115,10 +115,26 @@ pddcp_xor_node_alloc(double value)
   return xn;
 }
 
+/**
+ * Append a new XOR linked list node.
+ *
+ * @param xll Original XOR linked list
+ * @param value New node value
+ * @returns `PDDCP_XORLL_OK` on success, `PDDCP_XORLL_ERR_*` otherwise.
+ */
 PDDCP_XORLL_PUBLIC
 pddcp_xorll_error
 pddcp_xorll_append(pddcp_xorll *xll, double value);
 
+/**
+ * Returns the specified node in linked list.
+ *
+ * If the list is `NULL` or contains less than k + 1 nodes, returns an error.
+ *
+ * @param xll Original XOR linked list
+ * @param k Node index
+ * @param out Address to the `pddcp_xor_node *` we write the result to
+ */
 PDDCP_XORLL_PUBLIC
 pddcp_xorll_error
 pddcp_xorll_get(pddcp_xorll *xll, size_t k, pddcp_xor_node **out);
