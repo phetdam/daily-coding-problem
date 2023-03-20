@@ -16,6 +16,8 @@ if(MSVC)
         # Google Test gtest-param-util.h triggers these warnings (braced
         # initialization list eval order, Spectre mitigation)
         /wd4868 /wd5045
+        # 89.cc, 135.cc Google Test warns that const variable is not used
+        /wd5264
     )
     if(NOT CMAKE_BUILD_TYPE STREQUAL Release)
         add_compile_options(/Od /DEBUG)

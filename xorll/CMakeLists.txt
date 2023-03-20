@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 # XOR linked list mini-library. on Windows, we also need to copy it to where
-# the legacy XOR linked list driver program will be copied
+# the legacy XOR linked list driver program will be copied + manage DLL export
 add_library(pddcp_xorll SHARED xorll.c)
 if(WIN32)
+    target_compile_definitions(pddcp_xorll PRIVATE PDDCP_XORLL_BUILD_DLL)
     add_custom_command(
         TARGET pddcp_xorll POST_BUILD
         COMMAND

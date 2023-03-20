@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 3.21)
 
 # if C++ compiler is not defined, we automatically choose Clang on Linux. GCC
 # 11.3 is required at the minimum and not all *nix system have this yet.
-if(NOT MSVC)
+if(NOT ${MSVC})
     if(NOT DEFINED CMAKE_C_COMPILER)
         set(MESSAGE "CMAKE_C_COMPILER not defined, using clang as default")
         set(CMAKE_C_COMPILER clang)
@@ -34,7 +34,7 @@ project(
 )
 
 # default build type Debug
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 

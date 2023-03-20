@@ -28,6 +28,17 @@
 #define PDDCP_XORLL_STRINGIFY_I(x) #x
 #define PDDCP_XORLL_STRINGIFY(x) PDDCP_XORLL_STRINGIFY_I(x)
 
+// DLL import/export for Windows
+#ifdef _WIN32
+#ifdef PDDCP_XORLL_BUILD_DLL
+#define PDDCP_XORLL_PUBLIC __declspec(dllexport)
+#else
+#define PDDCP_XORLL_PUBLIC __declspec(dllimport)
+#endif  // PDDCP_XORLL_BUILD_DLL
+#else
+#define PDDCP_XORLL_PUBLIC
+#endif  // _WIN32
+
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
@@ -104,8 +115,11 @@ pddcp_xor_node_alloc(double value)
   return xn;
 }
 
+PDDCP_XORLL_PUBLIC
 pddcp_xorll_error
 pddcp_xorll_append(pddcp_xorll *xll, double value);
+
+PDDCP_XORLL_PUBLIC
 pddcp_xorll_error
 pddcp_xorll_get(pddcp_xorll *xll, size_t k, pddcp_xor_node **out);
 

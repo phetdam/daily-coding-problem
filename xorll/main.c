@@ -106,7 +106,7 @@ main(int argc, char **argv)
   for (size_t i = 0; i < n; i++) {
     if (pddcp_xorll_get(xll, i, &temp))
       return EXIT_FAILURE;
-    printf("%.2g", temp->data);
+    printf("%g", temp->data);
     if (i < n - 1)
       printf(" ");
   }
