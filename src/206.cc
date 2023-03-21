@@ -25,6 +25,16 @@
 
 namespace {
 
+/**
+ * Return `true` if the indices represent a valid index permutation.
+ *
+ * A valid index permutation is such that for a container size `N`, it contains
+ * the unique index values `0` through `N - 1` inclusive.
+ *
+ * @tparam IndexContainer *SequenceContainer* with unsigned `value_type`
+ *
+ * @param indices Container of permuted indices
+ */
 template <typename IndexContainer>
 bool is_permutation(const IndexContainer& indices)
 {
@@ -49,6 +59,18 @@ bool is_permutation(const IndexContainer& indices)
   return true;
 }
 
+/**
+ * Permute a container of values using the given permutation.
+ *
+ * @tparam ValueContainer *SequenceContainer* implementing `operator[]`
+ * @tparam IndexContainer *SequenceContainer* with unsigned `size_type`
+ *
+ * @param values Container of values to permute
+ * @param indices Container of permuted indices
+ * @param check_indices `true` to check `indices`, `false` for no check
+ * @throws `std::runtime_error` if `values` and `indices` have different sizes.
+ *  Also thrown if `check_indices` is `true` and `indices` is invalid.
+ */
 template <typename ValueContainer, typename IndexContainer>
 auto permute(
   const ValueContainer& values,
@@ -104,10 +126,12 @@ INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
   DailyTest206,
   ::testing::Values(
+    // is_permutation is given invalid indices
     pair_type{
       {{{'c', 'a', '2', 'd', 's'}, {0, 4, 1, 3, 2}}, {1, 56, 2, 3}},
       {{'c', 's', 'a', 'd', '2'}, false}
     },
+    // is_permutation is given valid indices
     pair_type{
       {{{'a', 'g', '1', 'd', 'b', 'j'}, {0, 2, 5, 1, 4, 3}}, {1, 0, 2, 3}},
       {{'a', '1', 'j', 'g', 'b', 'd'}, true}
