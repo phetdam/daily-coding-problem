@@ -26,7 +26,7 @@
 namespace {
 
 template <typename IndexContainer>
-bool valid_permutation(const IndexContainer& indices)
+bool is_permutation(const IndexContainer& indices)
 {
   // if using integral indexing, the index type must be unsigned integral
   using index_type = typename IndexContainer::value_type;
@@ -63,7 +63,7 @@ auto permute(
   // sanity check for size + optional permutation check
   if (values.size() != indices.size())
     throw std::runtime_error("values and indices must have same length");
-  if (check_indices && !valid_permutation(indices))
+  if (check_indices && !is_permutation(indices))
     throw std::runtime_error("indices do not make a valid permutation");
   // make permutation and return
   ValueContainer new_values(values.size());
@@ -78,9 +78,9 @@ using input_type = std::pair<
     std::vector<char>,         // values for permute testing
     std::vector<unsigned int>  // valid permutation for permute testing
   >,
-  std::vector<unsigned short>  // for testing valid_permutation
+  std::vector<unsigned short>  // for testing is_permutation
 >;
-// vector to check permute result, bool to check valid_permutation result
+// vector to check permute result, bool to check is_permutation result
 using result_type = std::pair<std::vector<char>, bool>;
 using pair_type = std::pair<input_type, result_type>;
 
@@ -127,11 +127,11 @@ TEST_P(DailyTest206, PermuteTest)
 }
 
 /**
- * Test that `valid_permutation` works correctly.
+ * Test that `is_permutation` works correctly.
  */
-TEST_P(DailyTest206, ValidPermutationTest)
+TEST_P(DailyTest206, IsPermutationTest)
 {
-  EXPECT_EQ(GetParam().second.second, valid_permutation(GetParam().first.second));
+  EXPECT_EQ(GetParam().second.second, is_permutation(GetParam().first.second));
 }
 
 }  // namespace
