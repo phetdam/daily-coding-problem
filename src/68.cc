@@ -110,6 +110,34 @@ INSTANTIATE_TEST_SUITE_P(
   ::testing::Values(pair_type{{{0, 0}, {1, 2}, {2, 2}, {4, 0}}, 2})
 );
 
+INSTANTIATE_TEST_SUITE_P(
+  CustomPairs,
+  DailyTest68,
+  // the origin of the boards used below is at the top left
+  ::testing::Values(
+    /**
+     * - b - - - b
+     * - - - - - -
+     * - - - b - -
+     * - - - - - -
+     * - b - - - -
+     * - - b - - -
+     */
+    pair_type{{{0, 1}, {0, 5}, {2, 3}, {4, 1}, {5, 2}}, 5},
+    /**
+     * - - - - - - - -
+     * - - - - - - - -
+     * - b - - - - - -
+     * - - b - - - - -
+     * - - - - - - - -
+     * - - - - b - - -
+     * - - - - - - - -
+     * - - b - - - b -
+     */
+    pair_type{{{2, 1}, {3, 2}, {5, 4}, {7, 2}, {7, 6}}, 7}
+  )
+);
+
 /**
  * Test that `bishop_attacks` works correctly.
  */
