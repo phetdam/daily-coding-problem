@@ -8,17 +8,21 @@ add_executable(
     ${PDDCP_SRC_DIR}/15.cc
     ${PDDCP_SRC_DIR}/23.cc
     ${PDDCP_SRC_DIR}/35.cc
+    ${PDDCP_SRC_DIR}/47.cc
     ${PDDCP_SRC_DIR}/51.cc
+    ${PDDCP_SRC_DIR}/68.cc
     ${PDDCP_SRC_DIR}/89.cc
     ${PDDCP_SRC_DIR}/124.cc
     ${PDDCP_SRC_DIR}/128.cc
     ${PDDCP_SRC_DIR}/135.cc
     ${PDDCP_SRC_DIR}/141.cc
     ${PDDCP_SRC_DIR}/176.cc
+    ${PDDCP_SRC_DIR}/206.cc
     # tests from shared library unit tests
     binary_tree_test.cc
     matrix_test.cc
     prefix_tree_test.cc
+    type_traits_test.cc
 )
 # use OpenMP if available
 if(OpenMP_CXX_FOUND)
