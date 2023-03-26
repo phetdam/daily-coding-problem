@@ -2,22 +2,25 @@ cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 add_executable(
     pddcp_test
-    # tests included from standalone runners
-    ${PDDCP_SRC_DIR}/7.cc
-    ${PDDCP_SRC_DIR}/11.cc
-    ${PDDCP_SRC_DIR}/15.cc
-    ${PDDCP_SRC_DIR}/23.cc
-    ${PDDCP_SRC_DIR}/35.cc
-    ${PDDCP_SRC_DIR}/47.cc
-    ${PDDCP_SRC_DIR}/51.cc
-    ${PDDCP_SRC_DIR}/68.cc
-    ${PDDCP_SRC_DIR}/89.cc
+    # tests included from standalone runners. if a runner's source file
+    # compiles the same under -DPDDCP_GTEST_STANDALONE, we can avoid
+    # recompiling its source by directly linking the object into pddcp_test
+    $<TARGET_OBJECTS:7>
+    $<TARGET_OBJECTS:11>
+    $<TARGET_OBJECTS:15>
+    $<TARGET_OBJECTS:23>
+    $<TARGET_OBJECTS:35>
+    $<TARGET_OBJECTS:47>
+    $<TARGET_OBJECTS:51>
+    $<TARGET_OBJECTS:68>
+    $<TARGET_OBJECTS:89>
     ${PDDCP_SRC_DIR}/124.cc
     ${PDDCP_SRC_DIR}/128.cc
-    ${PDDCP_SRC_DIR}/135.cc
-    ${PDDCP_SRC_DIR}/141.cc
-    ${PDDCP_SRC_DIR}/176.cc
-    ${PDDCP_SRC_DIR}/206.cc
+    $<TARGET_OBJECTS:135>
+    $<TARGET_OBJECTS:141>
+    $<TARGET_OBJECTS:161>
+    $<TARGET_OBJECTS:176>
+    $<TARGET_OBJECTS:206>
     # tests from shared library unit tests
     binary_tree_test.cc
     matrix_test.cc
