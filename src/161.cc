@@ -43,7 +43,7 @@ inline T bit_reverse(T value)
 
 // convenience type aliases
 using input_type = std::uint32_t;
-using result_type = std::uint32_t;
+using result_type = input_type;
 using pair_type = std::pair<input_type, result_type>;
 
 /**
