@@ -21,14 +21,14 @@
 namespace {
 
 /**
- * Return input with bits reversed.
+ * Return input with bits inverted.
  *
  * @tparam T Integral type
  *
- * @param value Value to have bits reversed
+ * @param value Value to have bits inverted
  */
 template <typename T>
-inline T bit_reverse(T value)
+inline T invert_bits(T value)
 {
   static_assert(std::is_integral_v<T>);
   return ~value;
@@ -37,9 +37,9 @@ inline T bit_reverse(T value)
 /**
  * Macro for reversing bits.
  *
- * @param x Integral value to have bits reversed
+ * @param x Integral value to have bits inverted
  */
-#define BIT_REVERSE(x) ~(x)
+#define INVERT_BITS(x) ~(x)
 
 // convenience type aliases
 using input_type = std::uint32_t;
@@ -67,19 +67,19 @@ INSTANTIATE_TEST_SUITE_P(
 );
 
 /**
- * Test that `bit_reverse` works as expected.
+ * Test that `invert_bits` works as expected.
  */
 TEST_P(DailyTest161, FunctionParamTest)
 {
-  EXPECT_EQ(GetParam().second, bit_reverse(GetParam().first));
+  EXPECT_EQ(GetParam().second, invert_bits(GetParam().first));
 }
 
 /**
- * Test that `BIT_REVERSE` works as expected.
+ * Test that `INVERT_BITS` works as expected.
  */
 TEST_P(DailyTest161, MacroParamTest)
 {
-  EXPECT_EQ(GetParam().second, BIT_REVERSE(GetParam().first));
+  EXPECT_EQ(GetParam().second, INVERT_BITS(GetParam().first));
 }
 
 }  // namespace
