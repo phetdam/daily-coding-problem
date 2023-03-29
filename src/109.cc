@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "pddcp/utility.h"
+#include "pddcp/warnings.h"
 
 namespace {
 
@@ -46,11 +47,15 @@ using pair_type = std::pair<input_type, result_type>;
 
 class DailyTest109 : public ::testing::TestWithParam<pair_type> {};
 
+// MSVC complains that the hex value conversion may result in loss of data
+PDDCP_MSVC_WARNING_PUSH()
+PDDCP_MSVC_WARNING_DISABLE(4242)
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
   DailyTest109,
   ::testing::Values(pair_type{0xAA, 0x55}, pair_type{0xE2, 0xD1})
 );
+PDDCP_MSVC_WARNING_POP()
 
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
