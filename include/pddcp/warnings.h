@@ -27,21 +27,8 @@
  */
 #define PDDCP_MSVC_WARNING_POP() __pragma(warning(pop))
 #else
-/**
- * Push warning state.
- */
 #define PDDCP_MSVC_WARNING_PUSH()
-
-/**
- * Disable specified MSVC warnings.
- *
- * @param wnos Warning number(s), e.g. 4242
- */
 #define PDDCP_MSVC_WARNING_DISABLE(wnos)
-
-/**
- * Pop warning state.
- */
 #define PDDCP_MSVC_WARNING_POP()
 #endif  // _MSC_VER
 
@@ -65,21 +52,8 @@
  */
 #define PDDCP_GNU_WARNING_POP() _Pragma("GCC diagnostic pop")
 #else
-/**
- * Push warning state.
- */
 #define PDDCP_GNU_WARNING_PUSH()
-
-/**
- * Disable specified GCC/Clang warning.
- *
- * @param wname GCC/Clang warning name without -W, e.g. self-move, narrowing
- */
 #define PDDCP_GNU_WARNING_DISABLE(wname)
-
-/**
- * Pop warning state.
- */
 #define PDDCP_GNU_WARNING_POP()
 #endif  // __GNUC__
 
