@@ -116,7 +116,7 @@ protected:
 /**
  * Macro for defining a `CaseTest`.
  *
- * Defines a test to check that `pddcp::bt::min_path` works as expected.
+ * Defines a test to check that `pddcp::tree::min_path` works as expected.
  *
  * Trying to reduce some fingerwork since we have to manually parametrize, as
  * the `binary_tree<T>` is not copyable due to use of `std::unique_ptr`.
@@ -127,7 +127,7 @@ protected:
   TEST_F(DailyTest135, CaseTest ## n) \
   { \
     const auto& [root, cost] = case_ ## n ## _; \
-    EXPECT_EQ(cost, pddcp::bt::min_path(&root)); \
+    EXPECT_EQ(cost, pddcp::tree::min_path(&root)); \
   }
 
 DAILY_TEST_135_CASE_TEST(1)

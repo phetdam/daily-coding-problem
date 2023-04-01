@@ -32,7 +32,7 @@ public:
    *
    * @param value node value
    */
-  binary_tree(T value) : binary_tree(value, nullptr, nullptr) {}
+  binary_tree(T value) : binary_tree{value, nullptr, nullptr} {}
 
   /**
    * Create binary tree node with children.
@@ -45,6 +45,20 @@ public:
    */
   binary_tree(T value, self_type* left, self_type* right)
     : value_(value), left_(left), right_(right)
+  {}
+
+  /**
+   * Create binary tree node with children.
+   *
+   * @param value node value
+   * @param left Owned left child to take ownership of
+   * @param right Owned right child to take ownership of
+   */
+  binary_tree(
+    T value,
+    std::unique_ptr<self_type>& left,
+    std::unique_ptr<self_type>& right)
+    : binary_tree{value, left.release(), right.release()}
   {}
 
   // getters, including convenience getters for left + right values
@@ -135,7 +149,7 @@ private:
   std::unique_ptr<self_type> right_;
 };
 
-namespace bt {
+namespace tree {
 
 /**
  * Returns the minimum cost of travelling from root to leaf in a binary tree.
@@ -162,7 +176,20 @@ auto min_path(const binary_tree<T>* root)
   return root->value() + std::min(left_cost, right_cost);
 }
 
-}  // namespace bt
+/**
+ * Returns the minimum cost of travelling from root to leaf in a binary tree.
+ *
+ * @tparam T value type
+ *
+ * @param root binary tree root
+ */
+template <typename T>
+inline auto min_path(const binary_tree<T>& root)
+{
+  return min_path(&root);
+}
+
+}  // namespace tree
 
 namespace bst {
 

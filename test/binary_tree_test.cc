@@ -138,9 +138,9 @@ TEST_F(BinaryTreeTest, SetRightValueTest)
  */
 TEST_F(BinaryTreeTest, MinPathTest)
 {
-  EXPECT_EQ(g_min_path_1_, pddcp::bt::min_path(&g_root_1_));
-  EXPECT_EQ(g_min_path_2_, pddcp::bt::min_path(&g_root_2_));
-  EXPECT_EQ(g_min_path_3_, pddcp::bt::min_path(&g_root_3_));
+  EXPECT_EQ(g_min_path_1_, pddcp::tree::min_path(g_root_1_));
+  EXPECT_EQ(g_min_path_2_, pddcp::tree::min_path(g_root_2_));
+  EXPECT_EQ(g_min_path_3_, pddcp::tree::min_path(g_root_3_));
 }
 
 /**
