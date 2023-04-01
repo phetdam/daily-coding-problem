@@ -37,7 +37,11 @@ namespace {
  */
 inline std::uint8_t swap_adjacent_bits(std::uint8_t value)
 {
+// MSVC complains about signed/unsigned mismatch from int to std::uint8_t
+PDDCP_MSVC_WARNING_PUSH()
+PDDCP_MSVC_WARNING_DISABLE(4365)
   return ((value & 0x55) << 1) | ((value & 0xAA) >> 1);
+PDDCP_MSVC_WARNING_POP()
 }
 
 // convenience type aliases

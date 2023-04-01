@@ -12,6 +12,8 @@
 #include <cstdint>
 #include <type_traits>
 
+#include "pddcp/warnings.h"
+
 namespace pddcp {
 
 namespace detail {
@@ -117,9 +119,13 @@ template <typename T>
 inline T swap_adjacent_bits(T value)
 {
   static_assert(std::is_integral_v<T>);
+// MSVC complains about signed/unsigned mismatch from int to T
+PDDCP_MSVC_WARNING_PUSH()
+PDDCP_MSVC_WARNING_DISABLE(4365)
   return
     ((value & alternating_bitmasks<T>::odd_mask) << 1) |
     ((value & alternating_bitmasks<T>::even_mask) >> 1);
+PDDCP_MSVC_WARNING_POP()
 }
 
 }  // namespace pddcp
