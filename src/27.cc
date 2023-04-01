@@ -242,11 +242,6 @@ using pair_type = std::pair<input_type, result_type>;
     PDDCP_CONCAT(U, str) \
   }
 
-// macros for the different string literals we want to check.
-#define LITERAL_1 "([])[]({})"
-#define LITERAL_2 "([)]"
-#define LITERAL_3 "((()"
-
 /**
  * Test fixture class for parametrized tests.
  */
