@@ -187,7 +187,7 @@ bool update_bracket_stack(std::stack<CharT, Container>& stack, CharT c)
   return true;
 }
 
-template <typename CharT, typename Traits = std::char_traits<CharT>>
+template <typename CharT, typename Traits>
 bool brackets_balanced(std::basic_istream<CharT, Traits>& stream)
 {
   std::stack<CharT> stack;
