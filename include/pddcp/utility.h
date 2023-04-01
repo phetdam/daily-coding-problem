@@ -114,7 +114,7 @@ struct alternating_bitmasks : detail::alternating_bitmasks<sizeof(T), T> {};
  * @param value Value whose even and odd bits are to be swapped
  */
 template <typename T>
-auto swap_adjacent_bits(T value)
+inline T swap_adjacent_bits(T value)
 {
   static_assert(std::is_integral_v<T>);
   return

@@ -35,7 +35,7 @@ namespace {
  *
  * @param value Value whose even and odd bits are to be swapped
  */
-auto swap_adjacent_bits(std::uint8_t value)
+inline std::uint8_t swap_adjacent_bits(std::uint8_t value)
 {
   return ((value & 0x55) << 1) | ((value & 0xAA) >> 1);
 }
