@@ -9,9 +9,12 @@
 #define PDDCP_BINARY_TREE_H_
 
 #include <algorithm>
+#include <deque>
 #include <initializer_list>
 #include <memory>
 #include <optional>
+#include <ostream>
+#include <type_traits>
 #include <vector>
 
 namespace pddcp {
@@ -149,6 +152,8 @@ private:
   std::unique_ptr<self_type> right_;
 };
 
+// TODO: consider removing tree namespace, minimum path cost is something
+// generic that could be applied to graphs, non-binary trees, etc.
 namespace tree {
 
 /**
@@ -156,7 +161,7 @@ namespace tree {
  *
  * @tparam T value type
  *
- * @param root binary tree root
+ * @param root Binary tree root
  */
 template <typename T>
 auto min_path(const binary_tree<T>* root)
@@ -181,7 +186,7 @@ auto min_path(const binary_tree<T>* root)
  *
  * @tparam T value type
  *
- * @param root binary tree root
+ * @param root Binary tree root
  */
 template <typename T>
 inline auto min_path(const binary_tree<T>& root)
@@ -190,6 +195,139 @@ inline auto min_path(const binary_tree<T>& root)
 }
 
 }  // namespace tree
+
+/**
+ * Perform a breadth-first search on the binary tree.
+ *
+ * @tparam T value type
+ * @tparam Sink *Callable* that takes a `T` or `const T&`
+ *
+ * @param root Binary tree root
+ * @param sink *Callable* used to handle each retrieved value
+ * @returns Number of elements found in the tree
+ */
+template <typename T, typename Sink>
+auto bfs(const binary_tree<T>* root, Sink sink)
+{
+  // queue for nodes + counter for number of elements in tree
+  std::deque<const binary_tree<T>*> node_queue;
+  std::size_t n_nodes = 0;
+  // if there's no tree, there are no results
+  if (!root)
+    return n_nodes;
+  // otherwise, proceed in a typical breadth-first search
+  node_queue.push_back(root);
+  while (node_queue.size()) {
+    // place value of front node in the sink + increment node count
+    auto node = node_queue.front();
+    // values.emplace_back(node.value());
+    sink(node->value());
+    n_nodes++;
+    // add left and right child if they exist
+    if (node->left())
+      node_queue.push_back(node->left());
+    if (node->right())
+      node_queue.push_back(node->right());
+    // remove remaining front reference in queue
+    node_queue.pop_front();
+  }
+  return n_nodes;
+}
+
+/**
+ * Perform a breadth-first search on the binary tree.
+ *
+ * @tparam T value type
+ * @tparam Sink *Callable* that takes a `T` or `const T&`
+ *
+ * @param root Binary tree root
+ * @param sink *Callable* used to handle each retrieved value
+ * @returns Number of elements found in the tree
+ */
+template <typename T, typename Sink>
+inline auto bfs(const binary_tree<T>& root, Sink sink)
+{
+  return bfs(&root, sink);
+}
+
+/**
+ * Return values from a breadth-first search in a container.
+ *
+ * @tparam Container *Container* with `T` as `value_type`
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename Container, typename T>
+inline auto bfs(const binary_tree<T>* root)
+{
+  static_assert(std::is_same_v<T, typename Container::value_type>);
+  Container values;
+  bfs(root, [&values](const T& v) { values.emplace_back(v); });
+  return values;
+}
+
+/**
+ * Return values from a breadth-first search in a container.
+ *
+ * @tparam Container *Container* with `T` as `value_type`
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename Container, typename T>
+inline auto bfs(const binary_tree<T>& root)
+{
+  return bfs<Container>(&root);
+}
+
+/**
+ * Return values from a breadth-first search in a `std::vector<T>`.
+ *
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename T>
+inline auto bfs(const binary_tree<T>* root)
+{
+  return bfs<std::vector<T>>(root);
+}
+
+/**
+ * Return values from a breadth-first search in a `std::vector<T>`.
+ *
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename T>
+inline auto bfs(const binary_tree<T>& root)
+{
+  return bfs(&root);
+}
+
+template <typename CharT, typename Traits, typename T>
+inline auto bfs(
+  std::basic_ostream<CharT, Traits>& stream,
+  const binary_tree<T>* root)
+{
+  return bfs(
+    root,
+    [&stream](const T& v)
+    {
+      stream << v;
+      stream.put(stream.widen('\n'));
+    }
+  );
+}
+
+template <typename CharT, typename Traits, typename T>
+inline auto bfs(
+  std::basic_ostream<CharT, Traits>& stream, const binary_tree<T>& root)
+{
+  return bfs(stream, &root);
+}
 
 namespace bst {
 
@@ -200,7 +338,7 @@ namespace bst {
  *
  * @tparam T value type
  *
- * @param root binary tree root
+ * @param root Binary tree root
  * @param value value to insert
  * @returns `root` to allow method chaining
  */
@@ -235,7 +373,7 @@ auto insert(binary_tree<T>* root, T value)
  * @tparam T value type
  * @tparam ContainerType *Container* with `T` as `value_type`
  *
- * @param root binary tree root
+ * @param root Binary tree root
  * @param values *Container* of `T` values to insert
  * @returns `this` to allow method chaining
  */
@@ -255,7 +393,7 @@ inline auto insert(binary_tree<T>* root, const ContainerType& values)
  *
  * @tparam T value type
  *
- * @param root binary tree root
+ * @param root Binary tree root
  * @param values initializer list of `T` values to insert
  * @returns `this` to allow method chaining
  */
