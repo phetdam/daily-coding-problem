@@ -15,6 +15,7 @@ add_executable(
     $<TARGET_OBJECTS:51>
     $<TARGET_OBJECTS:68>
     $<TARGET_OBJECTS:89>
+    $<TARGET_OBJECTS:107>
     $<TARGET_OBJECTS:109>
     ${PDDCP_SRC_DIR}/124.cc
     ${PDDCP_SRC_DIR}/128.cc
