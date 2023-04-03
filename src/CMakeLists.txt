@@ -13,6 +13,7 @@ pddcp_add_gtest_standalone(47)
 pddcp_add_gtest_standalone(51)
 pddcp_add_gtest_standalone(68)
 pddcp_add_gtest_standalone(89)
+pddcp_add_gtest_standalone(107)
 pddcp_add_gtest_standalone(109)
 pddcp_add_gtest_standalone(124)
 # kill flood of warnings that pop up on Windows from ppltasks.h
