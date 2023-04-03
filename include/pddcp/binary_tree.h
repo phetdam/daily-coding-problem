@@ -307,6 +307,16 @@ inline auto bfs(const binary_tree<T>& root)
   return bfs(&root);
 }
 
+/**
+ * Write values from a breadth-first search to a stream, one value per line.
+ *
+ * @tparam Char T Char type
+ * @tparam Traits Char traits
+ * @tparam T value type
+ *
+ * @param stream Output stream
+ * @param root Binary tree root
+ */
 template <typename CharT, typename Traits, typename T>
 inline auto bfs(
   std::basic_ostream<CharT, Traits>& stream,
@@ -322,6 +332,16 @@ inline auto bfs(
   );
 }
 
+/**
+ * Write values from a breadth-first search to a stream, one value per line.
+ *
+ * @tparam Char T Char type
+ * @tparam Traits Char traits
+ * @tparam T value type
+ *
+ * @param stream Output stream
+ * @param root Binary tree root
+ */
 template <typename CharT, typename Traits, typename T>
 inline auto bfs(
   std::basic_ostream<CharT, Traits>& stream, const binary_tree<T>& root)
