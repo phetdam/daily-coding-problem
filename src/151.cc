@@ -2,6 +2,7 @@
  * @file 151.cc
  * @author Derek Huang
  * @brief #151 from Daily Coding Problem
+ * @copyright MIT License
  *
  * Given a 2-D matrix representing an image, a location of a pixel in the
  * screen and a color C, replace the color of the given pixel and all adjacent
