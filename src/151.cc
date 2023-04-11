@@ -33,17 +33,28 @@
 
 namespace {
 
-template <typename Matrix, typename IndexType, typename ValueType>
+/**
+ * Flood-fill a matrix with a value starting from a given index.
+ *
+ * @tparam Matrix `pddcp::matrix_base<T>` CRTP subclass
+ * @tparam ValueType Type convertiable to `pddcp::matrix_traits<T>::value_type`
+ *
+ * @param mat Matrix to flood fill
+ * @param index Index to start filling at
+ * @param fill_value Value to fill with
+ * @returns Number of filled cells
+ */
+template <typename Matrix, typename ValueType>
 auto flood_fill(
   pddcp::matrix_base<Matrix>& mat,
-  const std::pair<IndexType, IndexType>& index,
+  const typename pddcp::matrix_traits<Matrix>::index_type index,
   ValueType fill_value)
 {
+  // type aliases + check that conversion is allowed
   using traits_type = pddcp::matrix_traits<Matrix>;
   using value_type = typename traits_type::value_type;
-  using index_pair_type = std::decay_t<decltype(index)>;
+  using index_type = std::decay_t<decltype(index)>;
   static_assert(std::is_convertible_v<ValueType, value_type>);
-  static_assert(std::is_unsigned_v<IndexType>);
   // can't fill any cells outside the grid
   std::size_t n_filled = 0;
   if (
@@ -52,40 +63,51 @@ auto flood_fill(
   )
     return n_filled;
   // value at the current index that we want to replace
-  const auto old_value = mat.at(index.first, index.second);
+  const auto old_value = mat(index);
   // otherwise, perform breadth-first fill from the starting index
-  std::deque<index_pair_type> index_queue{index};
+  std::deque<index_type> index_queue{index};
   while (index_queue.size()) {
     // get row and column indices, perform the fill, update count, pop front
     auto [row, col] = index_queue.front();
-    mat.at(row, col) = fill_value;
+    mat(row, col) = fill_value;
     n_filled++;
     index_queue.pop_front();
     // add valid neighbors to the queue
-    if (row > 0 && mat.at(row - 1, col) == old_value)
+    if (row > 0 && mat(row - 1, col) == old_value)
       index_queue.push_back({row - 1, col});
-    if (row < traits_type::row_count - 1 && mat.at(row + 1, col) == old_value)
+    if (row < traits_type::row_count - 1 && mat(row + 1, col) == old_value)
       index_queue.push_back({row + 1, col});
-    if (col > 0 && mat.at(row, col - 1) == old_value)
+    if (col > 0 && mat(row, col - 1) == old_value)
       index_queue.push_back({row, col - 1});
-    if (col < traits_type::col_count - 1 && mat.at(row, col + 1) == old_value)
+    if (col < traits_type::col_count - 1 && mat(row, col + 1) == old_value)
       index_queue.push_back({row, col + 1});
   }
   return n_filled;
 }
 
+/**
+ * Base class template.
+ *
+ * Create specializations to use `TYPED_TEST` like a parametrized test.
+ *
+ * @tparam Matrix `pddcp::matrix_base<T>` CRTP subclass
+ */
 template <typename Matrix>
 class DailyTest151 : public ::testing::Test {
 public:
   using matrix_type = Matrix;
 };
 
+/**
+ * Specialization for the sample input/output pair.
+ */
 template <>
 class DailyTest151<pddcp::dense_matrix<4, 3, char>> : public ::testing::Test {
 public:
   using matrix_type = pddcp::dense_matrix<4, 3, char>;
   using size_type = typename matrix_type::size_type;
   using index_type = std::pair<size_type, size_type>;
+
 protected:
   DailyTest151()
     : input_matrix_{
@@ -96,6 +118,7 @@ protected:
   {}
 
   matrix_type input_matrix_;
+
   static inline const matrix_type output_matrix_{
     {'B', 'B', 'G'},
     {'G', 'G', 'G'},
@@ -109,6 +132,9 @@ protected:
 using DailyTest151Types = ::testing::Types<pddcp::dense_matrix<4, 3, char>>;
 TYPED_TEST_SUITE(DailyTest151, DailyTest151Types);
 
+/**
+ * Test that `flood_fill` works as expected.
+ */
 TYPED_TEST(DailyTest151, TypedTest)
 {
   flood_fill(

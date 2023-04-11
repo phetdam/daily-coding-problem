@@ -53,6 +53,7 @@ namespace pddcp {
 #define PDDCP_MATRIX_TRAITS_MEMBERS \
   using value_type = T; \
   using size_type = std::size_t; \
+  using index_type = std::pair<size_type, size_type>; \
   static inline constexpr auto row_count = n_rows_; \
   static inline constexpr auto col_count = n_cols_
 
@@ -64,6 +65,7 @@ namespace pddcp {
 #define PDDCP_MATRIX_BASE_MEMBERS(template_name) \
   using typename matrix_base<template_name<n_rows_, n_cols_, T>>::value_type; \
   using typename matrix_base<template_name<n_rows_, n_cols_, T>>::size_type; \
+  using typename matrix_base<template_name<n_rows_, n_cols_, T>>::index_type; \
   using matrix_base<template_name<n_rows_, n_cols_, T>>::row_count; \
   using matrix_base<template_name<n_rows_, n_cols_, T>>::col_count
 
@@ -120,6 +122,7 @@ class matrix_base {
 public:
   using value_type = typename matrix_traits<Derived>::value_type;
   using size_type = typename matrix_traits<Derived>::size_type;
+  using index_type = typename matrix_traits<Derived>::index_type;
 
   static_assert(
     std::is_arithmetic_v<value_type>, "only arithmetic types allowed"
@@ -161,8 +164,8 @@ public:
   /**
    * Return reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
   decltype(auto) at(size_type row, size_type col)
   {
@@ -172,8 +175,8 @@ public:
   /**
    * Return const reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
   decltype(auto) at(size_type row, size_type col) const
   {
@@ -183,8 +186,28 @@ public:
   /**
    * Return reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param index Index
+   */
+  decltype(auto) at(const index_type& index)
+  {
+    return static_cast<Derived*>(this)->at(index.first, index.second);
+  }
+
+  /**
+   * Return const reference to the (i, j) matrix value.
+   *
+   * @param index Index
+   */
+  decltype(auto) at(const index_type& index) const
+  {
+    return static_cast<const Derived*>(this)->at(index.first, index.second);
+  }
+
+  /**
+   * Return reference to the (i, j) matrix value.
+   *
+   * @param row Row index
+   * @param col Col index
    */
   decltype(auto) operator()(size_type row, size_type col)
   {
@@ -194,12 +217,32 @@ public:
   /**
    * Return const reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
   decltype(auto) operator()(size_type row, size_type col) const
   {
     return static_cast<const Derived*>(this)->at(row, col);
+  }
+
+  /**
+   * Return reference to the (i, j) matrix value.
+   *
+   * @param index Index
+   */
+  decltype(auto) operator()(const index_type& index)
+  {
+    return static_cast<Derived*>(this)->at(index.first, index.second);
+  }
+
+  /**
+   * Return const reference to the (i, j) matrix value.
+   *
+   * @param index Index
+   */
+  decltype(auto) operator()(const index_type& index) const
+  {
+    return static_cast<const Derived*>(this)->at(index.first, index.second);
   }
 };
 
@@ -272,8 +315,8 @@ public:
   /**
    * Return reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
 #if __cplusplus >= 202002L
   constexpr
@@ -286,8 +329,8 @@ public:
   /**
    * Return const reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
 #if __cplusplus >= 202002L
   constexpr
@@ -320,7 +363,6 @@ template <PDDCP_MATRIX_TEMPLATE_PARAMS>
 class sparse_matrix : public matrix_base<sparse_matrix<n_rows_, n_cols_, T>> {
 public:
   PDDCP_MATRIX_BASE_MEMBERS(sparse_matrix);
-  using index_type = std::pair<size_type, size_type>;
   using storage_type = std::map<index_type, value_type>;
   using storage_value_type = typename storage_type::value_type;
 
@@ -404,8 +446,8 @@ public:
   /**
    * Return reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
   T& at(size_type row, size_type col)
   {
@@ -421,8 +463,8 @@ public:
   /**
    * Return const reference to the (i, j) matrix value.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    */
   const T& at(size_type row, size_type col) const
   {
@@ -433,25 +475,6 @@ public:
         return empty_value_;
     // otherwise just return the value. if outside of bounds, this throws
     return values_.at(index);
-  }
-
-  /**
-   * Return reference to the (i, j) matrix value.
-   *
-   * @param row row index
-   * @param col col index
-   */
-  T& operator()(size_type row, size_type col) { return at(row, col); }
-
-  /**
-   * Return const reference to the (i, j) matrix value.
-   *
-   * @param row row index
-   * @param col col index
-   */
-  const T& operator()(size_type row, size_type col) const
-  {
-    return at(row, col);
   }
 
 private:
@@ -486,8 +509,8 @@ private:
   /**
    * Check if we are indexing inside the bounds of the matrix.
    *
-   * @param row row index
-   * @param col col index
+   * @param row Row index
+   * @param col Col index
    * @param hard_check `true` to assert if out of bounds, `false` not to
    * @returns `true` if valid index, `false` if invalid
    */
