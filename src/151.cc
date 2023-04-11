@@ -98,15 +98,28 @@ public:
   using matrix_type = Matrix;
 };
 
+// matrix types used in the specializations + TYPED_TEST_SUITE macro
+using MatrixType1 = pddcp::dense_matrix<4, 3, char>;
+using MatrixType2 = pddcp::sparse_matrix<3, 4, unsigned int>;
+
+/**
+ * Matrix for the base type members of each DailyTest151 specialization.
+ *
+ * @param type Matrix type
+ */
+#define DAILY_TEST_151_TYPES(type) \
+  using matrix_type = type; \
+  using size_type = typename matrix_type::size_type; \
+  using index_type = typename matrix_type::index_type; \
+  using value_type = typename matrix_type::value_type
+
 /**
  * Specialization for the sample input/output pair.
  */
 template <>
-class DailyTest151<pddcp::dense_matrix<4, 3, char>> : public ::testing::Test {
+class DailyTest151<MatrixType1> : public ::testing::Test {
 public:
-  using matrix_type = pddcp::dense_matrix<4, 3, char>;
-  using size_type = typename matrix_type::size_type;
-  using index_type = std::pair<size_type, size_type>;
+  DAILY_TEST_151_TYPES(MatrixType1);
 
 protected:
   DailyTest151()
@@ -125,11 +138,47 @@ protected:
     {'G', 'G', 'G'},
     {'B', 'B', 'B'}
   };
-  static inline constexpr char fill_value_ = 'G';
+  static inline constexpr value_type fill_value_ = 'G';
   static inline const index_type fill_point_{2, 2};
 };
 
-using DailyTest151Types = ::testing::Types<pddcp::dense_matrix<4, 3, char>>;
+/**
+ * Specialization for the custom input/output pair.
+ *
+ * The initial sparse matrix looks like
+ *
+ * 0 1 0 1
+ * 0 2 0 0
+ * 1 0 0 0
+ *
+ * After filling with 5 at (1, 2), the resulting sparse matrix is
+ *
+ * 0 1 5 1
+ * 0 2 5 5
+ * 1 5 5 5
+ */
+template <>
+class DailyTest151<MatrixType2> : public ::testing::Test {
+public:
+  DAILY_TEST_151_TYPES(MatrixType2);
+
+protected:
+  DailyTest151()
+    : input_matrix_{{{0, 1}, 1}, {{0, 3}, 1}, {{1, 1}, 2}, {{2, 0}, 1}}
+  {}
+
+  matrix_type input_matrix_;
+
+  static inline const matrix_type output_matrix_{
+    {{0, 1}, 1}, {{0, 3}, 1}, {{0, 2}, 5},
+    {{1, 1}, 2}, {{1, 2}, 5}, {{1, 3}, 5},
+    {{2, 0}, 1}, {{2, 1}, 5}, {{2, 2}, 5}, {{2, 3}, 5}
+  };
+  static inline constexpr value_type fill_value_ = 5;
+  static inline const index_type fill_point_{1, 2};
+};
+
+using DailyTest151Types = ::testing::Types<MatrixType1, MatrixType2>;
 TYPED_TEST_SUITE(DailyTest151, DailyTest151Types);
 
 /**
