@@ -116,16 +116,16 @@ public:
 
 protected:
   DailyTest151()
-    : input_matrix_{
+    : input_{
       {'B', 'B', 'W'},
       {'W', 'W', 'W'},
       {'W', 'W', 'W'},
       {'B', 'B', 'B'}}
   {}
 
-  matrix_type input_matrix_;
+  matrix_type input_;
 
-  static inline const matrix_type output_matrix_{
+  static inline const matrix_type output_{
     {'B', 'B', 'G'},
     {'G', 'G', 'G'},
     {'G', 'G', 'G'},
@@ -157,12 +157,12 @@ public:
 
 protected:
   DailyTest151()
-    : input_matrix_{{{0, 1}, 1}, {{0, 3}, 1}, {{1, 1}, 2}, {{2, 0}, 1}}
+    : input_{{{0, 1}, 1}, {{0, 3}, 1}, {{1, 1}, 2}, {{2, 0}, 1}}
   {}
 
-  matrix_type input_matrix_;
+  matrix_type input_;
 
-  static inline const matrix_type output_matrix_{
+  static inline const matrix_type output_{
     {{0, 1}, 1}, {{0, 3}, 1}, {{0, 2}, 5},
     {{1, 1}, 2}, {{1, 2}, 5}, {{1, 3}, 5},
     {{2, 0}, 1}, {{2, 1}, 5}, {{2, 2}, 5}, {{2, 3}, 5}
@@ -179,10 +179,8 @@ TYPED_TEST_SUITE(DailyTest151, DailyTest151Types);
  */
 TYPED_TEST(DailyTest151, TypedTest)
 {
-  flood_fill(
-    this->input_matrix_, TestFixture::fill_point_, TestFixture::fill_value_
-  );
-  EXPECT_EQ(TestFixture::output_matrix_, this->input_matrix_);
+  flood_fill(this->input_, TestFixture::fill_point_, TestFixture::fill_value_);
+  EXPECT_EQ(TestFixture::output_, this->input_);
 }
 
 }  // namespace
