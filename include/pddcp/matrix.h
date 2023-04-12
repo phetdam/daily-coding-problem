@@ -15,6 +15,7 @@
 #include <initializer_list>
 #include <limits>
 #include <map>
+#include <utility>
 
 #ifdef _OPENMP
 #include <mutex>
