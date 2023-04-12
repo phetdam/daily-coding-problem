@@ -30,6 +30,7 @@
 #include <gtest/gtest.h>
 
 #include "pddcp/matrix.h"
+#include "pddcp/utility.h"
 
 namespace {
 
@@ -86,29 +87,32 @@ auto flood_fill(
 }
 
 /**
- * Base class template.
+ * Base test class template.
  *
  * Create specializations to use `TYPED_TEST` like a parametrized test.
  *
- * @tparam Matrix `pddcp::matrix_base<T>` CRTP subclass
+ * @tparam IndexedType `pddcp::indexed_type<I, T>` with a
+ *  `pddcp::matrix_base<T>` CRTP subclass as the `element_type`
  */
-template <typename Matrix>
+template <typename IndexedType>
 class DailyTest151 : public ::testing::Test {
 public:
-  PDDCP_MATRIX_HELPER_TYPES(Matrix);
+  PDDCP_MATRIX_HELPER_TYPES(typename IndexedType::element_type);
 };
 
-// matrix types used in the specializations + TYPED_TEST_SUITE macro
-using MatrixType1 = pddcp::dense_matrix<4, 3, char>;
-using MatrixType2 = pddcp::sparse_matrix<3, 4, unsigned int>;
+// input types used in the specializations + TYPED_TEST_SUITE macro. although
+// we don't need indexed_type here as the matrix types are different, it would
+// be useful if we want different matrix input values for the same matrix type.
+using InputType1 = pddcp::indexed_type<0, pddcp::dense_matrix<4, 3, char>>;
+using InputType2 = pddcp::indexed_type<1, pddcp::sparse_matrix<3, 4, unsigned>>;
 
 /**
  * Specialization for the sample input/output pair.
  */
 template <>
-class DailyTest151<MatrixType1> : public ::testing::Test {
+class DailyTest151<InputType1> : public ::testing::Test {
 public:
-  PDDCP_MATRIX_HELPER_TYPES(MatrixType1);
+  PDDCP_MATRIX_HELPER_TYPES(typename InputType1::element_type);
 
 protected:
   DailyTest151()
@@ -147,9 +151,9 @@ protected:
  * 1 5 5 5
  */
 template <>
-class DailyTest151<MatrixType2> : public ::testing::Test {
+class DailyTest151<InputType2> : public ::testing::Test {
 public:
-  PDDCP_MATRIX_HELPER_TYPES(MatrixType2);
+  PDDCP_MATRIX_HELPER_TYPES(typename InputType2::element_type);
 
 protected:
   DailyTest151()
@@ -167,7 +171,7 @@ protected:
   static inline const index_type fill_point_{1, 2};
 };
 
-using DailyTest151Types = ::testing::Types<MatrixType1, MatrixType2>;
+using DailyTest151Types = ::testing::Types<InputType1, InputType2>;
 TYPED_TEST_SUITE(DailyTest151, DailyTest151Types);
 
 /**

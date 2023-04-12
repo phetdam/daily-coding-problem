@@ -128,6 +128,24 @@ PDDCP_MSVC_WARNING_DISABLE(4365)
 PDDCP_MSVC_WARNING_POP()
 }
 
+/**
+ * Class template for an "indexed" type.
+ *
+ * Allows us to create a wrapper type around the same type `T` so as to make
+ * unique types with the same `element_type`. One application is with the
+ * Google Test `TYPED_TEST_SUITE`, as we can use identical input types `T` but
+ * use `index_type<index_, T>` to create distinct types for distinct
+ * specializations of the test fixture class template.
+ *
+ * @tparam I type index
+ * @tparam T type
+ */
+template <std::size_t I, typename T>
+struct indexed_type {
+  using element_type = T;
+  static inline constexpr decltype(I) index = I;
+};
+
 }  // namespace pddcp
 
 #endif  // PDDCP_UTILITY_H_
