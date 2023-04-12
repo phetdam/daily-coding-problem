@@ -522,6 +522,17 @@ private:
 };
 
 /**
+ * Define some common helper types for a matrix type.
+ *
+ * @param type Matrix type
+ */
+#define PDDCP_MATRIX_HELPER_TYPES(type) \
+  using matrix_type = type; \
+  using size_type = typename matrix_type::size_type; \
+  using index_type = typename matrix_type::index_type; \
+  using value_type = typename matrix_type::value_type
+
+/**
  * Loop through matrix indices in row-major order.
  *
  * Signed loop variables are used if compiled with OpenMP by MSVC, in which

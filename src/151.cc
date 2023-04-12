@@ -103,23 +103,12 @@ using MatrixType1 = pddcp::dense_matrix<4, 3, char>;
 using MatrixType2 = pddcp::sparse_matrix<3, 4, unsigned int>;
 
 /**
- * Matrix for the base type members of each DailyTest151 specialization.
- *
- * @param type Matrix type
- */
-#define DAILY_TEST_151_TYPES(type) \
-  using matrix_type = type; \
-  using size_type = typename matrix_type::size_type; \
-  using index_type = typename matrix_type::index_type; \
-  using value_type = typename matrix_type::value_type
-
-/**
  * Specialization for the sample input/output pair.
  */
 template <>
 class DailyTest151<MatrixType1> : public ::testing::Test {
 public:
-  DAILY_TEST_151_TYPES(MatrixType1);
+  PDDCP_MATRIX_HELPER_TYPES(MatrixType1);
 
 protected:
   DailyTest151()
@@ -160,7 +149,7 @@ protected:
 template <>
 class DailyTest151<MatrixType2> : public ::testing::Test {
 public:
-  DAILY_TEST_151_TYPES(MatrixType2);
+  PDDCP_MATRIX_HELPER_TYPES(MatrixType2);
 
 protected:
   DailyTest151()
