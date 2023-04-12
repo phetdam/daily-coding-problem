@@ -95,7 +95,7 @@ auto flood_fill(
 template <typename Matrix>
 class DailyTest151 : public ::testing::Test {
 public:
-  using matrix_type = Matrix;
+  PDDCP_MATRIX_HELPER_TYPES(Matrix);
 };
 
 // matrix types used in the specializations + TYPED_TEST_SUITE macro
