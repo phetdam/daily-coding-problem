@@ -69,6 +69,31 @@ inline auto string_join(const Container& values)
   return string_join(values, "");
 }
 
+/**
+ * Check that a string is a palindrome.
+ *
+ * @tparam CharT Char type
+ * @tparam Traits Char traits
+ * @tparam Alloc Allocator
+ *
+ * @param str String to check
+ */
+template <typename CharT, typename Traits, typename Alloc>
+bool is_palindrome(const std::basic_string<CharT, Traits, Alloc>& str)
+{
+  // empty string is not considered palindrome
+  if (str.empty())
+    return false;
+  // right and left endpoints of string
+  auto right_i = str.size() - 1;
+  decltype(right_i) left_i = 0;
+  // move towards center to check
+  while (left_i < right_i)
+    if (str[left_i++] != str[right_i--])
+      return false;
+  return true;
+}
+
 
 }  // namespace pddcp
 

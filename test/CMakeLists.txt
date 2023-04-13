@@ -24,6 +24,7 @@ add_executable(
     $<TARGET_OBJECTS:141>
     $<TARGET_OBJECTS:151>
     $<TARGET_OBJECTS:161>
+    $<TARGET_OBJECTS:167>
     $<TARGET_OBJECTS:176>
     $<TARGET_OBJECTS:206>
     # tests from shared library unit tests
