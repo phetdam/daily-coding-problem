@@ -102,6 +102,7 @@ public:
 using InputType1 = pddcp::indexed_type<0, pddcp::dense_matrix<3, 3, char>>;
 using InputType2 = pddcp::indexed_type<2, pddcp::dense_matrix<1, 6, char>>;
 using InputType3 = pddcp::indexed_type<3, typename InputType1::element_type>;
+using InputType4 = pddcp::indexed_type<4, pddcp::dense_matrix<3, 7, wchar_t>>;
 
 /**
  * `DailyTest76` specialization for the first sample input/output pair.
@@ -118,7 +119,7 @@ public:
   PDDCP_MATRIX_HELPER_TYPES(typename InputType1::element_type);
 
 protected:
-  DailyTest76() : input_{{'c', 'b', 'a'}, {'d', 'a', 'f'}, {'g', 'h', 'i'}} {};
+  DailyTest76() : input_{{'c', 'b', 'a'}, {'d', 'a', 'f'}, {'g', 'h', 'i'}} {}
   matrix_type input_;
   static inline constexpr std::size_t output_ = 1;
 };
@@ -136,7 +137,7 @@ public:
   PDDCP_MATRIX_HELPER_TYPES(typename InputType2::element_type);
 
 protected:
-  DailyTest76() : input_{{'a', 'b', 'c', 'd', 'e', 'f'}} {};
+  DailyTest76() : input_{{'a', 'b', 'c', 'd', 'e', 'f'}} {}
   matrix_type input_;
   static inline constexpr std::size_t output_ = 0;
 };
@@ -156,12 +157,40 @@ public:
   PDDCP_MATRIX_HELPER_TYPES(typename InputType3::element_type);
 
 protected:
-  DailyTest76() : input_{{'z', 'y', 'x'}, {'w', 'v', 'u'}, {'t', 's', 'r'}} {};
+  DailyTest76() : input_{{'z', 'y', 'x'}, {'w', 'v', 'u'}, {'t', 's', 'r'}} {}
   matrix_type input_;
   static inline constexpr std::size_t output_ = 3;
 };
 
-using DailyTest76Types = ::testing::Types<InputType1, InputType2, InputType3>;
+/**
+ * `DailyTest76` specialization for a custom sample input/output pair.
+ *
+ * Input matrix:
+ *
+ * asdfgsw
+ * bslfjvo
+ * dfsdhws
+ */
+template <>
+class DailyTest76<InputType4> : public ::testing::Test {
+public:
+  PDDCP_MATRIX_HELPER_TYPES(typename InputType4::element_type);
+
+protected:
+  DailyTest76()
+    : input_{
+      {L'a', L's', L'd', L'f', L'g', L's', L'w'},
+      {L'b', L's', L'l', L'f', L'j', L'v', L'o'},
+      {L'd', L'f', L's', L'd', L'h', L'w', L's'}}
+  {}
+
+  matrix_type input_;
+  static inline constexpr std::size_t output_ = 3;
+};
+
+using DailyTest76Types = ::testing::Types<
+  InputType1, InputType2, InputType3, InputType4
+>;
 TYPED_TEST_SUITE(DailyTest76, DailyTest76Types);
 
 /**
