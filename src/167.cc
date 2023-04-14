@@ -89,6 +89,7 @@ public:
 // input types used in the test fixture specializations. index types allows for
 // unique wrapper types that have the same element_type member.
 using InputType1 = pddcp::indexed_type<0, string_vector<char>>;
+using InputType2 = pddcp::indexed_type<1, string_vector<char>>;
 
 /**
  * Specialization for the sample input/output pair.
@@ -102,7 +103,27 @@ protected:
   static inline const index_vector_type output_{{0, 1}, {1, 0}, {2, 3}};
 };
 
-using DailyTest167Types = ::testing::Types<InputType1>;
+/**
+ * Specialization for a custom sample input/output pair.
+ *
+ * This input is designed to test the handling of cases where permuting the
+ * concatenation either forms the same palindrome or does not form a palindrome.
+ *
+ * For example, "aaa" + "baaa" is a palindrome, but "baaa" + "aaa" is not. Same
+ * with "ch" + "ahc" compared to "ahc" + "ch".
+ */
+template <>
+class DailyTest167<InputType2> : public ::testing::Test {
+public:
+  DAILY_TEST_167_HELPER_TYPES(InputType2);
+protected:
+  static inline const element_type input_{"aaa", "aaa", "baaa", "ch", "ahc"};
+  static inline const index_vector_type output_{
+    {0, 1}, {0, 2}, {1, 0}, {1, 2}, {3, 4}
+  };
+};
+
+using DailyTest167Types = ::testing::Types<InputType1, InputType2>;
 TYPED_TEST_SUITE(DailyTest167, DailyTest167Types);
 
 /**
