@@ -52,6 +52,9 @@ auto contiguous_sum(T target_sum, const InContainer& values)
     running_sum += value;
     queue.push_back(value);
   }
+  // one final check in case last value meets target sum
+  if (running_sum == target_sum)
+    return OutContainer{queue.begin(), queue.end()};
   // failed to meet summation, so return empty OutContainer
   return OutContainer{};
 }
@@ -77,12 +80,13 @@ public:
 // input types used in the test fixture specializations. index types allows for
 // unique wrapper types that have the same element_type member.
 using InputType1 = pddcp::indexed_type<0, std::vector<unsigned int>>;
+using InputType2 = pddcp::indexed_type<1, std::vector<unsigned short>>;
 
 /**
  * Specialization for the sample input/output pair.
  */
 template <>
-class DailyTest102<InputType1> : public::testing::Test {
+class DailyTest102<InputType1> : public ::testing::Test {
 public:
   PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType1);
 protected:
@@ -91,7 +95,23 @@ protected:
   static inline const std::vector<value_type> output_{2, 3, 4};
 };
 
-using DailyTest102Types = ::testing::Types<InputType1>;
+/**
+ * Specialization for a custom input/output pair with only unsigned values.
+ *
+ * `contiguous_sum` will end up exiting the range-for loop since the last value
+ * in the input container is needed to meet the target value.
+ */
+template <>
+class DailyTest102<InputType2> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType2);
+protected:
+  static inline const element_type input_{3, 5, 1, 7, 10, 4};
+  static inline constexpr value_type target_ = 14;
+  static inline const std::vector<value_type> output_{10, 4};
+};
+
+using DailyTest102Types = ::testing::Types<InputType1, InputType2>;
 TYPED_TEST_SUITE(DailyTest102, DailyTest102Types);
 
 /**
