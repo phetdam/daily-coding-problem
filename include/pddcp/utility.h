@@ -146,6 +146,25 @@ struct indexed_type {
   static inline constexpr decltype(I) index = I;
 };
 
+/**
+ * Macro defining some useful indexed type helper type aliases.
+ *
+ * @param type `pddcp::indexed_type<I, T>` specialization
+ */
+#define PDDCP_INDEXED_TYPE_HELPER_TYPES(type) \
+  using indexed_type = type; \
+  using element_type = typename indexed_type::element_type
+
+/**
+ * Macro for defining some useful indexed helper type aliases for containers.
+ *
+ * @param type `pddcp::indexed_type<I, T>` specialization, `T` a *Container*
+ */
+#define PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(type) \
+  PDDCP_INDEXED_TYPE_HELPER_TYPES(type); \
+  using size_type = typename element_type::size_type; \
+  using value_type = typename element_type::value_type
+
 }  // namespace pddcp
 
 #endif  // PDDCP_UTILITY_H_

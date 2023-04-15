@@ -69,9 +69,7 @@ auto palindrome_indices(const string_vector<CharT, Traits, Alloc>& values)
  * @param type `pddcp::indexed_type<I, T>` to get type members for
  */
 #define DAILY_TEST_167_HELPER_TYPES(type) \
-  using indexed_type = type; \
-  using element_type = typename indexed_type::element_type; \
-  using size_type = typename element_type::size_type; \
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(type); \
   using index_vector_type = std::vector<std::pair<size_type, size_type>>
 
 /**
