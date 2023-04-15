@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION ${CMAKE_MINIMUM_REQUIRED_VERSION})
 
 # set compiler-specific options
 if(MSVC)
-    # MSVC doesn't report __cplusplus correctly unless you specify
-    # /Zc:__cplusplus; it used to always be 199711L regardless of standard
     add_compile_options(
+        # MSVC doesn't report __cplusplus correctly unless you specify
+        # /Zc:__cplusplus; it used to always be 199711L regardless of standard
         /Wall /Zc:__cplusplus
         # typically don't care if unreferenced inline functions are removed
         /wd4514
