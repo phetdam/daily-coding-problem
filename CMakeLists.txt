@@ -30,6 +30,7 @@ project(
     pddcp
     VERSION 0.1.0
     DESCRIPTION "Solutions written for Daily Coding Problem exercises"
+    HOMEPAGE_URL https://github.com/phetdam/daily-coding-problem
     LANGUAGES C CXX
 )
 
