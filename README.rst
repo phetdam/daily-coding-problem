@@ -66,7 +66,7 @@ Building from source
 
 Standalone runners built from the sources in ``src`` are compiled with
 ``PDDCP_GTEST_STANDALONE`` defined and typically contain the respective
-conditional compilation constructs like
+conditional compilation constructs, for example
 
 .. code:: cpp
 
