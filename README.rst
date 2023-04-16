@@ -86,7 +86,7 @@ Building is easy with the provided ``build.sh`` build script. For usage, type
 
    ./build.sh --help
 
-The build release binaries for this project, simply use the command
+To build release binaries for this project, simply use the command
 
 .. code:: bash
 
