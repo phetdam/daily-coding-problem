@@ -86,19 +86,18 @@ inline auto contiguous_sum(T target_sum, const Container& values)
 /**
  * Base test class template.
  *
- * @tparam IndexedType `pddcp::indexed_type<I, T>`, *Container* `element_type`
+ * @tparam IndexedType `pddcp::indexed_type<I, T>`, *Container* `container_type`
  */
 template <typename IndexedType>
 class DailyTest102 : public ::testing::Test {
 public:
-  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(IndexedType);
+  PDDCP_CONTAINER_HELPER_TYPES(IndexedType);
 };
 
-// input types used in the test fixture specializations. index types allows for
-// unique wrapper types that have the same element_type member.
-using InputType1 = pddcp::indexed_type<0, std::vector<unsigned int>>;
-using InputType2 = pddcp::indexed_type<1, std::vector<unsigned short>>;
-using InputType3 = pddcp::indexed_type<2, std::vector<long>>;
+// input types used in the test fixture specializations
+using InputType1 = std::vector<unsigned int>;
+using InputType2 = std::vector<unsigned short>;
+using InputType3 = std::vector<long>;
 
 /**
  * Specialization for the sample input/output pair.
@@ -106,9 +105,9 @@ using InputType3 = pddcp::indexed_type<2, std::vector<long>>;
 template <>
 class DailyTest102<InputType1> : public ::testing::Test {
 public:
-  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType1);
+  PDDCP_CONTAINER_HELPER_TYPES(InputType1);
 protected:
-  static inline const element_type input_{1, 2, 3, 4, 5};
+  static inline const container_type input_{1, 2, 3, 4, 5};
   static inline constexpr value_type target_ = 9;
   static inline const std::vector<value_type> output_{2, 3, 4};
 };
@@ -122,9 +121,9 @@ protected:
 template <>
 class DailyTest102<InputType2> : public ::testing::Test {
 public:
-  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType2);
+  PDDCP_CONTAINER_HELPER_TYPES(InputType2);
 protected:
-  static inline const element_type input_{3, 5, 1, 7, 10, 4};
+  static inline const container_type input_{3, 5, 1, 7, 10, 4};
   static inline constexpr value_type target_ = 14;
   static inline const std::vector<value_type> output_{10, 4};
 };
@@ -135,9 +134,9 @@ protected:
 template <>
 class DailyTest102<InputType3> : public ::testing::Test {
 public:
-  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType3);
+  PDDCP_CONTAINER_HELPER_TYPES(InputType3);
 protected:
-  static inline const element_type input_{3, 1, 2, 12, 5, 6};
+  static inline const container_type input_{3, 1, 2, 12, 5, 6};
   static inline constexpr value_type target_ = 17;
   static inline const std::vector<value_type> output_{12, 5};
 };

@@ -129,6 +129,29 @@ PDDCP_MSVC_WARNING_POP()
 }
 
 /**
+ * Impl macro for defining common container helper type aliases.
+ *
+ * Do not use directly, prefer using `PDDCP_CONTAINER_HELPER_TYPES`.
+ *
+ * @param type *Container* type
+ */
+#define PDDCP_CONTAINER_HELPER_TYPES_I(type) \
+  using size_type = typename type::size_type; \
+  using value_type = typename type::value_type
+
+/**
+ * Macro for defining common container helper type aliases.
+ *
+ * The `container_type` alias allows `type` to be a type member of another
+ * type, i.e. so we could use `typename type_a::type_b` as a parameter.
+ *
+ * @param type *Container* type
+ */
+#define PDDCP_CONTAINER_HELPER_TYPES(type) \
+  using container_type = type; \
+  PDDCP_CONTAINER_HELPER_TYPES_I(container_type)
+
+/**
  * Class template for an "indexed" type.
  *
  * Allows us to create a wrapper type around the same type `T` so as to make
@@ -162,8 +185,7 @@ struct indexed_type {
  */
 #define PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(type) \
   PDDCP_INDEXED_TYPE_HELPER_TYPES(type); \
-  using size_type = typename element_type::size_type; \
-  using value_type = typename element_type::value_type
+  PDDCP_CONTAINER_HELPER_TYPES_I(element_type)
 
 }  // namespace pddcp
 
