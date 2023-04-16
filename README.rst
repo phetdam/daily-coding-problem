@@ -64,9 +64,9 @@ Dependencies
 Building from source
 --------------------
 
-Note that standalone runners built from the sources in ``src`` are compiled
-with ``PDDCP_GTEST_STANDALONE`` defined, enabling any code within constructs
-like
+Standalone runners built from the sources in ``src`` are compiled with
+``PDDCP_GTEST_STANDALONE`` defined and typically contain the respective
+conditional compilation constructs like
 
 .. code:: cpp
 
