@@ -21,6 +21,13 @@
 
 namespace {
 
+/**
+ * Return a contiguous slice of values that sum up to the given target.
+ *
+ * @tparam OutContainer *Container* used for the return type
+ * @tparam T target sum type
+ * @tparam InContainer *Container* with `value_type` convertible to `T`
+ */
 template <typename OutContainer, typename T, typename InContainer>
 auto contiguous_sum(T target_sum, const InContainer& values)
 {
@@ -59,6 +66,12 @@ auto contiguous_sum(T target_sum, const InContainer& values)
   return OutContainer{};
 }
 
+/**
+ * Return a contiguous vector of values that sum up to the given target.
+ *
+ * @tparam T target sum type
+ * @tparam Container *Container* with `value_type` convertible to `T`
+ */
 template <typename T, typename Container>
 inline auto contiguous_sum(T target_sum, const Container& values)
 {
