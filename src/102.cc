@@ -24,6 +24,8 @@ namespace {
 /**
  * Return a contiguous slice of values that sum up to the given target.
  *
+ * The input container must only contain nonnegative values for correct output.
+ *
  * @tparam OutContainer *Container* used for the return type
  * @tparam T target sum type
  * @tparam InContainer *Container* with `value_type` convertible to `T`
@@ -69,6 +71,8 @@ auto contiguous_sum(T target_sum, const InContainer& values)
 /**
  * Return a contiguous vector of values that sum up to the given target.
  *
+ * The input container must only contain nonnegative values for correct output.
+ *
  * @tparam T target sum type
  * @tparam Container *Container* with `value_type` convertible to `T`
  */
@@ -94,6 +98,7 @@ public:
 // unique wrapper types that have the same element_type member.
 using InputType1 = pddcp::indexed_type<0, std::vector<unsigned int>>;
 using InputType2 = pddcp::indexed_type<1, std::vector<unsigned short>>;
+using InputType3 = pddcp::indexed_type<2, std::vector<long>>;
 
 /**
  * Specialization for the sample input/output pair.
@@ -124,7 +129,21 @@ protected:
   static inline const std::vector<value_type> output_{10, 4};
 };
 
-using DailyTest102Types = ::testing::Types<InputType1, InputType2>;
+/**
+ * Specialization for a custom input/output pair with signed values.
+ */
+template <>
+class DailyTest102<InputType3> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType3);
+protected:
+  static inline const element_type input_{3, 1, 2, 12, 5, 6};
+  static inline constexpr value_type target_ = 17;
+  static inline const std::vector<value_type> output_{12, 5};
+};
+
+
+using DailyTest102Types = ::testing::Types<InputType1, InputType2, InputType3>;
 TYPED_TEST_SUITE(DailyTest102, DailyTest102Types);
 
 /**
