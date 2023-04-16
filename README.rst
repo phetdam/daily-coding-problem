@@ -64,9 +64,9 @@ Dependencies
 Building from source
 --------------------
 
-TBA. For now, see the comments in the top-level ``CMakeLists.txt``. Note that
-standalone runners built from the sources in ``src`` are compiled with
-``PDDCP_GTEST_STANDALONE`` defined, enabling any code within constructs like
+Note that standalone runners built from the sources in ``src`` are compiled
+with ``PDDCP_GTEST_STANDALONE`` defined, enabling any code within constructs
+like
 
 .. code:: cpp
 
@@ -76,3 +76,17 @@ standalone runners built from the sources in ``src`` are compiled with
 
 Some standalone runners define additional `Google Test`_ tests within these
 blocks.
+
+\*nix
+~~~~~
+
+Building is easy with the provided ``build.sh`` build script. For usage, type
+
+.. code:: bash
+
+   ./build.sh --help
+
+Windows
+~~~~~~~
+
+TBA. For now, see the comments in the top-level ``CMakeLists.txt``.
