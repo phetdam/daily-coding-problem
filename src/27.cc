@@ -72,7 +72,7 @@ public: \
  * Macro for ending the body of a `(open|close)_bracket_map`.
  */
 #define PDDCP_END_BRACKET_MAP \
-   {} \
+    {} \
   PDDCP_BRACKET_MAP_OPERATORS(); \
 private: \
   map_type map_;
@@ -85,9 +85,7 @@ private: \
  * @tparam CharT char type
  */
 template <typename CharT>
-struct open_bracket_map {
-  // static_assert(false);
-};
+struct open_bracket_map {};
 
 /**
  * Main template for the close bracket map.
@@ -97,7 +95,7 @@ struct open_bracket_map {
  * @tparam CharT char type
  */
 template <typename CharT>
-struct close_bracket_map {  };
+struct close_bracket_map {};
 
 /**
  * `open_bracket_map<CharT>` specializations.
@@ -171,15 +169,16 @@ template <typename CharT, typename Container>
 bool update_bracket_stack(std::stack<CharT, Container>& stack, CharT c)
 {
   // maps opening to closing brackets and vice versa
-  static open_bracket_map<CharT> open_map;
-  static close_bracket_map<CharT> close_map;
+  static const open_bracket_map<CharT> open_map;
+  static const close_bracket_map<CharT> close_map;
   // push open brackets onto the stack
   if (open_map->find(c) != open_map->cend())
     stack.push(c);
   // if it's a close bracket, check that last pushed bracket is open bracket
   else if (close_map->find(c) != close_map->cend()) {
-    // if it's not the open bracket, mismatch, so return early, otherwise pop
-    if (stack.top() != close_map[c])
+    // if stack if empty/top element is not the open bracket, mismatch, so
+    // return early, otherwise pop the top element off stack
+    if (stack.empty() || stack.top() != close_map[c])
       return false;
     stack.pop();
   }
@@ -251,9 +250,7 @@ INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
   DailyTest27,
   ::testing::Values(
-    // FIXME: leads to segmentation fault if the input case is modified to
-    // INPUT_TYPE_FROM("([])[]({})}"), false
-    pair_type{INPUT_TYPE_FROM("([])[]({})"), true},
+    pair_type{INPUT_TYPE_FROM("([])[]({})}"), false},
     pair_type{INPUT_TYPE_FROM("([)]"), false},
     pair_type{INPUT_TYPE_FROM("((()"), false}
   )
@@ -264,7 +261,11 @@ INSTANTIATE_TEST_SUITE_P(
   DailyTest27,
   ::testing::Values(
     pair_type{INPUT_TYPE_FROM("(([[]{{}}])){[]}()[[]]"), true},
-    pair_type{INPUT_TYPE_FROM("sfdf(([ssdf[]{{}}])){[hello]}()[[oo]]"), true}
+    pair_type{INPUT_TYPE_FROM("sfdf(([ssdf[]{{}}])){[hello]}()[[oo]]"), true},
+    // before update_bracket_stack checked stack size before popping, this
+    // input pair causes segfault, as when checking the final '}' the stack is
+    // empty and so accessing the last element gives the segfault
+    pair_type{INPUT_TYPE_FROM("([])[]({})}"), false}
     // ,
     // FIXME: this test input value causes ctest test registration to break
     // pair_type{INPUT_TYPE_FROM("{{([]))}}uhwf{[]}[()sdfsdf"), false}
