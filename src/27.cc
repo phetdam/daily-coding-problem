@@ -267,7 +267,8 @@ INSTANTIATE_TEST_SUITE_P(
     // empty and so accessing the last element gives the segfault
     pair_type{INPUT_TYPE_FROM("([])[]({})}"), false}
     // ,
-    // FIXME: this test input value causes ctest test registration to break
+    // FIXME: this test input value causes ctest test registration to break,
+    // but only on WSL Ubuntu, not on Windows, which is strange
     // pair_type{INPUT_TYPE_FROM("{{([]))}}uhwf{[]}[()sdfsdf"), false}
   )
 );
