@@ -9,6 +9,7 @@
 #define PDDCP_BINARY_TREE_H_
 
 #include <algorithm>
+#include <cstdint>
 #include <deque>
 #include <initializer_list>
 #include <memory>
@@ -210,7 +211,7 @@ template <typename T, typename Sink>
 auto bfs(const binary_tree<T>* root, Sink sink)
 {
   // queue for nodes + counter for number of elements in tree
-  std::deque<const binary_tree<T>*> node_queue;
+  std::deque<decltype(root)> node_queue;
   std::size_t n_nodes = 0;
   // if there's no tree, there are no results
   if (!root)
@@ -347,6 +348,59 @@ inline auto bfs(
   std::basic_ostream<CharT, Traits>& stream, const binary_tree<T>& root)
 {
   return bfs(stream, &root);
+}
+
+/**
+ * Return the deepest node in a binary tree.
+ *
+ * If the deepest nodes of the left and right subtree have the same depth, by
+ * convention the left deepest node is chosen. This is done by doing the
+ * breadth-first search from right to left instead of left to right.
+ *
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename T>
+auto deepest_node(const binary_tree<T>* root)
+{
+  // return null if tree is null
+  if (!root)
+    return root;
+  // current deepest node + queue to store pointers in
+  decltype(root) cur_deepest = nullptr;
+  std::deque<decltype(cur_deepest)> node_queue{root};
+  // perform breadth-first search for deepest node
+  while (node_queue.size()) {
+    auto node = node_queue.front();
+    node_queue.pop_front();
+    // if node has no children, candidate for current deepest
+    if (!node->left() && !node->right())
+      cur_deepest = node;
+    // otherwise, add children. we add the right node before the left node in
+    // order to break ties for deepest node by choosing the leftmost node.
+    if (node->right())
+      node_queue.push_back(node->right());
+    if (node->left())
+      node_queue.push_back(node->left());
+  }
+  return cur_deepest;
+}
+
+/**
+ * Return the deepest node in a binary tree.
+ *
+ * If the deepest nodes of the left and right subtree have the same depth, by
+ * convention the left deepest node is chosen.
+ *
+ * @tparam T value type
+ *
+ * @param root Binary tree root
+ */
+template <typename T>
+inline auto deepest_node(const binary_tree<T>& root)
+{
+  return deepest_node(&root);
 }
 
 namespace bst {
