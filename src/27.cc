@@ -256,6 +256,24 @@ INSTANTIATE_TEST_SUITE_P(
   )
 );
 
+// TODO: the following test input value causes ctest add_test to break:
+//
+//   "{{([]))}}uhwf{[]}[()sdfsdf"
+//
+// however, this only happens on WSL Ubuntu, not on Windows, which is strange.
+// it may be related to the CMake version for VS 2022 being 3.25.1 while 3.22.2
+// was used on WSL Ubuntu. currently, it seems like having any new "false"
+// (unbalanced bracket) input case causes ctest input parsing of the generated
+// add_test command to break, so for Linux, we instead use a "true" input.
+// for now, this "false" case is enabled only on Windows builds.
+#ifdef _WIN32
+#define DAILY_TEST_27_BAD_CUSTOM_INPUT \
+  pair_type{INPUT_TYPE_FROM("{{([]))}}uhwf{[]}[()sdfsdf"), false}
+#else
+#define DAILY_TEST_27_BAD_CUSTOM_INPUT \
+  pair_type{INPUT_TYPE_FROM("[]{{}}(())[[[]]]()sdfs[]"), true}
+#endif  // _WIN32
+
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
   DailyTest27,
@@ -265,11 +283,8 @@ INSTANTIATE_TEST_SUITE_P(
     // before update_bracket_stack checked stack size before popping, this
     // input pair causes segfault, as when checking the final '}' the stack is
     // empty and so accessing the last element gives the segfault
-    pair_type{INPUT_TYPE_FROM("([])[]({})}"), false}
-    // ,
-    // FIXME: this test input value causes ctest test registration to break,
-    // but only on WSL Ubuntu, not on Windows, which is strange
-    // pair_type{INPUT_TYPE_FROM("{{([]))}}uhwf{[]}[()sdfsdf"), false}
+    pair_type{INPUT_TYPE_FROM("([])[]({})}"), false},
+    DAILY_TEST_27_BAD_CUSTOM_INPUT
   )
 );
 
