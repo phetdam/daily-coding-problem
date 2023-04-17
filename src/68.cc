@@ -71,8 +71,8 @@ auto bishop_attacks(InputIt first, InputIt last)
       const auto& [outer_0, outer_1] = *outer;
       const auto& [inner_0, inner_1] = *inner;
       // avoid using absolute value in case types are unsigned
-      auto diff_0 = (outer_0 < inner_0) ? inner_0 - outer_0 : outer_0 - inner_0;
-      auto diff_1 = (outer_1 < inner_1) ? inner_1 - outer_1 : outer_1 - inner_1;
+      auto diff_0 = outer_0 < inner_0 ? inner_0 - outer_0 : outer_0 - inner_0;
+      auto diff_1 = outer_1 < inner_1 ? inner_1 - outer_1 : outer_1 - inner_1;
       // bishops attack diagonals through pieces, i.e. diff_0 == diff_1
       if (diff_0 == diff_1)
         n_attacking++;

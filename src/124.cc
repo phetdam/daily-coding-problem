@@ -49,7 +49,7 @@ template <typename UIntType>
 inline auto expected_rounds(UIntType n)
 {
   static_assert(std::is_unsigned_v<UIntType>);
-  return std::log2((!n) ? n + 1 : n);
+  return std::log2(!n ? n + 1 : n);
 }
 
 #ifdef PDDCP_GTEST_STANDALONE

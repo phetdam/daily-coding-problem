@@ -134,7 +134,7 @@ TYPED_TEST(DailyTest51, TypedTest)
     std::unordered_map<int_type, unsigned short> value_map;
     for (const auto& card : new_deck)
       value_map[card] = 1;
-    return (value_map.size() == new_deck.size()) ? true : false;
+    return value_map.size() == new_deck.size() ? true : false;
   }();
   EXPECT_TRUE(valid_shuffle);
 }
