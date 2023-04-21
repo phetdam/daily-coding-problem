@@ -79,6 +79,101 @@ struct is_homogenous_pair : is_homogenous_tuple<2, T> {};
 template <typename T>
 inline constexpr bool is_homogenous_pair_v = is_homogenous_pair<T>::value;
 
+/**
+ * Base template checking if a type supports bitwise and.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_bitwise_and : std::is_integral<T> {};
+
+/**
+ * Specialization for types with user-defined `operator&`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_bitwise_and<
+  T, std::void_t<decltype(operator&(std::declval<T>(), std::declval<T>()))>
+> : std::true_type {};
+
+/**
+ * Base template checking if a type supports bitwise or.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_bitwise_or : std::is_integral<T> {};
+
+/**
+ * Specialization for types with user-defined `operator|`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_bitwise_or<
+  T, std::void_t<decltype(operator|(std::declval<T>(), std::declval<T>()))>
+> : std::true_type {};
+
+/**
+ * Base template checking if a type supports bitwise exclusive or.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_bitwise_xor : std::is_integral<T> {};
+
+/**
+ * Specialization for types with user-defined `operator^`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_bitwise_xor<
+  T, std::void_t<decltype(operator^(std::declval<T>(), std::declval<T>()))>
+> : std::true_type {};
+
+/**
+ * Base template checking if a type supports bitwise not.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_bitwise_not : std::is_integral<T> {};
+
+/**
+ * Specialization for types with user-defined `operator~`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_bitwise_not<T, std::void_t<decltype(operator~(std::declval<T>()))>>
+  : std::true_type {};
+
+/**
+ * Boolean helper to check if a type supports bitwise and.
+ */
+template <typename T>
+inline constexpr bool has_bitwise_and_v = has_bitwise_and<T>::value;
+
+/**
+ * Boolean helper to check if a type supports bitwise or.
+ */
+template <typename T>
+inline constexpr bool has_bitwise_or_v = has_bitwise_or<T>::value;
+
+/**
+ * Boolean helper to check if a type supports bitwise exclusive or.
+ */
+template <typename T>
+inline constexpr bool has_bitwise_xor_v = has_bitwise_xor<T>::value;
+
+/**
+ * Boolean helper to check if a type supports bitwise not.
+ */
+template <typename T>
+inline constexpr bool has_bitwise_not_v = has_bitwise_not<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
