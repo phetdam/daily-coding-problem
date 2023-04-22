@@ -74,7 +74,7 @@ PDDCP_BITWISE_ENUM_BINARY_OPERATOR(execution, ^)
 /**
  * Unary bitwise negation operator for the `execution` enum.
  *
- * @param a Value to bitweise negate
+ * @param a Value to bitwise negate
  */
 inline constexpr auto operator~(execution a)
 {
