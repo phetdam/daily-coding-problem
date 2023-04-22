@@ -34,7 +34,10 @@ project(
     LANGUAGES C CXX
 )
 
-# default build type Debug
+# check if we are using single or multi-config generator
+get_property(PDDCP_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+# default build type Debug for single-config generators
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
