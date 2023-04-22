@@ -174,6 +174,27 @@ inline constexpr bool has_bitwise_xor_v = has_bitwise_xor<T>::value;
 template <typename T>
 inline constexpr bool has_bitwise_not_v = has_bitwise_not<T>::value;
 
+/**
+ * Checks if a type is a bitmask type.
+ *
+ * @note This does not fully meet the *BitmaskType* named requirements yet.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_bitmask_type : std::bool_constant<
+  has_bitwise_and_v<T> &&
+  has_bitwise_or_v<T> &&
+  has_bitwise_xor_v<T> &&
+  has_bitwise_not_v<T>
+> {};
+
+/**
+ * Boolean helper to check if a type is a bitmask type.
+ */
+template <typename T>
+inline constexpr bool is_bitmask_type_v = is_bitmask_type<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
