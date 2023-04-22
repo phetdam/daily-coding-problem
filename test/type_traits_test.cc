@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "pddcp/enums.h"
+
 namespace {
 
 /**
@@ -117,6 +119,17 @@ using InputType5 = is_homogenous_pair_input<pair_like<float, float>, true>;
 using InputType6 = is_homogenous_pair_input<pair_like<int, double>, false>;
 
 /**
+ * Sample unscoped and scoped enum types.
+ */
+enum unscoped_enum {
+  unscoped_enum_first,
+  unscoped_enum_second,
+  unscoped_enum_third,
+  unscoped_enum_count
+};
+enum class scoped_enum { first, second, third, count };
+
+/**
  * Helper for `pddcp::is_bitmask_type<T>` input type creation.
  *
  * @tparam T input type
@@ -134,6 +147,25 @@ using InputType9 = is_bitmask_type_input<std::tuple<double, int>, false>;
 using InputType10 = is_bitmask_type_input<std::size_t, true>;
 using InputType11 = is_bitmask_type_input<const char*, false>;
 using InputType12 = is_bitmask_type_input<std::array<char*, 9>, false>;
+using InputType13 = is_bitmask_type_input<unscoped_enum, false>;
+using InputType14 = is_bitmask_type_input<scoped_enum, false>;
+using InputType15 = is_bitmask_type_input<pddcp::execution, true>;
+
+/**
+ * Helper for `pddcp::is_bitmask_enum<T>` input type creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth give by the traits type
+ */
+template <typename T, bool truth>
+using is_bitmask_enum_input = std::pair<
+  pddcp::is_bitmask_enum<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::is_bitmask_enum<T> testing
+using InputType16 = is_bitmask_enum_input<unscoped_enum, false>;
+using InputType17 = is_bitmask_enum_input<scoped_enum, false>;
+using InputType18 = is_bitmask_enum_input<pddcp::execution, true>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
@@ -148,12 +180,28 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType9);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType10);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType11);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType12);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType13);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType14);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType15);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType16);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType17);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType18);
 
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
   InputType1, InputType2, InputType3, InputType4, InputType5, InputType6,
   // types for pddcp::is_bitmask_type<T> testing
-  InputType7, InputType8, InputType9, InputType10, InputType11, InputType12
+  InputType7,
+  InputType8,
+  InputType9,
+  InputType10,
+  InputType11,
+  InputType12,
+  InputType13,
+  InputType14,
+  InputType15,
+  // types for pddcp::is_bitmask_enum<T> testing
+  InputType16, InputType17, InputType18
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

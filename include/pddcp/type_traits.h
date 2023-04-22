@@ -152,24 +152,32 @@ struct has_bitwise_not<T, std::void_t<decltype(operator~(std::declval<T>()))>>
 
 /**
  * Boolean helper to check if a type supports bitwise and.
+ *
+ * @tparam T type
  */
 template <typename T>
 inline constexpr bool has_bitwise_and_v = has_bitwise_and<T>::value;
 
 /**
  * Boolean helper to check if a type supports bitwise or.
+ *
+ * @tparam T type
  */
 template <typename T>
 inline constexpr bool has_bitwise_or_v = has_bitwise_or<T>::value;
 
 /**
  * Boolean helper to check if a type supports bitwise exclusive or.
+ *
+ * @tparam T type
  */
 template <typename T>
 inline constexpr bool has_bitwise_xor_v = has_bitwise_xor<T>::value;
 
 /**
  * Boolean helper to check if a type supports bitwise not.
+ *
+ * @tparam T type
  */
 template <typename T>
 inline constexpr bool has_bitwise_not_v = has_bitwise_not<T>::value;
@@ -191,9 +199,30 @@ struct is_bitmask_type : std::bool_constant<
 
 /**
  * Boolean helper to check if a type is a bitmask type.
+ *
+ * @tparam T type
  */
 template <typename T>
 inline constexpr bool is_bitmask_type_v = is_bitmask_type<T>::value;
+
+/**
+ * Check if a type is an enum usable as a bitmask type.
+ *
+ * @note This does not make a distinction between scoped and unscoped enums.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_bitmask_enum : std::bool_constant<
+  std::is_enum_v<T> && is_bitmask_type_v<T>> {};
+
+/**
+ * Boolean helper to check if a type is a bitmask enum type.
+ *
+ * @tparam T type
+*/
+template <typename T>
+inline constexpr bool is_bitmask_enum_v = is_bitmask_enum<T>::value;
 
 }  // namespace pddcp
 
