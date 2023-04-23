@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 #include <gtest/gtest.h>
 
@@ -23,6 +24,50 @@
 #include "pddcp/utility.h"
 
 namespace {
+
+/**
+ * Return the Levenshtein distance between two string views.
+ *
+ * This is the naive recursive computation of the Levenshtein distance
+ * implemented by following its recurrence relation. The complexity is
+ * obviously O(3^N), which is exponential time complexity.
+ *
+ * Views are used to eliminate copying and are much more efficient that
+ * operating on strings as each substring requires another memory allocation.
+ *
+ * @tparam CharT Char type
+ * @tparam Traits Char traits type
+ *
+ * @param a First string view
+ * @param b Second string view
+ */
+template <typename CharT, typename Traits>
+auto levenshtein_distance_r(
+  const std::basic_string_view<CharT, Traits>& a,
+  const std::basic_string_view<CharT, Traits>& b)
+{
+  // if either is empty, return size of other string
+  if (b.empty())
+    return a.size();
+  if (a.empty())
+    return b.size();
+  // if first chars are equal, compute distance for the remainders (tails)
+  if (a[0] == b[0])
+    return levenshtein_distance_r(a.substr(1), b.substr(1));
+  // tails for first and second string
+  // auto tail_a = a.substr(1);
+  // auto tail_b = b.substr(1);
+  decltype(a) tail_a{a.data() + 1};
+  decltype(b) tail_b{b.data() + 1};
+  // consider all cases of computing the distance with or without the first
+  // characters of the two strings, i.e. (tail_a, b), (a, tail_b),
+  // (tail_a, tail_b). add one to the result is because we remove one char.
+  auto lev_a = levenshtein_distance_r(tail_a, b);
+  auto lev_b = levenshtein_distance_r(a, tail_b);
+  auto lev_ab = levenshtein_distance_r(tail_a, tail_b);
+  // of course, we would want to pick their minimum
+  return 1 + std::min({lev_a, lev_b, lev_ab});
+}
 
 /**
  * Return the Levenshtein distance between two strings.
@@ -39,29 +84,14 @@ namespace {
  * @param b Second string
  */
 template <typename CharT, typename Traits, typename Alloc>
-auto levenshtein_distance_r(
+inline auto levenshtein_distance_r(
   const std::basic_string<CharT, Traits, Alloc>& a,
   const std::basic_string<CharT, Traits, Alloc>& b)
 {
-  // if either is empty, return size of other string
-  if (b.empty())
-    return a.size();
-  if (a.empty())
-    return b.size();
-  // if first chars are equal, compute distance for the remainders (tails)
-  if (a[0] == b[0])
-    return levenshtein_distance_r(a.substr(1), b.substr(1));
-  // tails for first and second string
-  auto tail_a = a.substr(1);
-  auto tail_b = b.substr(1);
-  // consider all cases of computing the distance with or without the first
-  // characters of the two strings, i.e. (tail_a, b), (a, tail_b),
-  // (tail_a, tail_b). add one to the result is because we remove one char.
-  auto lev_a = levenshtein_distance_r(tail_a, b);
-  auto lev_b = levenshtein_distance_r(a, tail_b);
-  auto lev_ab = levenshtein_distance_r(tail_a, tail_b);
-  // of course, we would want to pick their minimum
-  return 1 + std::min({lev_a, lev_b, lev_ab});
+  return levenshtein_distance_r(
+    std::basic_string_view<CharT, Traits>{a.data()},
+    std::basic_string_view<CharT, Traits>{b.data()}
+  );
 }
 
 /**
