@@ -55,8 +55,6 @@ auto levenshtein_distance_r(
   if (a[0] == b[0])
     return levenshtein_distance_r(a.substr(1), b.substr(1));
   // tails for first and second string
-  // auto tail_a = a.substr(1);
-  // auto tail_b = b.substr(1);
   decltype(a) tail_a{a.data() + 1};
   decltype(b) tail_b{b.data() + 1};
   // consider all cases of computing the distance with or without the first
