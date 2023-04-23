@@ -94,7 +94,6 @@ bool is_palindrome(const std::basic_string<CharT, Traits, Alloc>& str)
   return true;
 }
 
-
 }  // namespace pddcp
 
 #endif  // PDDCP_STRING_H_
