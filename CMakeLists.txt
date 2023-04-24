@@ -63,7 +63,7 @@ include(AddGTestStandalone)
 set(PDDCP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PDDCP_INCLUDE_DIR})
 # path to src directory (we use this later when adding files to test runner)
-set(PDDCP_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(PDDCP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # interface target for precompiled headers usable by each target. no PCH is
 # built for a target unless they explicitly link against this.
@@ -73,7 +73,7 @@ target_precompile_headers(
     INTERFACE <algorithm> <string> <type_traits> <vector>
 )
 
-add_subdirectory(${PDDCP_SRC_DIR})
+add_subdirectory(${PDDCP_SOURCE_DIR})
 # XOR linked list implementation used for #6, also used by legacy Python driver
 add_subdirectory(xorll)
 
