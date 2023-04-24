@@ -90,10 +90,7 @@ TYPED_TEST(DailyTest31, RecursiveTest)
   EXPECT_EQ(
     TestFixture::distance_,
     pddcp::levenshtein_distance(
-      TestFixture::first_,
-      TestFixture::second_,
-      // pddcp::execution::sync is ignored
-      pddcp::execution::recursive | pddcp::execution::sync
+      TestFixture::first_, TestFixture::second_, pddcp::execution::recursive
     )
   );
 }
@@ -106,10 +103,7 @@ TYPED_TEST(DailyTest31, DynamicTest)
   EXPECT_EQ(
     TestFixture::distance_,
     pddcp::levenshtein_distance(
-      TestFixture::first_,
-      TestFixture::second_,
-      // pddcp::execution::async is ignored
-      pddcp::execution::dynamic | pddcp::execution::async
+      TestFixture::first_, TestFixture::second_, pddcp::execution::dynamic
     )
   );
 }
