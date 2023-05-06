@@ -65,7 +65,7 @@ bool can_partition(const Container& values)
   // trigger a warning from Clang about an unused lambda capture.
 PDDCP_GNU_WARNING_PUSH()
 PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
-  auto pos_sum = [&total_sum, &values]
+  const auto pos_sum = [&total_sum, &values]
   {
     if constexpr (std::is_unsigned_v<value_type>)
       return total_sum;
@@ -101,13 +101,16 @@ PDDCP_GNU_WARNING_PUSH()
 PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
   auto state_index = [&n_range_values, &offset](value_type v, size_type s)
   {
-    return (s - 1) * n_range_values + v + offset;
+    // static_cast to size_type is needed to suppress compiler warnings, which
+    // are emitted if value_type is larger than size_type is
+    return static_cast<size_type>((s - 1) * n_range_values + v + offset);
   };
 PDDCP_GNU_WARNING_POP()
   // then, we simply enumerate all the possible states. each (v, s) pair should
   // be interpreted as "there exists a subset of the first s elements of the
   // container values that sums to v". only n_range_values * n_elems states.
-  std::vector<bool> states(n_range_values * n_elems);
+  // need static_cast to size_type to as n_range_values is of type value_type
+  std::vector<bool> states(static_cast<size_type>(n_range_values) * n_elems);
   // the first column will have only index offset and index values[0] + offset
   // set to true, as given 1 element the subset can sum to itself or zero.
   states[state_index(0, 1)] = true;
@@ -191,7 +194,7 @@ protected:
 };
 
 /**
- * Specialization for the first custom input/output pair.
+ * Specialization for the second custom input/output pair.
  *
  * Here we demonstrate using negative values in a non-vector container. The
  * two subsets {-2, 1, 11} and {-4, 4, 10} have the same sum.
