@@ -137,7 +137,7 @@ protected:
 };
 
 /**
- * Speclization for the third custom input/output pair.
+ * Specialization for the third custom input/output pair.
  *
  * Here the running sum is never reset and the large negative value included in
  * the actual maximum sum of the container values, which is all the values.
