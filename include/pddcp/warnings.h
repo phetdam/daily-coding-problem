@@ -8,6 +8,12 @@
 #ifndef PDDCP_WARNINGS_H_
 #define PDDCP_WARNINGS_H_
 
+#include "pddcp/common.h"
+
+// macros for using _Pragma without needing to explicitly quote
+#define PDDCP_PRAGMA_I(x) _Pragma(#x)
+#define PDDCP_PRAGMA(x) PDDCP_PRAGMA_I(x)
+
 // helper macros for disabling and re-enabling MSVC warnings
 #ifdef _MSC_VER
 /**
@@ -37,7 +43,7 @@
 /**
  * Push warning state.
  */
-#define PDDCP_GNU_WARNING_PUSH() _Pragma("GCC diagnostic push")
+#define PDDCP_GNU_WARNING_PUSH() PDDCP_PRAGMA(GCC diagnostic push)
 
 /**
  * Disable specified GCC/Clang warning.
@@ -45,12 +51,12 @@
  * @param wname GCC/Clang warning name without -W, e.g. self-move, narrowing
  */
 #define PDDCP_GNU_WARNING_DISABLE(wname) \
-  _Pragma("GCC diagnostic ignored \"-W" #wname "\"")
+  PDDCP_PRAGMA(GCC diagnostic ignored PDDCP_STRINGIFY(PDDCP_CONCAT(-W, wname)))
 
 /**
  * Pop warning state.
  */
-#define PDDCP_GNU_WARNING_POP() _Pragma("GCC diagnostic pop")
+#define PDDCP_GNU_WARNING_POP() PDDCP_PRAGMA(GCC diagnostic pop)
 #else
 #define PDDCP_GNU_WARNING_PUSH()
 #define PDDCP_GNU_WARNING_DISABLE(wname)
