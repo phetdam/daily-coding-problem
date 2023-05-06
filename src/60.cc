@@ -15,6 +15,8 @@
  */
 
 #include <algorithm>
+#include <cstdint>
+#include <deque>
 #include <iostream>
 #include <numeric>
 #include <type_traits>
@@ -33,8 +35,11 @@ namespace {
  * Returns `true` if values can be partitioned into two subsets of equal sum.
  *
  * Subset is used loosely, more precisely these are multisets of the same size.
+ * This implementation is a pseudo-polynomial time dynamic programming solution
+ * to the subset partition problem, a special case of the subset sum problem.
+ * Negative values are allowed in the container passed to the function.
  *
- * @tparam Container *Container* with integral `value_type`
+ * @tparam Container *SequenceContainer* with integral `value_type`
  */
 template <typename Container>
 bool can_partition(const Container& values)
@@ -117,8 +122,8 @@ PDDCP_GNU_WARNING_POP()
       if (
         states[state_index(v, s - 1)] ||
         (
-          v >= values[s - 1] &&
-          v < n_range_values + values[s - 1] &&
+          v - values[s - 1] >= neg_sum &&
+          v - values[s - 1] < pos_sum &&
           states[state_index(v - values[s - 1], s - 1)]
         )
       )
@@ -143,6 +148,8 @@ public:
 // input types used in the specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, std::vector<unsigned int>>;
 using InputType2 = pddcp::indexed_type<1, std::vector<int>>;
+using InputType3 = pddcp::indexed_type<2, std::deque<std::size_t>>;
+using InputType4 = pddcp::indexed_type<3, std::deque<std::intmax_t>>;
 
 /**
  * Specialization for the first given input/output pair.
@@ -168,7 +175,39 @@ protected:
   static inline constexpr bool res_ = false;
 };
 
-using DailyTest60Types = ::testing::Types<InputType1, InputType2>;
+/**
+ * Specialization for the first custom input/output pair.
+ *
+ * Here we demonstrate using a non-vector container as the input. The two
+ * subsets {1, 5, 12} and {3, 15} have the same sum.
+ */
+template <>
+class DailyTest60<InputType3> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType3);
+protected:
+  static inline const element_type values_{1, 5, 15, 3, 12};
+  static inline constexpr bool res_ = true;
+};
+
+/**
+ * Specialization for the first custom input/output pair.
+ *
+ * Here we demonstrate using negative values in a non-vector container. The
+ * two subsets {-2, 1, 11} and {-4, 4, 10} have the same sum.
+ */
+template <>
+class DailyTest60<InputType4> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType4);
+protected:
+  static inline const element_type values_{-2, 10, -4, 1, 11, 4};
+  static inline constexpr bool res_ = true;
+};
+
+using DailyTest60Types = ::testing::Types<
+  InputType1, InputType2, InputType3, InputType4
+>;
 TYPED_TEST_SUITE(DailyTest60, DailyTest60Types);
 
 /**
