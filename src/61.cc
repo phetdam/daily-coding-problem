@@ -36,7 +36,7 @@ namespace {
  * @param exp Exponent
  */
 template <typename OutType, typename BaseType, typename ExpType>
-constexpr auto fast_pow(BaseType base, ExpType exp)
+constexpr auto integral_pow(BaseType base, ExpType exp)
 {
   // inputs must be integral, return float (to allow negative exponents)
   static_assert(std::is_integral_v<BaseType>, "BaseType must be integral");
@@ -52,7 +52,7 @@ constexpr auto fast_pow(BaseType base, ExpType exp)
   if (exp == 0)
     return value_type{1};
   // compute the square root of the result (approx if odd exponent)
-  const auto res_sqrt = fast_pow<OutType>(base, exp / 2);
+  const auto res_sqrt = integral_pow<OutType>(base, exp / 2);
   // if exponent is odd, we have to multiply base one more time. furthermore,
   // if the exponent is negative, we have to divide by base instead.
   // if exponent even, multiply squares
@@ -76,9 +76,9 @@ constexpr auto fast_pow(BaseType base, ExpType exp)
  * @param exp Exponent
  */
 template <typename BaseType, typename ExpType>
-inline constexpr auto fast_pow(BaseType base, ExpType exp)
+inline constexpr auto integral_pow(BaseType base, ExpType exp)
 {
-  return fast_pow<double>(base, exp);
+  return integral_pow<double>(base, exp);
 }
 
 /**
@@ -171,12 +171,12 @@ using DailyTest61Types = ::testing::Types<
 TYPED_TEST_SUITE(DailyTest61, DailyTest61Types);
 
 /**
- * Check that `fast_pow` works as expected.
+ * Check that `integral_pow` works as expected.
  */
 TYPED_TEST(DailyTest61, TypedTest)
 {
   EXPECT_DOUBLE_EQ(
-    TestFixture::res_, fast_pow(TestFixture::base_, TestFixture::exp_)
+    TestFixture::res_, integral_pow(TestFixture::base_, TestFixture::exp_)
   );
 }
 
