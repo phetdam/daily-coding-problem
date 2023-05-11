@@ -89,10 +89,7 @@ inline constexpr auto integral_pow(BaseType base, ExpType exp)
  * @tparam IndexedType `pddcp::indexed_type<I, T>`, tuple-like `element_type`
  */
 template <typename IndexedType>
-class DailyTest61 : public ::testing::Test {
-public:
-  PDDCP_INDEXED_TYPE_HELPER_TYPES(IndexedType);
-};
+class DailyTest61 : public ::testing::Test {};
 
 // input types used in the specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, std::tuple<unsigned, short, float>>;
