@@ -38,6 +38,7 @@ add_executable(
     enums_test.cc
     matrix_test.cc
     prefix_tree_test.cc
+    rtti_test.cc
     type_traits_test.cc
 )
 # use OpenMP if available

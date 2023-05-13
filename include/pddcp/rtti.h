@@ -8,22 +8,36 @@
 #ifndef PDDCP_RTTI_H_
 #define PDDCP_RTTI_H_
 
-/**
- * Macro for checking that Itanium ABI is used by this compiler.
- */
+// macro indicating that Itanium ABI is used by this compiler
 #ifdef __has_include
 #if __has_include(<cxxabi.h>)
-#define PDDCP_ITANIUM_CXX_ABI
+#define PDDCP_CXX_ABI_ITANIUM
 #endif  // !__has_include(<cxxabi.h>)
 #endif  // __has_include
 
-#ifdef PDDCP_ITANIUM_CXX_ABI
+// MSVC has its own ABI
+#ifdef _MSC_VER
+// can't have cxxabi.h if compiling with MSVC
+#ifdef PDDCP_CXX_ABI_ITANIUM
+#error "Cannot have both Itanium and MSVC ABIs present"
+#endif  // PDDCP_CXX_ABI_ITANIUM
+#define PDDCP_CXX_ABI_MSVC
+#endif  // _MSC_VER
+
+// indicate if we know the compiler ABI or not
+#if defined(PDDCP_CXX_ABI_ITANIUM) || defined(PDDCP_CXX_ABI_MSVC)
+#define PDDCP_CXX_ABI_KNOWN
+#else
+#define PDDCP_CXX_ABI_UNKNOWN
+#endif  // !defined(PDDCP_CXX_ABI_ITANIUM) && !defined(PDDCP_CXX_ABI_MSVC)
+
+#ifdef PDDCP_CXX_ABI_ITANIUM
 #include <cxxabi.h>
 
 #include <cstddef>
 #include <cstdlib>
 #include <stdexcept>
-#endif  // PDDCP_ITANIUM_CXX_ABI
+#endif  // PDDCP_CXX_ABI_ITANIUM
 #include <string>
 #include <typeinfo>
 
@@ -58,7 +72,7 @@ namespace pddcp {
 inline std::string demangled_name(const char* name)
 {
 // otherwise, any compiler that uses Itanium ABI needs to demangle
-#ifdef PDDCP_ITANIUM_CXX_ABI
+#ifdef PDDCP_CXX_ABI_ITANIUM
   int status;
   auto name_buf = abi::__cxa_demangle(name, nullptr, nullptr, &status);
   // on success, status is 0. we need to copy into a string and free the buffer
@@ -90,10 +104,10 @@ inline std::string demangled_name(const char* name)
     std::string{": abi::__cxa_demangle returned unexpected status "} +
     std::to_string(status)
   };
-// backup is to undecorated name. note that MSVC does not mangle the type
+// else return undecorated name. note that MSVC does not mangle the type
 #else
   return name;
-#endif  // PDDCP_ITANIUM_CXX_ABI
+#endif  // PDDCP_CXX_ABI_ITANIUM
 }
 
 /**
