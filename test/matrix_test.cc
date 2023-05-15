@@ -239,7 +239,7 @@ TYPED_TEST(MatrixTest, NegationTest)
     );
   }
   else
-    GTEST_SKIP() << "skipping negation of unsigned type";
+    GTEST_SKIP();
 }
 
 /**
