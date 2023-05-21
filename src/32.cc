@@ -16,12 +16,14 @@
 
 #include <cmath>
 #include <limits>
+#include <ostream>
 #include <stdexcept>
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
 #include "pddcp/matrix.h"
+#include "pddcp/rtti.h"
 #include "pddcp/utility.h"
 #include "pddcp/warnings.h"
 
@@ -56,11 +58,31 @@ public:
   constexpr auto& second() const { return second_; }
   constexpr auto& third() const { return third_; }
 
+  /**
+   * Equality operator.
+   *
+   * @param other `fx_triangle<T>` to compare equality against
+   */
   constexpr bool operator==(const fx_triangle& other) const
   {
     return first_ == other.first() &&
       second_ == other.second() &&
       third_ == other.third();
+  }
+
+  /**
+   * `PrintTo` friend function so Google Test can print this type.
+   *
+   * @note If not defined inline in class, must define in the same namespace.
+   *
+   * @param triangle `fx_triangle<T>` to print
+   * @param out Output stream pointer
+   */
+  friend void PrintTo(const fx_triangle& triangle, std::ostream* out)
+  {
+    *out << "fx_triangle<" << PDDCP_DEMANGLED_NAME(T) << ">{" <<
+      triangle.first_ << ", " << triangle.second_ << ", " <<
+      triangle.third_ << "}";
   }
 
 private:
@@ -151,6 +173,7 @@ class DailyTest32 : public ::testing::Test {};
 
 using InputType1 = pddcp::indexed_type<0, pddcp::dense_matrix<3, 3, float>>;
 using InputType2 = pddcp::indexed_type<1, pddcp::dense_matrix<3, 3, float>>;
+using InputType3 = pddcp::indexed_type<2, pddcp::dense_matrix<6, 6, double>>;
 
 /**
  * Specialization for the first input/output pair.
@@ -197,7 +220,31 @@ PDDCP_MSVC_WARNING_POP()
   static inline const fx_triangle_vector<size_type> arbs_{{0, 1, 2}};
 };
 
-using DailyTest32Types = ::testing::Types<InputType1, InputType2>;
+/**
+ * Specialization for the third input/output pair.
+ *
+ * Only one pair of currencies has an non-identity exchange rate, resulting in
+ * 4 different triangular arbitrage opportunities.
+ */
+template <>
+class DailyTest32<InputType3> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType3);
+protected:
+  static inline const element_type fx_rates_{
+    {1., 1., 1., 2., 1., 1.},
+    {1., 1., 1., 1., 1., 1.},
+    {1., 1., 1., 1., 1., 1.},
+    {0.5, 1., 1., 1., 1., 1.},
+    {1., 1., 1., 1., 1., 1.},
+    {1., 1., 1., 1., 1., 1.}
+  };
+  static inline const fx_triangle_vector<size_type> arbs_{
+    {0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {0, 3, 5}
+  };
+};
+
+using DailyTest32Types = ::testing::Types<InputType1, InputType2, InputType3>;
 TYPED_TEST_SUITE(DailyTest32, DailyTest32Types);
 
 /**
