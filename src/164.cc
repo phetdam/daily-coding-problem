@@ -11,9 +11,13 @@
  * it in linear time and space.
  */
 
+#include <deque>
+#include <list>
 #include <map>
 #include <numeric>
+#include <set>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -95,11 +99,13 @@ using container_value_frequency_map_t =
   typename container_value_frequency_map<T>::type;
 
 /**
- * Find all the duplicates in a given *Container*.
+ * Return a set of all the duplicates in a given *Container*.
  *
  * Barring a user-specified `MapType`, the runtime of this O(N) space
  * implementation can be O(N) or O(N log(N)) depending on the default value
- * frequency map type chosen for `MapType`.
+ * frequency map type chosen for `MapType`. However, the worst-case is still
+ * O(N log(N)) if the number of duplicates is large, i.e. close to N, as
+ * `std::set` has logarithmic insertion time.
  *
  * @tparam Container *Container* type
  * @tparam MapType Mapping type that maps the `value_type` of `Container` to
@@ -128,10 +134,10 @@ auto find_duplicates(const Container& values)
   for (const auto& value : values)
     value_map[value] += 1;
   // collect duplicates and return
-  std::vector<value_type> dups;
+  std::set<value_type> dups;
   for (const auto& [value, count] : value_map)
     if (count > 1)
-      dups.emplace_back(value);
+      dups.emplace(value);
   return dups;
 }
 
@@ -148,32 +154,101 @@ public:
 
 // input types used in the specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, std::vector<int>>;
+using InputType2 = pddcp::indexed_type<1, std::vector<std::string>>;
+using InputType3 = pddcp::indexed_type<2, std::list<unsigned int>>;
+using InputType4 = pddcp::indexed_type<3, std::deque<double>>;
 
+/**
+ * Specialization for first input/output pair.
+ *
+ * Here `pigeonhole_duplicate` and `find_duplicates` will be run.
+ */
 template <>
 class DailyTest164<InputType1> : public ::testing::Test {
 public:
   PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType1);
 protected:
   static inline const element_type values_{3, 1, 2, 3, 4, 5};
-  static inline constexpr value_type dup_ = 3;
-  static inline const element_type all_dups_{3};
+  static inline const std::set<value_type> duplicates_{3};
 };
 
-using DailyTest164Types = ::testing::Types<InputType1>;
+/**
+ * Specialization for the second input/output pair using strings as values.
+ *
+ * Only `find_duplicates` will run on this input.
+ */
+template <>
+class DailyTest164<InputType2> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType2);
+protected:
+  static inline const element_type values_{
+    "abc", "hello", "cheese", "hello", "banana", "apple", "banana", "yeetus"
+  };
+  static inline const std::set<value_type> duplicates_{"banana", "hello"};
+};
+
+/**
+ * Specialization for the third input/output pair.
+ *
+ * Here `pigeonhole_duplicate` and `find_duplicates` will be run. The input
+ * container is a `std::list<T>` to show that the functions work for non-vector
+ * containers, in particular any object that exposes iterators.
+ */
+template <>
+class DailyTest164<InputType3> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType3);
+protected:
+  static inline const element_type values_{4, 1, 6, 2, 3, 4, 5};
+  static inline const std::set<value_type> duplicates_{4};
+};
+
+/**
+ * Specialization for the fourth input/output pair.
+ *
+ * Only `find_duplicates` will run on this input. The input container is a
+ * `std::deque<double>` that contains multiple duplicates.
+ */
+template <>
+class DailyTest164<InputType4> : public ::testing::Test {
+public:
+  PDDCP_INDEXED_TYPE_CONTAINER_HELPER_TYPES(InputType4);
+protected:
+  static inline const element_type values_{
+    4.1, 4.1, 1., 13., 23., 14.5, 14.5, 2.2, 2.2, 2., 16., 14.
+  };
+  static inline const std::set<value_type> duplicates_{2.2, 4.1, 14.5};
+};
+
+using DailyTest164Types = ::testing::Types<
+  InputType1, InputType2, InputType3, InputType4
+>;
 TYPED_TEST_SUITE(DailyTest164, DailyTest164Types);
 
+/**
+ * Test that `pigeonhole_duplicate` works as expected.
+ *
+ * This test is skipped for any `values_` input with non-integral `value_type`.
+ */
 TYPED_TEST(DailyTest164, PigeonDuplicateTest)
 {
-  // pigeonhole_duplicate can only be used for containers of integral values
   if constexpr (std::is_integral_v<typename TestFixture::value_type>)
-    EXPECT_EQ(TestFixture::dup_, pigeonhole_duplicate(TestFixture::values_));
+    // first element of duplicates_ is the expected pigeonhole_duplicate result
+    EXPECT_EQ(
+      *TestFixture::duplicates_.begin(),
+      pigeonhole_duplicate(TestFixture::values_)
+    );
   else
     GTEST_SKIP();
 }
 
+/**
+ * Test that `find_duplicates` works as expected.
+ */
 TYPED_TEST(DailyTest164, FullDuplicateTest)
 {
-  EXPECT_EQ(TestFixture::all_dups_, find_duplicates(TestFixture::values_));
+  EXPECT_EQ(TestFixture::duplicates_, find_duplicates(TestFixture::values_));
 }
 
 }  // namespace
