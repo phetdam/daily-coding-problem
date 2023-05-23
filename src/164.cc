@@ -74,7 +74,6 @@ struct container_value_frequency_map {
   using type = std::map<typename T::value_type, typename T::size_type>;
 };
 
-
 /**
  * Partial specialization for when `T` has a `std::hash<T>` specialization.
  *
