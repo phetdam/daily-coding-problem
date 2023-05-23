@@ -9,6 +9,7 @@
 #define PDDCP_TYPE_TRAITS_H_
 
 #include <cstdint>
+#include <functional>
 #include <tuple>
 #include <type_traits>
 
@@ -223,6 +224,30 @@ struct is_bitmask_enum : std::bool_constant<
 */
 template <typename T>
 inline constexpr bool is_bitmask_enum_v = is_bitmask_enum<T>::value;
+
+/**
+ * Check if a type `T` has a `std::hash<T>` specialization.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct is_std_hashable : std::false_type {};
+
+/**
+ * True specialization for when `T` has a `std::hash<T>` specialization.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_std_hashable<T, std::void_t<std::hash<T>>> : std::true_type {};
+
+/**
+ * Boolean helper to check if a type is a hashable type.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool is_std_hashable_v = is_std_hashable<T>::value;
 
 }  // namespace pddcp
 
