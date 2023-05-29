@@ -11,6 +11,8 @@
  * ignoring the remainder.
  */
 
+#include <cstdint>
+#include <stdexcept>
 #include <type_traits>
 
 #include <gtest/gtest.h>
@@ -22,6 +24,8 @@ namespace {
 template <typename T, std::enable_if_t<std::is_signed_v<T>, bool> = true>
 auto divide(T a, T b)
 {
+  if (!b)
+    throw std::runtime_error{"denominator b is zero"};
   // flags for signs of a, b
   bool a_neg = (a < 0);
   bool b_neg = (b < 0);
@@ -41,6 +45,8 @@ auto divide(T a, T b)
 template <typename T, std::enable_if_t<std::is_unsigned_v<T>, bool> = true>
 auto divide(T a, T b)
 {
+  if (!b)
+    throw std::runtime_error{"denominator b is zero"};
   T quot = 0;
   while (a >= b) {
     a -= b;
@@ -57,6 +63,9 @@ using InputType2 = pddcp::indexed_type<1, unsigned int>;
 using InputType3 = pddcp::indexed_type<2, int>;
 using InputType4 = pddcp::indexed_type<3, long>;
 using InputType5 = pddcp::indexed_type<4, long>;
+using InputType6 = pddcp::indexed_type<5, std::size_t>;
+using InputType7 = pddcp::indexed_type<6, std::int32_t>;
+using InputType8 = pddcp::indexed_type<7, short>;
 
 #define DAILY_TEST_88(type, a, b, res) \
   template <> \
@@ -74,9 +83,19 @@ DAILY_TEST_88(InputType2, 10, 3, 3);
 DAILY_TEST_88(InputType3, 14, 2, 7);
 DAILY_TEST_88(InputType4, 15, 4, 3);
 DAILY_TEST_88(InputType5, 18, -4, -4);
+DAILY_TEST_88(InputType6, 0, 4, 0);
+DAILY_TEST_88(InputType7, -1, 10, 0);
+DAILY_TEST_88(InputType8, -19, 4, -4);
 
 using DailyTest88Types = ::testing::Types<
-  InputType1, InputType2, InputType3, InputType4, InputType5
+  InputType1,
+  InputType2,
+  InputType3,
+  InputType4,
+  InputType5,
+  InputType6,
+  InputType7,
+  InputType8
 >;
 TYPED_TEST_SUITE(DailyTest88, DailyTest88Types);
 
