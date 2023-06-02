@@ -26,6 +26,22 @@
 
 namespace {
 
+/**
+ * Return number of intersecting pairs line segments.
+ *
+ * Let p(1), ... p(n) and q(1), ... q(n) be two sets of x-coordinates, where
+ * each p(i) has a y-coordinate of 0 and each q(i) has a y-coordinate of 1, and
+ * let L(i) represent the line segment with endpoints (p(i), 0), (q(i), 1). The
+ * function returns for all i, j the number of intersecting L(i), L(j) pairs.
+ *
+ * Time complexity is O(pow(n, 2)) with n(n - 1) / 2 actual comparisons.
+ *
+ * @tparam FirstContainer *SequenceContainer* with arithmetic `value_type`
+ * @tparam SecondContainer *SequenceContainer* with arithmetic `value_type`
+ *
+ * @param ps Set of x-coordinates for points with y-coordinate 0
+ * @param qs Set of y-coordinates for points with y-coordinate 1
+ */
 template <typename FirstContainer, typename SecondContainer>
 auto intersecting_pairs(const FirstContainer& ps, const SecondContainer& qs)
 {
@@ -91,9 +107,16 @@ PDDCP_MSVC_WARNING_POP()
 template <typename T>
 using mono_pair = std::pair<T, T>;
 
+/**
+ * Base test class template.
+ *
+ * @tparam IndexedType `pddcp::indexed_type<I, T>`, `std::pair<U, V>` for
+ *  `element_type`, where `U`, `V`, are containers that support random access
+ */
 template <typename IndexedType>
 class DailyTest194 : public ::testing::Test {};
 
+// input types used in the specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, mono_pair<std::vector<double>>>;
 using InputType2 = pddcp::indexed_type<1, mono_pair<std::vector<float>>>;
 using InputType3 = pddcp::indexed_type<2, mono_pair<std::vector<double>>>;
@@ -103,6 +126,14 @@ using InputType4 = pddcp::indexed_type<
 >;
 using InputType5 = pddcp::indexed_type<4, mono_pair<std::vector<int>>>;
 
+/**
+ * Helper macro defining each `DailyTest194` specialization.
+ *
+ * @param input_type `pddcp::indexed_type<I, T>` specialization
+ * @param ps_init `INIT_LIST(...)` of x-coordinates for y-coordinate 0 points
+ * @param qs_init `INIT_LIST(...)` of x-coordinates for y-coordinate 1 points
+ * @param res Expected number of intersecting line segments
+ */
 #define DAILY_TEST_194(input_type, ps_init, qs_init, res) \
   template <> \
   class DailyTest194<input_type> : public ::testing::Test { \
@@ -126,18 +157,62 @@ using InputType5 = pddcp::indexed_type<4, mono_pair<std::vector<int>>>;
     static inline const size_type res_ = res; \
   }
 
+/**
+ * Specialization for the first input/output pair.
+ *
+ * Models a single pair of intersecting segments.
+ */
 DAILY_TEST_194(InputType1, INIT_LIST(0.3, 0.2), INIT_LIST(0.2, 0.3), 1);
 
-// explicitly use f suffix to please MSVC, otherwise emits C4305
+/**
+ * Specialization for the second input/output pair.
+ *
+ * Models a single pair of parallel line segments.
+ *
+ * @note We explicitly use the `f` suffix to please MSVC, other C4305 emitted
+ */
 DAILY_TEST_194(InputType2, INIT_LIST(0.1f, 0.2f), INIT_LIST(0.1f, 0.2f), 0);
 
+/**
+ * Specialization for the third input/output pair.
+ *
+ * Models the following arrangement of points (5 intersecting pairs):
+ *
+ *  q(1)  q(2)  q(3)  q(4)  q(5)
+ *
+ *  p(5)  p(2)  p(1)  p(3)  p(4)
+ */
 DAILY_TEST_194(
   InputType3,
   INIT_LIST(0.3, 0.2, 0.4, 0.5, 0.1),
   INIT_LIST(0.1, 0.2, 0.3, 0.4, 0.5),
   5
 );
+
+/**
+ * Specialization for the fourth input/output pair.
+ *
+ * Models the following arrangement of points (2 intersecting pairs):
+ *
+ *  q(1)  q(2)  q(3)
+ *
+ *  p(3)  p(1)  p(2)
+ *
+ * The first and second *SequenceContainer* types also differ here.
+ */
 DAILY_TEST_194(InputType4, INIT_LIST(0.2, 0.3, 0.1), INIT_LIST(0.1, 0.2, 0.3), 2);
+
+/**
+ * Specializaton for the fifth input/output pair.
+ *
+ * Models the following arrangement of points (5 intersecting pairs):
+ *
+ *  q(1)  q(2)  q(3)  q(4)  q(5)
+ *
+ *  p(5)  p(2)  p(1)  p(3)  p(4)
+ *
+ * Here we use a *SequenceContainer* with `int` `value_type` for the input type.
+ */
 DAILY_TEST_194(
   InputType5,
   INIT_LIST(0, -1, 1, 2, -2),
@@ -150,6 +225,9 @@ using DailyTest194Types = ::testing::Types<
 >;
 TYPED_TEST_SUITE(DailyTest194, DailyTest194Types);
 
+/**
+ * Test that `intersecting_pairs` works as expected.
+ */
 TYPED_TEST(DailyTest194, TypedTest)
 {
   EXPECT_EQ(
