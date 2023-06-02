@@ -95,7 +95,7 @@ using InputType8 = pddcp::indexed_type<7, short>;
  * Each specialization has `a_`, `b_`, and `res_` members for the numerator,
  * denominator, and expected result, respectively.
  *
- * @param type `pddcp::indexed_type<I, T>` specialiation
+ * @param type `pddcp::indexed_type<I, T>` specialization
  * @param a Input numerator
  * @param b Input denominator
  * @param res Expected result
