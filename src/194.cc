@@ -21,6 +21,7 @@
 
 #include <gtest/gtest.h>
 
+#include "pddcp/common.h"
 #include "pddcp/utility.h"
 #include "pddcp/warnings.h"
 
@@ -93,13 +94,6 @@ PDDCP_MSVC_WARNING_POP()
 }
 
 /**
- * Helper macro for creating an initializer list out of varargs.
- *
- * @param ... Arguments for the initializer list
- */
-#define INIT_LIST(...) {__VA_ARGS__}
-
-/**
  * Helper for a pair whose `first_type` and `second_type` are the same.
  *
  * @param T type
@@ -130,8 +124,8 @@ using InputType5 = pddcp::indexed_type<4, mono_pair<std::vector<int>>>;
  * Helper macro defining each `DailyTest194` specialization.
  *
  * @param input_type `pddcp::indexed_type<I, T>` specialization
- * @param ps_init `INIT_LIST(...)` of x-coordinates for y-coordinate 0 points
- * @param qs_init `INIT_LIST(...)` of x-coordinates for y-coordinate 1 points
+ * @param ps_init `PDDCP_INIT_LIST(...)` of x-coordinates for y = 0 points
+ * @param qs_init `PDDCP_INIT_LIST(...)` of x-coordinates for y = 1 points
  * @param res Expected number of intersecting line segments
  */
 #define DAILY_TEST_194(input_type, ps_init, qs_init, res) \
@@ -162,7 +156,9 @@ using InputType5 = pddcp::indexed_type<4, mono_pair<std::vector<int>>>;
  *
  * Models a single pair of intersecting segments.
  */
-DAILY_TEST_194(InputType1, INIT_LIST(0.3, 0.2), INIT_LIST(0.2, 0.3), 1);
+DAILY_TEST_194(
+  InputType1, PDDCP_INIT_LIST(0.3, 0.2), PDDCP_INIT_LIST(0.2, 0.3), 1
+);
 
 /**
  * Specialization for the second input/output pair.
@@ -171,7 +167,9 @@ DAILY_TEST_194(InputType1, INIT_LIST(0.3, 0.2), INIT_LIST(0.2, 0.3), 1);
  *
  * @note We explicitly use the `f` suffix to please MSVC, other C4305 emitted
  */
-DAILY_TEST_194(InputType2, INIT_LIST(0.1f, 0.2f), INIT_LIST(0.1f, 0.2f), 0);
+DAILY_TEST_194(
+  InputType2, PDDCP_INIT_LIST(0.1f, 0.2f), PDDCP_INIT_LIST(0.1f, 0.2f), 0
+);
 
 /**
  * Specialization for the third input/output pair.
@@ -184,8 +182,8 @@ DAILY_TEST_194(InputType2, INIT_LIST(0.1f, 0.2f), INIT_LIST(0.1f, 0.2f), 0);
  */
 DAILY_TEST_194(
   InputType3,
-  INIT_LIST(0.3, 0.2, 0.4, 0.5, 0.1),
-  INIT_LIST(0.1, 0.2, 0.3, 0.4, 0.5),
+  PDDCP_INIT_LIST(0.3, 0.2, 0.4, 0.5, 0.1),
+  PDDCP_INIT_LIST(0.1, 0.2, 0.3, 0.4, 0.5),
   5
 );
 
@@ -200,7 +198,9 @@ DAILY_TEST_194(
  *
  * The first and second *SequenceContainer* types also differ here.
  */
-DAILY_TEST_194(InputType4, INIT_LIST(0.2, 0.3, 0.1), INIT_LIST(0.1, 0.2, 0.3), 2);
+DAILY_TEST_194(
+  InputType4, PDDCP_INIT_LIST(0.2, 0.3, 0.1), PDDCP_INIT_LIST(0.1, 0.2, 0.3), 2
+);
 
 /**
  * Specializaton for the fifth input/output pair.
@@ -215,8 +215,8 @@ DAILY_TEST_194(InputType4, INIT_LIST(0.2, 0.3, 0.1), INIT_LIST(0.1, 0.2, 0.3), 2
  */
 DAILY_TEST_194(
   InputType5,
-  INIT_LIST(0, -1, 1, 2, -2),
-  INIT_LIST(-2, -1, 0, 1, 2),
+  PDDCP_INIT_LIST(0, -1, 1, 2, -2),
+  PDDCP_INIT_LIST(-2, -1, 0, 1, 2),
   5
 );
 

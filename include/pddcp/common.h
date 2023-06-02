@@ -17,6 +17,13 @@
 #define PDDCP_STRINGIFY(x) PDDCP_STRINGIFY_I(x)
 
 /**
+ * Create an initializer list out from variadic arguments.
+ *
+ * @param ... Arguments for the initializer list
+ */
+#define PDDCP_INIT_LIST(...) {__VA_ARGS__}
+
+/**
  * Stringify a token with a user-provided prefix.
  *
  * @param p Prefix char, e.g. `L` for wide string, `u` for `char16_t`
