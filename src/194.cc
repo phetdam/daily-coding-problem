@@ -123,6 +123,10 @@ using InputType5 = pddcp::indexed_type<4, mono_pair<std::vector<int>>>;
 /**
  * Helper macro defining each `DailyTest194` specialization.
  *
+ * Each specialization has `ps_`, `qs_`, and `res_` static members for the
+ * y = 0 points' x-coordinates, the y = 1 points' x-coordinates, and expected
+ * number of intersecting line segments, respectively.
+ *
  * @param input_type `pddcp::indexed_type<I, T>` specialization
  * @param ps_init `PDDCP_INIT_LIST(...)` of x-coordinates for y = 0 points
  * @param qs_init `PDDCP_INIT_LIST(...)` of x-coordinates for y = 1 points
