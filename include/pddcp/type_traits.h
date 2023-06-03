@@ -273,7 +273,7 @@ struct is_std_vector<
     std::vector<typename T::value_type, typename T::allocator_type>>> {};
 
 /**
- * Boolean helper to check if a type is a STl vector.
+ * Boolean helper to check if a type is a STL vector.
  *
  * @tparam T type
  */
