@@ -217,6 +217,10 @@ using InputType3 = pddcp::indexed_type<2, long>;
     }; \
   }
 
+/**
+ * Specializations for each input/output pair.
+ */
+
 DAILY_TEST_188(InputType1, PDDCP_INIT_LIST(1, 2, 3), "123");
 DAILY_TEST_188(InputType2, PDDCP_INIT_LIST("hi", "hey", "hm"), "hiheyhm");
 DAILY_TEST_188(InputType3, PDDCP_INIT_LIST(2, 4, 6, 8, 10), "246810");
@@ -227,7 +231,7 @@ TYPED_TEST_SUITE(DailyTest188, DailyTest188Types);
 /**
  * Test that the `value_printer<T>` class template works as expected.
  *
- * The unit test code is the C++ analogue to the following Python code:
+ * The unit test code is the C++ analogue of the following Python code:
  *
  * @code{.py}
  * from typing import Any, Callable, List, Iterable
@@ -241,7 +245,8 @@ TYPED_TEST_SUITE(DailyTest188, DailyTest188Types);
  *     return [printer_factory(value) for value in values]
  *
  *
- * for printer in make_printers():
+ * # in the unit test, DAILY_TEST_188 specifies the input
+ * for printer in make_printers([1, 2, 3]):
  *     printer()
  * @endcode
  *
@@ -270,6 +275,34 @@ TYPED_TEST(DailyTest188, PrinterTest)
   EXPECT_EQ(TestFixture::res_, stream.str());
 }
 
+/**
+ * Test that `bad_value_printer<T>` class template works as expected.
+ *
+ * The unit test code is the C++ analogue of the following Python code:
+ *
+ * @code{.py}
+ * from typing import Any, Callable, List
+ *
+ *
+ * def make_bad_printers(values: Iterable[Any]) -> List[Callable[[], None]]:
+ *     return [lambda: print(value) for value in values]
+ *
+ *
+ * # in the unit test, DAILY_TEST_188 specifies the input
+ * for printer in make_bad_printers([1, 2, 3]):
+ *     printer()
+ * @endcode
+ *
+ * The above code is a cleaned up version of the original Python code presented
+ * in problem, containing the same exact problem. Instead of printing 1, 2, 3
+ * on separate lines, the above code prints 3, 3, 3 on separate lines. The
+ * reason for this is due to how Python passes values by reference. Each lambda
+ * refers to `value`, so it is not garbage collected, but its value after the
+ * end of the generator expression is `3`, hence each lambda will print `3`.
+ *
+ * `PrinterTest` shows the correct Python code, which uses a factory function
+ * to return a function object to break the reference chain.
+ */
 TYPED_TEST(DailyTest188, BadPrinterTest)
 {
   // populate vector of bad printers
@@ -282,7 +315,5 @@ TYPED_TEST(DailyTest188, BadPrinterTest)
     printer(stream);
   EXPECT_EQ(TestFixture::bad_res_, stream.str());
 }
-
-// DAILY_TEST
 
 }  // namespace
