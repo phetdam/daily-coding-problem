@@ -9,9 +9,11 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -26,6 +28,9 @@ namespace {
  *   resulting from applying a traits template to a type and `TruthType` is
  *  `std::true_type` or `std::false_type`. See examples for helper type
  *  template definitions that provide simpler use than manual repetition.
+ *
+ * @note The `Traits` type is expected to be a `std::bool_constant<B>` subclass
+ *  or at least contain the static constexpr boolean `value` member.
  */
 template <typename InputType>
 class TypeTraitsTest : public ::testing::Test {};
@@ -40,7 +45,6 @@ class TypeTraitsTest : public ::testing::Test {};
   class TypeTraitsTest<traits_input> : public ::testing::Test { \
   public: \
     using traits_type = typename traits_input::first_type; \
-    using value_type = typename traits_type::value_type; \
     using truth_type = typename traits_input::second_type; \
   protected: \
     static inline constexpr bool expected_ = truth_type::value; \
@@ -155,7 +159,7 @@ using InputType15 = is_bitmask_type_input<pddcp::execution, true>;
  * Helper for `pddcp::is_bitmask_enum<T>` input type creation.
  *
  * @tparam T input type
- * @tparam truth Expected truth give by the traits type
+ * @tparam truth Expected truth given by the traits type
  */
 template <typename T, bool truth>
 using is_bitmask_enum_input = std::pair<
@@ -166,6 +170,24 @@ using is_bitmask_enum_input = std::pair<
 using InputType16 = is_bitmask_enum_input<unscoped_enum, false>;
 using InputType17 = is_bitmask_enum_input<scoped_enum, false>;
 using InputType18 = is_bitmask_enum_input<pddcp::execution, true>;
+
+/**
+ * Helper for `pddcp::is_std_vector<T>` input type creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using is_std_vector_input = std::pair<
+  pddcp::is_std_vector<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::is_std_vector<T> testing
+using InputType19 = is_std_vector_input<double, false>;
+using InputType20 = is_std_vector_input<std::array<double, 10>, false>;
+using InputType21 = is_std_vector_input<std::vector<unsigned int>, true>;
+using InputType22 = is_std_vector_input<std::vector<std::string>, true>;
+using InputType23 = is_std_vector_input<double[20], false>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
@@ -186,6 +208,11 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType15);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType16);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType17);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType18);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType19);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType20);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType21);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType22);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType23);
 
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
@@ -201,7 +228,9 @@ using TypeTraitsTestTypes = ::testing::Types<
   InputType14,
   InputType15,
   // types for pddcp::is_bitmask_enum<T> testing
-  InputType16, InputType17, InputType18
+  InputType16, InputType17, InputType18,
+  // types for pddcp::is_std_vector<T> testing
+  InputType19, InputType20, InputType21, InputType22, InputType23
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

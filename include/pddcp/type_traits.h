@@ -249,6 +249,37 @@ struct is_std_hashable<T, std::void_t<std::hash<T>>> : std::true_type {};
 template <typename T>
 inline constexpr bool is_std_hashable_v = is_std_hashable<T>::value;
 
+/**
+ * Check if a type is a STL vector.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void, typename = void>
+struct is_std_vector : std::false_type {};
+
+/**
+ * True specialization for when `T` is a STL vector.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_std_vector<
+  T,
+  std::void_t<typename T::value_type>,
+  std::void_t<typename T::allocator_type>
+> : std::bool_constant<
+  std::is_same_v<
+    std::decay_t<T>,
+    std::vector<typename T::value_type, typename T::allocator_type>>> {};
+
+/**
+ * Boolean helper to check if a type is a STl vector.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool is_std_vector_v = is_std_vector<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
