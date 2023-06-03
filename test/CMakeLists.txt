@@ -37,6 +37,7 @@ add_executable(
     $<TARGET_OBJECTS:164>
     $<TARGET_OBJECTS:167>
     $<TARGET_OBJECTS:176>
+    $<TARGET_OBJECTS:188>
     $<TARGET_OBJECTS:194>
     $<TARGET_OBJECTS:206>
     # tests from shared library unit tests
