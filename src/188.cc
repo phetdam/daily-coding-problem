@@ -51,6 +51,8 @@ namespace {
 template <typename T>
 class value_printer {
 public:
+  using value_type = T;
+
   /**
    * Ctor initializing by copy.
    *
@@ -109,6 +111,8 @@ private:
 template <typename T>
 class bad_value_printer {
 public:
+  using value_type = T;
+
   /**
    * Ctor initializing by copy.
    *
