@@ -373,6 +373,7 @@ struct has_value_type<T, std::void_t<typename T::value_type>>
 template <typename T>
 inline constexpr bool has_value_type_v = has_value_type<T>::value;
 
+// TODO: add comments
 template <typename T>
 struct innermost_value_type {
   using type = std::conditional_t<
@@ -394,6 +395,7 @@ struct innermost_value_type {
   }();
 };
 
+// TODO: add comments, remark on why void specialization is needed
 template <>
 struct innermost_value_type<void> {
   using type = void;
