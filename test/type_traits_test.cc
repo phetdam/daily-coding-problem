@@ -12,6 +12,7 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -207,6 +208,24 @@ using InputType26 = is_std_vector_input<std::vector<unsigned int>, true>;
 using InputType27 = is_std_vector_input<std::vector<std::string>, true>;
 using InputType28 = is_std_vector_input<double[20], false>;
 
+/**
+ * Helper for `pddcp::is_iterable<T>` input type creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using is_iterable_input = std::pair<
+  pddcp::is_iterable<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::is_iterable<T> testing
+using InputType29 = is_iterable_input<std::string, true>;
+using InputType30 = is_iterable_input<std::vector<std::string>, true>;
+using InputType31 = is_iterable_input<double, false>;
+using InputType32 = is_iterable_input<int[30], false>;
+using InputType33 = is_iterable_input<std::unordered_map<int, int>, true>;
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
@@ -236,6 +255,11 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType25);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType26);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType27);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType28);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType29);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType30);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType31);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType32);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType33);
 
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
@@ -255,7 +279,9 @@ using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_std_hashable<T> testing
   InputType19, InputType20, InputType21, InputType22, InputType23,
   // types for pddcp::is_std_vector<T> testing
-  InputType24, InputType25, InputType26, InputType27, InputType28
+  InputType24, InputType25, InputType26, InputType27, InputType28,
+  // types for pddcp::is_iterable<T> testing
+  InputType29, InputType30, InputType31, InputType32, InputType33
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

@@ -282,6 +282,35 @@ struct is_std_vector<
 template <typename T>
 inline constexpr bool is_std_vector_v = is_std_vector<T>::value;
 
+/**
+ * Check if a type is iterable.
+ *
+ * An iterable type `T` will have `begin()` and `end()` members.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void, typename = void>
+struct is_iterable : std::false_type {};
+
+/**
+ * True specialization for when `T` is iterable.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_iterable<
+  T,
+  std::void_t<decltype(std::declval<T>().begin())>,
+  std::void_t<decltype(std::declval<T>().end())>> : std::true_type {};
+
+/**
+ * Boolean helper to check if a type is iterable.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool is_iterable_v = is_iterable<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
