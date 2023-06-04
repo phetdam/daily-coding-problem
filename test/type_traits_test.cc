@@ -227,6 +227,27 @@ using InputType32 = is_iterable_input<int[30], false>;
 using InputType33 = is_iterable_input<std::unordered_map<int, int>, true>;
 
 /**
+ * Helper for `pddcp::value_type_t<T>` input type creation.
+ *
+ * @tparam InputType Input type
+ * @tparam ExpectedType Expected value of `pddcp::value_type_t<T>`
+ */
+template <typename InputType, typename ExpectedType>
+using value_type_t_input = std::pair<
+  std::is_same<pddcp::value_type_t<InputType>, ExpectedType>,
+  std::true_type
+>;
+
+// types for pddcp::value_type_t<T> testing
+using InputType34 = value_type_t_input<std::vector<int>, int>;
+using InputType35 = value_type_t_input<double, void>;
+using InputType36 = value_type_t_input<std::vector<std::string>, std::string>;
+using InputType37 = value_type_t_input<
+  std::unordered_map<std::string, std::size_t>,
+  std::pair<const std::string, std::size_t>
+>;
+
+/**
  * Helper for `pddcp::has_value_type<T>` input type creation.
  *
  * @tparam T input type
@@ -238,10 +259,10 @@ using has_value_type_input = std::pair<
 >;
 
 // types for pddcp::has_value_type<T> testing
-using InputType34 = has_value_type_input<int, false>;
-using InputType35 = has_value_type_input<std::vector<double>, true>;
-using InputType36 = has_value_type_input<double[20], false>;
-using InputType37 = has_value_type_input<std::string, true>;
+using InputType38 = has_value_type_input<int, false>;
+using InputType39 = has_value_type_input<std::vector<double>, true>;
+using InputType40 = has_value_type_input<double[20], false>;
+using InputType41 = has_value_type_input<std::string, true>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
@@ -281,6 +302,10 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType34);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType35);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType36);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType38);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType39);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType40);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType41);
 
 // note: once the 50-type limit has been exhausted, we must switch to
 // type-parametrized testing and use multiple ::testing::Types<...> lists.
@@ -305,8 +330,10 @@ using TypeTraitsTestTypes = ::testing::Types<
   InputType24, InputType25, InputType26, InputType27, InputType28,
   // types for pddcp::is_iterable<T> testing
   InputType29, InputType30, InputType31, InputType32, InputType33,
+  // types for pddcp::value_type_t<T> testing
+  InputType34, InputType35, InputType36, InputType37,
   // types for pddcp::has_value_type<T> testing
-  InputType34, InputType35, InputType36, InputType37
+  InputType38, InputType39, InputType40, InputType41
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

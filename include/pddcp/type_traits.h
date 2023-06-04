@@ -312,9 +312,44 @@ template <typename T>
 inline constexpr bool is_iterable_v = is_iterable<T>::value;
 
 /**
+ * Get the `value_type` type member from a type, `void` if no member exists.
+ *
+ * Useful in template metaprogramming when `T` may not have the `value_type`
+ * type member, as otherwise using `typename T::value_type` will cause a
+ * compile error if used on types without the `value_type` type member.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct value_type { using type = void; };
+
+/**
+ * Specialization providing `value_type` for types that have the type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct value_type<T, std::void_t<typename T::value_type>> {
+  using type = typename T::value_type;
+};
+
+/**
+ * Helper type for the `value_type` type member of a type.
+ *
+ * If the type has no `value_type` type member, the helper type is `void`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+using value_type_t = typename value_type<T>::type;
+
+/**
  * Check if a type has a `value_type` type member.
  *
- * If you want to check that a type is iterable, use `is_iterable<T>` instead.
+ * Use `pddcp::is_iterable<T>` instead to check if a type is iterable.
+ *
+ * @note We could have implemented `has_value_type<T>` as a subclass of
+ *  `std::bool_constant<!std::is_same_v<void, pddcp::value_type_t<T>>>;
  *
  * @tparam T type
  */
