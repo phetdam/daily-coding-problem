@@ -312,7 +312,7 @@ template <typename T>
 inline constexpr bool is_iterable_v = is_iterable<T>::value;
 
 /**
- * Get the `value_type` type member from a type, `void` if no member exists.
+ * Get the `value_type` type member of a type, `void` if no member exists.
  *
  * Useful in template metaprogramming when `T` may not have the `value_type`
  * type member, as otherwise using `typename T::value_type` will cause a
@@ -373,15 +373,30 @@ struct has_value_type<T, std::void_t<typename T::value_type>>
 template <typename T>
 inline constexpr bool has_value_type_v = has_value_type<T>::value;
 
-// TODO: add comments
+/**
+ * Get the innermost `value_type` member of a type, `void` if no member exists.
+ *
+ * The `type` member is an alias for the innermost `value_type` type member or
+ * `void` if the type has no `value_type` member while the `depth` member gives
+ * how many `value_type` members had to be iterated through to get `type`.
+ *
+ * For example, given `std::vector<std::vector<std::string>>` as the type, then
+ * `type` would be `char`, the `value_type` of the `std::string`, and `depth`
+ * would be `3`, as we iterate through 3 `value_type` members.
+ *
+ * @tparam T type
+ */
 template <typename T>
 struct innermost_value_type {
   using type = std::conditional_t<
+    // base case: T has no value_type type member
     !has_value_type_v<T>,
     void,
     std::conditional_t<
+      // base case: T has value_type without its own value_type type member
       !has_value_type_v<value_type_t<T>>,
       value_type_t<T>,
+      // otherwise, recurse into value_type of T
       typename innermost_value_type<value_type_t<T>>::type
     >
   >;
@@ -395,16 +410,33 @@ struct innermost_value_type {
   }();
 };
 
-// TODO: add comments, remark on why void specialization is needed
+/**
+ * `innermost_value_type<T>` specialization for `void`.
+ *
+ * The `void` specialization makes `innermost_value_type<void>` a complete
+ * type, as otherwise no members will be accessible.
+ */
 template <>
 struct innermost_value_type<void> {
   using type = void;
   static inline constexpr std::size_t depth = 0;
 };
 
+/**
+ * Helper type for the innermost `value_type` member of a type.
+ *
+ * If the type has no `value_type` type member, the helper type is `void`.
+ *
+ * @tparam T
+ */
 template <typename T>
 using innermost_value_type_t = typename innermost_value_type<T>::type;
 
+/**
+ * Helper for the depth of the innermost `value_type` member of a type.
+ *
+ * @tparam T
+ */
 template <typename T>
 inline constexpr std::size_t
 innermost_value_type_depth = innermost_value_type<T>::depth;
