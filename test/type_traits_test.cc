@@ -227,14 +227,28 @@ using InputType32 = is_iterable_input<int[30], false>;
 using InputType33 = is_iterable_input<std::unordered_map<int, int>, true>;
 
 /**
+ * Class template for an "indexed" version of `std::is_same<T, U>`.
+ *
+ * Solves an issue where input type helpers like `value_type_t_input<T, U>` and
+ * `innermost_value_type_t_input<T, U>` could end up defining the same types if
+ * using `std::is_same<T, U>` instead of `indexed_is_same<I, T, U>`.
+ *
+ * @tparam I index
+ * @tparam T first type
+ * @tparam U second type
+ */
+template <std::size_t I, typename T, typename U>
+struct indexed_is_same : std::is_same<T, U> {};
+
+/**
  * Helper for `pddcp::value_type_t<T>` input type creation.
  *
  * @tparam InputType Input type
- * @tparam ExpectedType Expected value of `pddcp::value_type_t<T>`
+ * @tparam ExpectedType Expected `pddcp::value_type_t<T>` type
  */
 template <typename InputType, typename ExpectedType>
 using value_type_t_input = std::pair<
-  std::is_same<pddcp::value_type_t<InputType>, ExpectedType>,
+  indexed_is_same<0, pddcp::value_type_t<InputType>, ExpectedType>,
   std::true_type
 >;
 
@@ -263,6 +277,29 @@ using InputType38 = has_value_type_input<int, false>;
 using InputType39 = has_value_type_input<std::vector<double>, true>;
 using InputType40 = has_value_type_input<double[20], false>;
 using InputType41 = has_value_type_input<std::string, true>;
+
+/**
+ * Helper for `pddcp::innermost_value_type_t<T>` input creation.
+ *
+ * @tparam InputType Input type
+ * @tparam ExpectedType Expected `pddcp::innermost_value_type_t<T>` type
+ */
+template <typename InputType, typename ExpectedType>
+using innermost_value_type_t_input = std::pair<
+  indexed_is_same<1, pddcp::innermost_value_type_t<InputType>, ExpectedType>,
+  std::true_type
+>;
+
+// types for pddcp::innermost_value_type_t<T> testing
+using InputType42 = innermost_value_type_t_input<std::vector<double>, double>;
+using InputType43 = innermost_value_type_t_input<double, void>;
+using InputType44 = innermost_value_type_t_input<
+  std::vector<std::unordered_map<std::string, std::size_t>>,
+  std::pair<const std::string, std::size_t>
+>;
+using InputType45 = innermost_value_type_t_input<
+  std::vector<std::vector<std::vector<std::wstring>>>, wchar_t
+>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
@@ -306,6 +343,10 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType38);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType39);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType40);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType41);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType42);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType43);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType44);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType45);
 
 // note: once the 50-type limit has been exhausted, we must switch to
 // type-parametrized testing and use multiple ::testing::Types<...> lists.
@@ -333,7 +374,9 @@ using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::value_type_t<T> testing
   InputType34, InputType35, InputType36, InputType37,
   // types for pddcp::has_value_type<T> testing
-  InputType38, InputType39, InputType40, InputType41
+  InputType38, InputType39, InputType40, InputType41,
+  // types for pddcp::innermost_value_type_t<T> testing
+  InputType42, InputType43, InputType44, InputType45
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

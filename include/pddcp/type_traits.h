@@ -373,6 +373,40 @@ struct has_value_type<T, std::void_t<typename T::value_type>>
 template <typename T>
 inline constexpr bool has_value_type_v = has_value_type<T>::value;
 
+template <typename T>
+struct innermost_value_type {
+  using type = std::conditional_t<
+    !has_value_type_v<T>,
+    void,
+    std::conditional_t<
+      !has_value_type_v<value_type_t<T>>,
+      value_type_t<T>,
+      typename innermost_value_type<value_type_t<T>>::type
+    >
+  >;
+  static inline constexpr std::size_t depth = []
+  {
+    // we include the "u" suffix explicitly to suppress MSVC C4365 warning
+    if constexpr (!has_value_type_v<T>)
+      return 0u;
+    else
+      return 1u + innermost_value_type<value_type_t<T>>::depth;
+  }();
+};
+
+template <>
+struct innermost_value_type<void> {
+  using type = void;
+  static inline constexpr std::size_t depth = 0;
+};
+
+template <typename T>
+using innermost_value_type_t = typename innermost_value_type<T>::type;
+
+template <typename T>
+inline constexpr std::size_t
+innermost_value_type_depth = innermost_value_type<T>::depth;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
