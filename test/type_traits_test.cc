@@ -172,6 +172,24 @@ using InputType17 = is_bitmask_enum_input<scoped_enum, false>;
 using InputType18 = is_bitmask_enum_input<pddcp::execution, true>;
 
 /**
+ * Helper for `pddcp::is_std_hashable<T>` input type creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using is_std_hashable_input = std::pair<
+  pddcp::is_std_hashable<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::is_std_hashable<T> testing
+using InputType19 = is_std_hashable_input<double, true>;
+using InputType20 = is_std_hashable_input<std::string, true>;
+using InputType21 = is_std_hashable_input<pair_like<int, std::string>, false>;
+using InputType22 = is_std_hashable_input<std::vector<bool>, true>;
+using InputType23 = is_std_hashable_input<std::vector<std::string>, false>;
+
+/**
  * Helper for `pddcp::is_std_vector<T>` input type creation.
  *
  * @tparam T input type
@@ -183,11 +201,11 @@ using is_std_vector_input = std::pair<
 >;
 
 // types for pddcp::is_std_vector<T> testing
-using InputType19 = is_std_vector_input<double, false>;
-using InputType20 = is_std_vector_input<std::array<double, 10>, false>;
-using InputType21 = is_std_vector_input<std::vector<unsigned int>, true>;
-using InputType22 = is_std_vector_input<std::vector<std::string>, true>;
-using InputType23 = is_std_vector_input<double[20], false>;
+using InputType24 = is_std_vector_input<double, false>;
+using InputType25 = is_std_vector_input<std::array<double, 10>, false>;
+using InputType26 = is_std_vector_input<std::vector<unsigned int>, true>;
+using InputType27 = is_std_vector_input<std::vector<std::string>, true>;
+using InputType28 = is_std_vector_input<double[20], false>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
@@ -213,6 +231,11 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType20);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType21);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType22);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType23);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType24);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType25);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType26);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType27);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType28);
 
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
@@ -229,8 +252,10 @@ using TypeTraitsTestTypes = ::testing::Types<
   InputType15,
   // types for pddcp::is_bitmask_enum<T> testing
   InputType16, InputType17, InputType18,
+  // types for pddcp::is_std_hashable<T> testing
+  InputType19, InputType20, InputType21, InputType22, InputType23,
   // types for pddcp::is_std_vector<T> testing
-  InputType19, InputType20, InputType21, InputType22, InputType23
+  InputType24, InputType25, InputType26, InputType27, InputType28
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

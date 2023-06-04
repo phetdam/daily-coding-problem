@@ -239,7 +239,9 @@ struct is_std_hashable : std::false_type {};
  * @tparam T type
  */
 template <typename T>
-struct is_std_hashable<T, std::void_t<std::hash<T>>> : std::true_type {};
+struct is_std_hashable<
+  T, std::void_t<decltype(std::hash<T>{}(std::declval<T>()))>
+> : std::true_type {};
 
 /**
  * Boolean helper to check if a type is a hashable type.
