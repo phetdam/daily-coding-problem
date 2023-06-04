@@ -331,7 +331,7 @@ struct has_value_type<T, std::void_t<typename T::value_type>>
   : std::true_type {};
 
 /**
- * Boolean hlper to check if a type has a `value_type` type member.
+ * Boolean helper to check if a type has a `value_type` type member.
  *
  * @tparam T type
  */
