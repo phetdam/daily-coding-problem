@@ -226,6 +226,23 @@ using InputType31 = is_iterable_input<double, false>;
 using InputType32 = is_iterable_input<int[30], false>;
 using InputType33 = is_iterable_input<std::unordered_map<int, int>, true>;
 
+/**
+ * Helper for `pddcp::has_value_type<T>` input type creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using has_value_type_input = std::pair<
+  pddcp::has_value_type<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::has_value_type<T> testing
+using InputType34 = has_value_type_input<int, false>;
+using InputType35 = has_value_type_input<std::vector<double>, true>;
+using InputType36 = has_value_type_input<double[20], false>;
+using InputType37 = has_value_type_input<std::string, true>;
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
@@ -260,6 +277,10 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType30);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType31);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType32);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType33);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType34);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType35);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType36);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
 
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
@@ -281,7 +302,9 @@ using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_std_vector<T> testing
   InputType24, InputType25, InputType26, InputType27, InputType28,
   // types for pddcp::is_iterable<T> testing
-  InputType29, InputType30, InputType31, InputType32, InputType33
+  InputType29, InputType30, InputType31, InputType32, InputType33,
+  // types for pddcp::has_value_type<T> testing
+  InputType34, InputType35, InputType36, InputType37
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 

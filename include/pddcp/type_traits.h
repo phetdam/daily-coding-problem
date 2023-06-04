@@ -311,6 +311,33 @@ struct is_iterable<
 template <typename T>
 inline constexpr bool is_iterable_v = is_iterable<T>::value;
 
+/**
+ * Check if a type has a `value_type` type member.
+ *
+ * If you want to check that a type is iterable, use `is_iterable<T>` instead.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_value_type : std::false_type {};
+
+/**
+ * True specialization for when `T` contains a `value_type` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_value_type<T, std::void_t<typename T::value_type>>
+  : std::true_type {};
+
+/**
+ * Boolean hlper to check if a type has a `value_type` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool has_value_type_v = has_value_type<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
