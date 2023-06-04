@@ -282,6 +282,8 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType35);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType36);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
 
+// note: once the 50-type limit has been exhausted, we must switch to
+// type-parametrized testing and use multiple ::testing::Types<...> lists.
 using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
   InputType1, InputType2, InputType3, InputType4, InputType5, InputType6,
