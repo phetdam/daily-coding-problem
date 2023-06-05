@@ -227,30 +227,29 @@ using InputType32 = is_iterable_input<int[30], false>;
 using InputType33 = is_iterable_input<std::unordered_map<int, int>, true>;
 
 /**
- * Class template for an "indexed" version of `std::is_same<T, U>`.
+ * Traits type helper for using `pddcp::value_type_t<T>`.
  *
- * Solves an issue where input type helpers like `value_type_t_input<T, U>` and
- * `innermost_value_type_t_input<T, U>` could end up defining the same types if
- * using `std::is_same<T, U>` instead of `indexed_is_same<I, T, U>`.
+ * Solves the issue of having `std::is_same<T, U>` for different input types
+ * `T1`, `T2` in the case where `pddcp::value_type_t<T1>` is the same as
+ * `pddcp::value_type_t<T2>`, so `value_type_t_input<T1, U>` would be the same
+ * type as `value_type_t_input<T2, U>` and cause a compile error.
  *
- * @tparam I index
- * @tparam T first type
- * @tparam U second type
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::value_type_t<T>` type
  */
-template <std::size_t I, typename T, typename U>
-struct indexed_is_same : std::is_same<T, U> {};
+template <typename T, typename U>
+struct value_type_t_helper {
+  static inline constexpr bool value = std::is_same_v<pddcp::value_type_t<T>, U>;
+};
 
 /**
  * Helper for `pddcp::value_type_t<T>` input type creation.
  *
- * @tparam InputType Input type
- * @tparam ExpectedType Expected `pddcp::value_type_t<T>` type
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::value_type_t<T>` type
  */
-template <typename InputType, typename ExpectedType>
-using value_type_t_input = std::pair<
-  indexed_is_same<0, pddcp::value_type_t<InputType>, ExpectedType>,
-  std::true_type
->;
+template <typename T, typename U>
+using value_type_t_input = std::pair<value_type_t_helper<T, U>, std::true_type>;
 
 // types for pddcp::value_type_t<T> testing
 using InputType34 = value_type_t_input<std::vector<int>, int>;
@@ -279,15 +278,30 @@ using InputType40 = has_value_type_input<double[20], false>;
 using InputType41 = has_value_type_input<std::string, true>;
 
 /**
+ * Traits type helper for using `pddcp::innermost_value_type_t<T>`.
+ *
+ * Solves the same issue that `value_type_t_helper<T, U>` solves, but for input
+ * types intended for `pddcp::innermost_value_type_t<T>` testing.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_value_type_t<T>` type
+ */
+template <typename T, typename U>
+struct innermost_value_type_t_helper {
+  static inline constexpr bool value = std::is_same_v<
+    pddcp::innermost_value_type_t<T>, U
+  >;
+};
+
+/**
  * Helper for `pddcp::innermost_value_type_t<T>` input creation.
  *
- * @tparam InputType Input type
- * @tparam ExpectedType Expected `pddcp::innermost_value_type_t<T>` type
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_value_type_t<T>` type
  */
-template <typename InputType, typename ExpectedType>
+template <typename T, typename U>
 using innermost_value_type_t_input = std::pair<
-  indexed_is_same<1, pddcp::innermost_value_type_t<InputType>, ExpectedType>,
-  std::true_type
+  innermost_value_type_t_helper<T, U>, std::true_type
 >;
 
 // types for pddcp::innermost_value_type_t<T> testing
