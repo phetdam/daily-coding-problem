@@ -315,6 +315,42 @@ using InputType45 = innermost_value_type_t_input<
   std::vector<std::vector<std::vector<std::wstring>>>, wchar_t
 >;
 
+/**
+ * Traits type helper for using `pddcp::innermost_value_type_depth<T>`.
+ *
+ * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
+ *
+ * @tparam T Input type
+ * @tparam depth Expected `pddcp::innermost_value_type_depth<T>` value
+ */
+template <typename T, decltype(pddcp::innermost_value_type_depth<T>) depth>
+struct innermost_value_type_depth_helper {
+  static inline constexpr bool value = (
+    depth == pddcp::innermost_value_type_depth<T>
+  );
+};
+
+/**
+ * Helper for `pddcp::innermost_value_type_depth<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam depth Expected `pddcp::innermost_value_type_depth<T>` value
+ */
+template <typename T, decltype(pddcp::innermost_value_type_depth<T>) depth>
+using innermost_value_type_depth_input = std::pair<
+  innermost_value_type_depth_helper<T, depth>, std::true_type
+>;
+
+// types for pddcp::innermost_value_type_depth<T> testing
+using InputType46 = innermost_value_type_depth_input<std::vector<double>, 1>;
+using InputType47 = innermost_value_type_depth_input<double, 0>;
+using InputType48 = innermost_value_type_depth_input<
+  std::vector<std::unordered_map<std::string, std::size_t>>, 2
+>;
+using InputType49 = innermost_value_type_depth_input<
+  std::vector<std::vector<std::vector<std::wstring>>>, 4
+>;
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
@@ -361,6 +397,10 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType42);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType43);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType44);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType45);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType46);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType47);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType48);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType49);
 
 // note: once the 50-type limit has been exhausted, we must switch to
 // type-parametrized testing and use multiple ::testing::Types<...> lists.
@@ -390,7 +430,9 @@ using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::has_value_type<T> testing
   InputType38, InputType39, InputType40, InputType41,
   // types for pddcp::innermost_value_type_t<T> testing
-  InputType42, InputType43, InputType44, InputType45
+  InputType42, InputType43, InputType44, InputType45,
+  // types for pddcp::innermost_value_type_depth<T> testing
+  InputType46, InputType47, InputType48, InputType49
 >;
 TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
 
