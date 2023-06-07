@@ -22,6 +22,7 @@
 #include <iterator>
 #include <list>
 #include <queue>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -178,17 +179,44 @@ public:
     return *this;
   }
 
+  /**
+   * Pop up to `n` elements from the stack into a container.
+   *
+   * If `n` exceeds the size of the stack, an exception is raised. This
+   * overload is selected if the container implements `emplace_back`.
+   *
+   * @tparam Container *Container* with appropriate `value_type`
+   *
+   * @param values Container to emplace popped values into
+   * @param n Number of values to pop
+   * @returns Reference to `*this` to allow method chaining
+   */
   template <
     typename Container,
     std::enable_if_t<
       pddcp::is_emplace_back_container_v<Container>, bool> = true>
   auto& pop(Container& values, std::size_t n)
   {
+    if (n > size())
+      throw std::runtime_error{"n cannot exceed size of stack"};
     for (decltype(n) i = 0; i < n; i++)
       values.emplace_back(pop());
     return *this;
   }
 
+  /**
+   * Pop up to `n` elements from the stack into a container.
+   *
+   * If `n` exceeds the size of the stack, an exception is raised. This
+   * overload is selected if the container only implements `push_back`. If the
+   * container implements `emplace_back`, the above overload is selected.
+   *
+   * @tparam Container *Container* with appropriate `value_type`
+   *
+   * @param values Container to push popped values into
+   * @param n Number of values to pop
+   * @returns Reference to `*this` to allow method chaining
+   */
   template <
     typename Container,
     std::enable_if_t<
@@ -196,11 +224,24 @@ public:
       !pddcp::is_emplace_back_container_v<Container>, bool> = true>
   auto& pop(Container& values, std::size_t n)
   {
+    if (n > size())
+      throw std::runtime_error{"n cannot exceed size of stack"};
     for (decltype(n) i = 0; i < n; i++)
       values.push_back(pop());
     return *this;
   }
 
+  /**
+   * Pop all elements from the stack into a container.
+   *
+   * Values will be emplaced using `emplace_back` if possible, but will use
+   * `push_back` if the container does not have an `emplace_back` method.
+   *
+   * @tparam Container *Container* with appropriate `value_type`
+   *
+   * @param values Container to emplace or push popped values into
+   * @returns Reference to `*this` to allow method chaining
+   */
   template <typename Container>
   auto& pop(Container& values)
   {
