@@ -453,7 +453,7 @@ using TypeTraitsTestTypes1 = ::testing::Types<
 INSTANTIATE_TYPED_TEST_SUITE_P(Types1, TypeTraitsTest, TypeTraitsTestTypes1);
 
 /**
- * A "fake" container-like class implementing `push_back`.
+ * A class implementing a container-like `push_back`.
  *
  * @tparam T value type
  */
@@ -489,9 +489,9 @@ public:
 };
 
 /**
- * First class incorrectly implementing `push_back`.
+ * Second class incorrectly implementing `push_back`.
  *
- * This one is has incorrect `push_back` signatures.
+ * This one has incorrect `push_back` signatures.
  *
  * @tparam T value type
  */
@@ -532,6 +532,77 @@ using InputType55 = is_push_back_container_input<
 >;
 using InputType56 = is_push_back_container_input<std::deque<int>, true>;
 
+/**
+ * A class implementing a container-like `emplace_back`.
+ *
+ * @tparam T value type
+ */
+template <typename T>
+class emplace_back_container {
+public:
+  using value_type = T;
+  emplace_back_container() {}
+  auto emplace_back(const T& value) { return value; }
+  auto emplace_back([[maybe_unused]] T&& value) { return 1; }
+};
+
+/**
+ * First class incorrectly implementing `emplace_back`.
+ *
+ * This one is missing the `value_type` type member.
+ *
+ * @tparam T value type
+ */
+template <typename T>
+class bad_emplace_back_container_1 {
+public:
+  bad_emplace_back_container_1() {}
+  auto emplace_back(const T& value) { return value; }
+};
+
+/**
+ * Second class incorrectly implementing `emplace_back`.
+ *
+ * This one has incorrect `emplace_back` signatures.
+ *
+ * @tparam T value type
+ */
+template <typename T>
+class bad_emplace_back_container_2 {
+public:
+  using value_type = T;
+  bad_emplace_back_container_2() {}
+  auto emplace_back() const { return 0; }
+  auto emplace_back(const T& a, [[maybe_unused]] const T& b) { return a; }
+};
+
+/**
+ * Helper for `pddcp::is_emplace_back_container<T>` input creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using is_emplace_back_container_input = std::pair<
+  pddcp::is_emplace_back_container<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::is_emplace_back_container<T> testing
+using InputType57 = is_emplace_back_container_input<std::vector<double>, true>;
+using InputType58 = is_emplace_back_container_input<double, false>;
+using InputType59 = is_emplace_back_container_input<
+  emplace_back_container<std::vector<std::string>>, true
+>;
+using InputType60 = is_emplace_back_container_input<
+  bad_emplace_back_container_1<std::string>, false
+>;
+using InputType61 = is_emplace_back_container_input<
+  std::deque<std::vector<double>>, true
+>;
+using InputType62 = is_emplace_back_container_input<
+  std::unordered_map<std::string, std::size_t>, false
+>;
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType50);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType51);
@@ -540,6 +611,12 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType53);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType54);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType55);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType56);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType57);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType58);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType59);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType60);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType61);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType62);
 
 // input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
@@ -550,7 +627,9 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   InputType53,
   InputType54,
   InputType55,
-  InputType56
+  InputType56,
+  // types for pddcp::is_emplace_back_container<T> testing
+  InputType57, InputType58, InputType59, InputType60, InputType61, InputType62
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 
