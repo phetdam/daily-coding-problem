@@ -253,13 +253,29 @@ private:
   std::size_t n_pushed_;
 };
 
+/**
+ * Base test class template.
+ *
+ * @tparam IndexedType `pddcp::indexed_type<I, T>` with *Container* `value_type`
+ */
 template <typename IndexedType>
 class DailyTest154 : public ::testing::Test {};
 
+// input types used in specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, std::vector<int>>;
 using InputType2 = pddcp::indexed_type<1, std::deque<double>>;
 using InputType3 = pddcp::indexed_type<2, std::list<unsigned int>>;
 
+/**
+ * Helper macro defining each `DailyTest154` specialization.
+ *
+ * Each specialization has `input_` and `res_` and `bad_res_` static members
+ * for the input container values and the expected vector of reversed values
+ * obtained by popping all the stack values into a container.
+ *
+ * @param input_type `pddcp::indexed_type<I, T>` specialization
+ * @param input_init `PDDCP_INIT_LIST(...)` of input values
+ */
 #define DAILY_TEST_154(input_type, input_init) \
   template <> \
   class DailyTest154<input_type> : public ::testing::Test { \
@@ -272,6 +288,7 @@ using InputType3 = pddcp::indexed_type<2, std::list<unsigned int>>;
       { \
         std::vector<value_type> out; \
         out.reserve(input_.size()); \
+        /* not all reverse iterators support operator<, so we use != */ \
         for (auto riter = input_.rbegin(); riter != input_.rend(); riter++) \
           out.emplace_back(*riter); \
         return out; \
@@ -279,6 +296,7 @@ using InputType3 = pddcp::indexed_type<2, std::list<unsigned int>>;
     }; \
   }
 
+// specializations for each input/output pair
 DAILY_TEST_154(InputType1, PDDCP_INIT_LIST(-1, 3, 2, 5));
 DAILY_TEST_154(InputType2, PDDCP_INIT_LIST(-4, 1.3, 3.2, 6));
 DAILY_TEST_154(InputType3, PDDCP_INIT_LIST(6, 1, 7, 14, 20, 51, 26));
@@ -286,6 +304,9 @@ DAILY_TEST_154(InputType3, PDDCP_INIT_LIST(6, 1, 7, 14, 20, 51, 26));
 using DailyTest154Types = ::testing::Types<InputType1, InputType2, InputType3>;
 TYPED_TEST_SUITE(DailyTest154, DailyTest154Types);
 
+/**
+ * Test that `heapstack<T>` works as expected.
+ */
 TYPED_TEST(DailyTest154, TypedTest)
 {
   heapstack<typename TestFixture::value_type> stack{TestFixture::input_};
