@@ -477,7 +477,7 @@ is_push_back_container_v = is_push_back_container<T>::value;
 /**
  * Check if a type has a container-like `emplace_back` member.
  *
- * A sutable type should have a `value_type` type member and either or both of
+ * A suitable type should have a `value_type` type member and either or both of
  * `emplace_back(const avlue_type&)`, `emplace_back(value_type&&)` overloads.
  *
  * @tparam T type
