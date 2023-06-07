@@ -452,6 +452,11 @@ using TypeTraitsTestTypes1 = ::testing::Types<
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types1, TypeTraitsTest, TypeTraitsTestTypes1);
 
+/**
+ * A "fake" container-like class implementing `push_back`.
+ *
+ * @tparam T value type
+ */
 template <typename T>
 class push_back_container {
 public:
@@ -469,6 +474,13 @@ PDDCP_GNU_WARNING_POP()
 #endif  // __clang__
 };
 
+/**
+ * First class incorrectly implementing `push_back`.
+ *
+ * This one is missing the `value_type` type member.
+ *
+ * @tparam T value type
+ */
 template <typename T>
 class bad_push_back_container_1 {
 public:
@@ -476,19 +488,34 @@ public:
   auto push_back(const T& value) { return value; }
 };
 
+/**
+ * First class incorrectly implementing `push_back`.
+ *
+ * This one is has incorrect `push_back` signatures.
+ *
+ * @tparam T value type
+ */
 template <typename T>
 class bad_push_back_container_2 {
 public:
   using value_type = T;
   bad_push_back_container_2() {}
   auto push_back() { return 1u; }
+  auto push_back(const T& a, [[maybe_unused]] const T& b) { return a; }
 };
 
+/**
+ * Helper for `pddcp::is_push_back_container<T>` input creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
 template <typename T, bool truth>
 using is_push_back_container_input = std::pair<
   pddcp::is_push_back_container<T>, std::bool_constant<truth>
 >;
 
+// types for pddcp::is_push_back_container<T> testing
 using InputType50 = is_push_back_container_input<std::vector<int>, true>;
 using InputType51 = is_push_back_container_input<int, false>;
 using InputType52 = is_push_back_container_input<
@@ -516,6 +543,7 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType56);
 
 // input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
+  // types for pddcp::is_push_back_container<T> testing
   InputType50,
   InputType51,
   InputType52,
