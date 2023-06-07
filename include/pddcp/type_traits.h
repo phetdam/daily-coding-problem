@@ -441,6 +441,39 @@ template <typename T>
 inline constexpr std::size_t
 innermost_value_type_depth = innermost_value_type<T>::depth;
 
+/**
+ * Check if a type has a container-like `push_back` member.
+ *
+ * A suitable type should have a `value_type` type member and either or both of
+ * `push_back(const value_type&)`, `push_back(const value_type&&)` overloads.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct is_push_back_container : std::false_type {};
+
+/**
+ * True specialization for a type with a container-like `push_back` member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct is_push_back_container<
+  T,
+  std::void_t<
+    decltype(
+      std::declval<T>().push_back(std::declval<typename T::value_type>()))>
+> : std::true_type {};
+
+/**
+ * Boolean helper to check if a type has a container-like `push_back` member.
+ *
+ * @tparam T
+ */
+template <typename T>
+inline constexpr bool
+is_push_back_container_v = is_push_back_container<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_

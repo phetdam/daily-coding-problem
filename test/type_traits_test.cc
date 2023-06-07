@@ -9,6 +9,7 @@
 
 #include <array>
 #include <cstdint>
+#include <deque>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -19,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "pddcp/enums.h"
+#include "pddcp/warnings.h"
 
 namespace {
 
@@ -35,6 +37,21 @@ namespace {
  */
 template <typename InputType>
 class TypeTraitsTest : public ::testing::Test {};
+
+// we use type-parametrized testing since we exceeded the 50-type limit for the
+// types that ::testing::Types<...> can support for typed tests
+TYPED_TEST_SUITE_P(TypeTraitsTest);
+
+/**
+ * Test that a traits class works as expected.
+ */
+TYPED_TEST_P(TypeTraitsTest, TraitsTest)
+{
+  EXPECT_EQ(TestFixture::expected_, TestFixture::actual_);
+}
+
+// unlike typed tests, need to individually register each test
+REGISTER_TYPED_TEST_SUITE_P(TypeTraitsTest, TraitsTest);
 
 /**
  * Macro for simplifying `TypeTraitsTest` specializations.
@@ -402,9 +419,8 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType47);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType48);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType49);
 
-// note: once the 50-type limit has been exhausted, we must switch to
-// type-parametrized testing and use multiple ::testing::Types<...> lists.
-using TypeTraitsTestTypes = ::testing::Types<
+// input types and type-parametrized test suite instantiation
+using TypeTraitsTestTypes1 = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
   InputType1, InputType2, InputType3, InputType4, InputType5, InputType6,
   // types for pddcp::is_bitmask_type<T> testing
@@ -434,14 +450,80 @@ using TypeTraitsTestTypes = ::testing::Types<
   // types for pddcp::innermost_value_type_depth<T> testing
   InputType46, InputType47, InputType48, InputType49
 >;
-TYPED_TEST_SUITE(TypeTraitsTest, TypeTraitsTestTypes);
+INSTANTIATE_TYPED_TEST_SUITE_P(Types1, TypeTraitsTest, TypeTraitsTestTypes1);
 
-/**
- * Test that a traits class works as expected.
- */
-TYPED_TEST(TypeTraitsTest, TraitsTest)
-{
-  EXPECT_EQ(TestFixture::expected_, TestFixture::actual_);
-}
+template <typename T>
+class push_back_container {
+public:
+  using value_type = T;
+  push_back_container([[maybe_unused]] const std::vector<T>& values) {}
+  auto push_back(const T& value) { return value; }
+// Clang correctly warns about value returned as copy, but it is intentional
+#ifdef __clang__
+PDDCP_GNU_WARNING_PUSH()
+PDDCP_GNU_WARNING_DISABLE(return-std-move)
+#endif  // __clang__
+  auto push_back(T&& value) { return value; }
+#ifdef __clang__
+PDDCP_GNU_WARNING_POP()
+#endif  // __clang__
+};
+
+template <typename T>
+class bad_push_back_container_1 {
+public:
+  bad_push_back_container_1() {}
+  auto push_back(const T& value) { return value; }
+};
+
+template <typename T>
+class bad_push_back_container_2 {
+public:
+  using value_type = T;
+  bad_push_back_container_2() {}
+  auto push_back() { return 1u; }
+};
+
+template <typename T, bool truth>
+using is_push_back_container_input = std::pair<
+  pddcp::is_push_back_container<T>, std::bool_constant<truth>
+>;
+
+using InputType50 = is_push_back_container_input<std::vector<int>, true>;
+using InputType51 = is_push_back_container_input<int, false>;
+using InputType52 = is_push_back_container_input<
+  std::unordered_map<std::string, std::size_t>, false
+>;
+using InputType53 = is_push_back_container_input<
+  push_back_container<std::vector<std::string>>, true
+>;
+using InputType54 = is_push_back_container_input<
+  bad_push_back_container_1<std::unordered_map<std::string, int>>, false
+>;
+using InputType55 = is_push_back_container_input<
+  bad_push_back_container_2<std::vector<int>>, false
+>;
+using InputType56 = is_push_back_container_input<std::deque<int>, true>;
+
+// specialization creation using the input types
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType50);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType51);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType52);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType53);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType54);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType55);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType56);
+
+// input types and type-parametrized test suite instantiation
+using TypeTraitsTestTypes2 = ::testing::Types<
+  InputType50,
+  InputType51,
+  InputType52,
+  InputType53,
+  InputType54,
+  InputType55,
+  InputType56
+>;
+INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 
 }  // namespace
