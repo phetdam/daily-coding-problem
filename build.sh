@@ -22,8 +22,8 @@ BUILD_CONFIG=Debug
 # Print build script usage.
 #
 print_usage() {
-    echo "Usage: $PROGNAME [-h] [-o OUTPUT_DIR] [-c CONFIG] [-a ARGS]" \
-        "[-b BUILD_ARGS]"
+    echo "Usage: $PROGNAME [-h] [-o OUTPUT_DIR] [-c CONFIG] [-Ca CMAKE_ARGS]" \
+        "[-Cb CMAKE_BUILD_ARGS]"
     echo
     echo "Build driver script for daily-coding-problem *nix builds."
     echo
@@ -31,13 +31,15 @@ print_usage() {
     echo "generators or Ninja, with \"Unix Makefiles\" as the default."
     echo
     echo "Options:"
-    echo "  -h, --help                     Print this usage"
-    echo "  -o, --output-dir OUTPUT_DIR    Build output directory, default" \
+    echo "  -h,  --help                     Print this usage"
+    echo "  -o,  --output-dir OUTPUT_DIR    Build output directory, default" \
         "$BUILD_OUTPUT_DIR"
-    echo "  -c, --config CONFIG            Build configuration, default" \
+    echo "  -c,  --config CONFIG            Build configuration, default" \
         "$BUILD_CONFIG"
-    echo "  -a, --args ARGS                Args to pass to cmake config command"
-    echo "  -b, --build-args BUILD_ARGS    Args to pass to cmake build command"
+    echo "  -Ca, --cmake-args CMAKE_ARGS    Args to pass to cmake config command"
+    echo
+    echo "  -Cb, --cmake-build-args CMAKE_BUILD_ARGS"
+    echo "                                  Args to pass to cmake build command"
 }
 
 ##
@@ -64,11 +66,11 @@ parse_args() {
                 PARSE_ACTION=build_config
                 ;;
             # collect CMake configure args
-            -a | --args)
+            -Ca | --cmake-args)
                 PARSE_ACTION=cmake_args
                 ;;
             # collect CMake build args
-            -b | --build-args)
+            -Cb | --cmake-build-args)
                 PARSE_ACTION=cmake_build_args
                 ;;
             # operate according to PARSE_ACTION
