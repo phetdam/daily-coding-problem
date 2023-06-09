@@ -63,8 +63,8 @@ bool can_partition(const Container& values)
   // positive sum is just total_sum if type is unsigned, no need to sum again.
   // due to the constexpr branch, total_sum may end up unused, which will
   // trigger a warning from Clang about an unused lambda capture.
-PDDCP_GNU_WARNING_PUSH()
-PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
+PDDCP_CLANG_WARNING_PUSH()
+PDDCP_CLANG_WARNING_DISABLE(unused-lambda-capture)
   const auto pos_sum = [&total_sum, &values]
   {
     if constexpr (std::is_unsigned_v<value_type>)
@@ -72,12 +72,12 @@ PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
     else
       return pddcp::positive_sum(values);
   }();
-PDDCP_GNU_WARNING_POP()
+PDDCP_CLANG_WARNING_POP()
   // conceptually, we can imagine a state matrix, representing each column as
   // holding the range of subset sum values, i.e. we have |neg_sum| + pos_sum +
   // 1 rows (don't forget 0), values.size() columns for the subset elements.
-PDDCP_GNU_WARNING_PUSH()
-PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
+PDDCP_CLANG_WARNING_PUSH()
+PDDCP_CLANG_WARNING_DISABLE(unused-lambda-capture)
   const auto offset = [&neg_sum]
   {
     // again, must be zero if type is unsigned
@@ -86,7 +86,7 @@ PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
     else
       return -neg_sum;
   }();
-PDDCP_GNU_WARNING_POP()
+PDDCP_CLANG_WARNING_POP()
   const auto n_range_values = offset + pos_sum + 1;
   const auto n_elems = values.size();
   // we can, however, model the state matrix as a flat vector such that the
@@ -97,15 +97,15 @@ PDDCP_GNU_WARNING_POP()
   // the below lambda reduces some typing for us. Clang warns that no lambda
   // capture is required for offset; this is due to choosing the true branch of
   // the constexpr if in the lambda invoked for offset.
-PDDCP_GNU_WARNING_PUSH()
-PDDCP_GNU_WARNING_DISABLE(unused-lambda-capture)
+PDDCP_CLANG_WARNING_PUSH()
+PDDCP_CLANG_WARNING_DISABLE(unused-lambda-capture)
   auto state_index = [&n_range_values, &offset](value_type v, size_type s)
   {
     // static_cast to size_type is needed to suppress compiler warnings, which
     // are emitted if value_type is larger than size_type is
     return static_cast<size_type>((s - 1) * n_range_values + v + offset);
   };
-PDDCP_GNU_WARNING_POP()
+PDDCP_CLANG_WARNING_POP()
   // then, we simply enumerate all the possible states. each (v, s) pair should
   // be interpreted as "there exists a subset of the first s elements of the
   // container values that sums to v". only n_range_values * n_elems states.
