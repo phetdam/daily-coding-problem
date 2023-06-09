@@ -2,4 +2,4 @@
 # labels if they are stored using LF as the line ending
 *.bat text eol=crlf
 # ignore the legacy Python code written
-legacy/*.py -linguist-detectable
+legacy/**/*.py -linguist-detectable
