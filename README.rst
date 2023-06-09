@@ -111,7 +111,7 @@ To build release binaries for this project, simply use the command
 
 Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
 You can specify the target architecture using the ``-a`` flag, e.g. to build
-64-bit release binaries instead of the default 32-bit ones, use the command
+64-bit release binaries instead of the default 32-bit ones, use
 
 .. code:: shell
 
