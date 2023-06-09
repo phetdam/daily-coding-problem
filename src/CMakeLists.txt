@@ -5,6 +5,7 @@ add_compile_definitions(PDDCP_GTEST_STANDALONE)
 
 pddcp_add_gtest_standalone(7)
 pddcp_add_gtest_standalone(11)
+pddcp_add_gtest_standalone(13)
 pddcp_add_gtest_standalone(15)
 pddcp_add_gtest_standalone(23)
 pddcp_add_gtest_standalone(27)

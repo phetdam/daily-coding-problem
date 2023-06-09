@@ -7,6 +7,7 @@ add_executable(
     # recompiling its source by directly linking the object into pddcp_test
     $<TARGET_OBJECTS:7>
     $<TARGET_OBJECTS:11>
+    $<TARGET_OBJECTS:13>
     $<TARGET_OBJECTS:15>
     $<TARGET_OBJECTS:23>
     $<TARGET_OBJECTS:27>
