@@ -1,1 +1,5 @@
-*.bat   text eol=crlf
+# batch files should always be CRLF, can run into some weird errors with
+# labels if they are stored using LF as the line ending
+*.bat text eol=crlf
+# ignore the legacy Python code written
+legacy/*.py -linguist-detectable
