@@ -18,6 +18,11 @@ if(MSVC)
         /wd4868 /wd5045
         # 89.cc, 135.cc Google Test warns that const variable is not used
         /wd5264
+        # /Wall enables excessive warnings about automatic inline expansion
+        /wd4710 /wd4711
+        # /Wall enables warning about 32-bit floats being stored in memory,
+        # which is performance loss compared to storing in register
+        /wd4738
         # /Od applied by default when using Debug configuration
         $<$<NOT:$<CONFIG:Release>>:/DEBUG>
     )
