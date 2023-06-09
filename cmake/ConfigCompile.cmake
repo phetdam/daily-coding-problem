@@ -18,16 +18,15 @@ if(MSVC)
         /wd4868 /wd5045
         # 89.cc, 135.cc Google Test warns that const variable is not used
         /wd5264
+        # /Od applied by default when using Debug configuration
+        $<$<NOT:$<CONFIG:Release>>:/DEBUG>
     )
-    if(NOT CMAKE_BUILD_TYPE STREQUAL Release)
-        add_compile_options(/Od /DEBUG)
-    endif()
 else()
-    # don't suggest putting () around && statement in ||
-    add_compile_options(-Wall -Wno-parentheses)
-    if(NOT CMAKE_BUILD_TYPE STREQUAL Release)
-        add_compile_options(-ggdb -O0)
-    else()
-        add_compile_options(-O3)
-    endif()
+    add_compile_options(
+        -Wall
+        # don't suggest putting () around && statement in ||
+        -Wno-parentheses
+        # -O0 is default optimization level anyways, Clang ignores -ggdb
+        $<$<NOT:$<CONFIG:Release>>:-ggdb> $<IF:$<CONFIG:Release>,-O3,-O0>
+    )
 endif()
