@@ -25,7 +25,10 @@ print_usage() {
     echo "Usage: $PROGNAME [-h] [-o OUTPUT_DIR] [-c CONFIG] [-a ARGS]" \
         "[-b BUILD_ARGS]"
     echo
-    echo "Build script for daily-coding-problem *nix builds."
+    echo "Build driver script for daily-coding-problem *nix builds."
+    echo
+    echo "Only supports single-configuration CMake generators, e.g. Makefile"
+    echo "generators or Ninja, with \"Unix Makefiles\" as the default."
     echo
     echo "Options:"
     echo "  -h, --help                     Print this usage"
