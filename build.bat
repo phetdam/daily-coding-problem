@@ -86,10 +86,23 @@ arm, arm64
 )
 exit /b !ERRORLEVEL!
 
-:ParseArgs
-:: parse incoming command-line options. notes:
+::::
+:: Parse incoming command-line arguments.
 ::
-:: 1. break early when encountering -h, --help
+:: Arguments:
+::  List of command-line arguments
+::
+:ParseArgs
+:: notes on massive if-else block (since there is no else if...):
+::
+:: + function exists early when -h, --help is seen
+:: + when a flag like -o, -a -Ca that takes args is recognized, PARSE_ACTION is
+::   first set appropriately. then, unrecognized flags are consumed based on
+::   the value of PARSE_ACTION, i.e. when parse_arch BUILD_ARCH is set
+:: + innermost else prints error message and exits with error if none of the
+::   parse actions are correct. more commonly, it is hit because an invalid
+::   value would have been specified for a particular argument.
+::
 for %%A in (%*) do (
     if %%A==-h (
         set BUILD_ACTION=print_usage
