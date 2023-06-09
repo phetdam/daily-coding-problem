@@ -97,4 +97,24 @@ Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
 Windows
 ~~~~~~~
 
-TBA. For now, see the comments in the top-level ``CMakeLists.txt``.
+Building is easy with the provided ``build.bat`` build script. For usage, type
+
+.. code:: shell
+
+   build --help
+
+To build release binaries for this project, simply use the command
+
+.. code:: shell
+
+   build -c Release
+
+Simply typing ``./build.sh`` will build unoptimized binaries with debug symbols.
+You can specify the target architecture using the ``-a`` flag, e.g. to build
+64-bit release binaries instead of the default 32-bit ones, use the command
+
+.. code:: shell
+
+   build -a x64 -c Release
+
+Currently, the Visual Studio toolset used will be whichever is the default.
