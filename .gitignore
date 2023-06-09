@@ -8,7 +8,7 @@
 **/*__pycache__
 # ignore build directorires
 build
-build_windows
+build_windows*
 # ignore VS Code settings
 .vscode
 # ignore top-level CMake testing directory
