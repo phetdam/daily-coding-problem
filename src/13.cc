@@ -24,6 +24,18 @@
 
 namespace {
 
+/**
+ * Return length of longest substring with up to `k` distinct characters.
+ *
+ * Implementation maintains a "sliding window" by tracking starting and ending
+ * indices for the substring, expanding and contracting as necessary.
+ *
+ * @tparam CharT Char type
+ * @tparam Traits Char traits type
+ *
+ * @param str Input string view
+ * @param max_distinct Max number of distinct chars allowed in substring
+ */
 template <typename CharT, typename Traits>
 auto longest_k_distinct_substring(
   const std::basic_string_view<CharT, Traits>& str, std::size_t max_distinct)
@@ -66,6 +78,16 @@ auto longest_k_distinct_substring(
   return max_len;
 }
 
+/**
+ * Return length of longest substring with up to `k` distinct characters.
+ *
+ * @tparam CharT Char type
+ * @tparam Traits Char traits type
+ * @tparam Alloc Allocator
+ *
+ * @param str Input string
+ * @param max_distinct Max number of distinct chars allowed in substring
+ */
 template <typename CharT, typename Traits, typename Alloc>
 inline auto longest_k_distinct_substring(
   const std::basic_string<CharT, Traits, Alloc>& str, std::size_t max_distinct)
@@ -75,13 +97,31 @@ inline auto longest_k_distinct_substring(
   );
 }
 
+/**
+ * Base test class template.
+ *
+ * @tparam IndexedType `pddcp::indexed_type<I, T>`, string `element_type`
+ */
 template <typename IndexedType>
 class DailyTest13 : public ::testing::Test {};
 
+// input types used in specializations + TYPED_TEST_SUITE macro
 using InputType1 = pddcp::indexed_type<0, std::string>;
 using InputType2 = pddcp::indexed_type<1, std::wstring>;
 using InputType3 = pddcp::indexed_type<2, std::basic_string<char16_t>>;
 
+/**
+ * Helper macro defining each `DailyTest13` specialization.
+ *
+ * Each specialization has `input_`, `max_distinct_`, and `res_` members for
+ * the input string, max number of distinct chars allowed in substring, and the
+ * expected maximum length of such a substring.
+ *
+ * @param input_type `pddcp::indexed_type<I, T>` specialization
+ * @param input String literal input
+ * @param max_distinct Max number of distinct chars allowed in substring
+ * @param res Expected max length of resulting substring
+ */
 #define DAILY_TEST_13(input_type, input, max_distinct, res) \
   template <> \
   class DailyTest13<input_type> : public ::testing::Test { \
@@ -93,13 +133,31 @@ using InputType3 = pddcp::indexed_type<2, std::basic_string<char16_t>>;
     static inline constexpr std::size_t res_ = res; \
   }
 
+/**
+ * The given input/output specialization.
+ */
 DAILY_TEST_13(InputType1, "abcba", 2, 3);
+
+/**
+ * First custom input/output specialization.
+ *
+ * Here we try using a wide string.
+ */
 DAILY_TEST_13(InputType2, L"abcdaklqw", 4, 5);
+
+/**
+ * Second custom input/output specialization.
+ *
+ * Here we try using a UTF-16 string.
+ */
 DAILY_TEST_13(InputType3, u"aninterestingstring", 5, 7);
 
 using DailyTest13Types = ::testing::Types<InputType1, InputType2, InputType3>;
 TYPED_TEST_SUITE(DailyTest13, DailyTest13Types);
 
+/**
+ * Test that `longest_k_distinct_substring` works as expected.
+ */
 TYPED_TEST(DailyTest13, TypedTest)
 {
   EXPECT_EQ(
