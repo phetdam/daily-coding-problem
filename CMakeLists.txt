@@ -47,6 +47,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# eliminate per-configuration subdirs from being appended to build artifact
+# output dirs for multi-config generators, e.g. Visual Studio
+set(
+    CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+set(
+    CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+set(
+    CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}$<$<CONFIG:Debug>:>
+)
+
 find_package(GTest 1.10 REQUIRED)
 
 # update CMake module path to allow inclusion of custom CMake code
