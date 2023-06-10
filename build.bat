@@ -24,14 +24,15 @@ exit /b !ERRORLEVEL!
 :: Print build script usage.
 ::
 :PrintUsage
-    echo Usage: %PROGNAME% [-h] [-o OUTPUT_PREFIX] [-a ARCH] [-c CONFIG]
+    echo Usage: %PROGNAME% [-h] [-o OUTPUT_PREFIX] [-a ARCH] [-c CONFIG] ^
+[-Ca CMAKE_ARGS] [-Cb CMAKE_BUILD_ARGS]
     echo.
     echo Build script for daily-coding-problem Windows builds.
     echo.
     echo Uses the default Visual Studio generator and toolset.
     echo.
-    echo Note: Don't forget to quote arguments of the form KEY=VALUE or the
-    echo argument becomes split into KEY and VALUE arguments!
+    echo Arguments of the form KEY^=VALUE must be double quoted, otherwise the
+    echo KEY and VALUE will be split into separate arguments.
     echo.
     echo Options:
     echo   -h,  --help               Print this usage
