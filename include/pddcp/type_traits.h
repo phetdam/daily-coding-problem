@@ -507,6 +507,61 @@ template <typename T>
 inline constexpr bool
 is_emplace_back_container_v = is_emplace_back_container<T>::value;
 
+/**
+ * Check if a type has an `iterator` type member.
+ *
+ * Use `pddcp::is_iterable<T>` instead to check if a type is iterable, which
+ * usually also implies that `T` has an `iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_iterator : std::false_type {};
+
+/**
+ * True specialization for a type with an `iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_iterator<T, std::void_t<typename T::iterator>> : std::true_type {};
+
+/**
+ * Boolean helper to check if a type has an `iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool has_iterator_v = has_iterator<T>::value;
+
+/**
+ * Check if a type has a `const_iterator` type member.
+ *
+ * Use `pddcp::is_iterable<T>` instead ot check if a type is iterable, which
+ * for STL containers also implies that `T` has a `const_iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct has_const_iterator : std::false_type {};
+
+/**
+ * True specialization for a type with a `const_iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct has_const_iterator<T, std::void_t<typename T::const_iterator>>
+  : std::true_type {};
+
+/**
+ * Boolen helper to check if a type has a `const_iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+inline constexpr bool has_const_iterator_v = has_const_iterator<T>::value;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
