@@ -555,7 +555,7 @@ struct has_const_iterator<T, std::void_t<typename T::const_iterator>>
   : std::true_type {};
 
 /**
- * Boolen helper to check if a type has a `const_iterator` type member.
+ * Boolean helper to check if a type has a `const_iterator` type member.
  *
  * @tparam T type
  */
