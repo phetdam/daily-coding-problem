@@ -603,6 +603,40 @@ using InputType62 = is_emplace_back_container_input<
   std::unordered_map<std::string, std::size_t>, false
 >;
 
+/**
+ * Helper for `pddcp::has_iterator<T>` input creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using has_iterator_input = std::pair<
+  pddcp::has_iterator<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::has_iterator<T> testing
+using InputType63 = has_iterator_input<std::vector<double>, true>;
+using InputType64 = has_iterator_input<double[20], false>;
+using InputType65 = has_iterator_input<std::string, true>;
+using InputType66 = has_iterator_input<int, false>;
+
+/**
+ * Helper for `pddcp::has_const_iterator<T>` input creation.
+ *
+ * @tparam T input type
+ * @tparam truth Expected truth given by the traits type
+ */
+template <typename T, bool truth>
+using has_const_iterator_input = std::pair<
+  pddcp::has_const_iterator<T>, std::bool_constant<truth>
+>;
+
+// types for pddcp::has_const_iterator<T> testing
+using InputType67 = has_const_iterator_input<std::vector<std::string>, true>;
+using InputType68 = has_const_iterator_input<const std::string*, false>;
+using InputType69 = has_const_iterator_input<std::wstring, true>;
+using InputType70 = has_const_iterator_input<double, false>;
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType50);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType51);
@@ -617,6 +651,14 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType59);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType60);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType61);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType62);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType63);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType64);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType65);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType66);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType67);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType68);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType69);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType70);
 
 // input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
@@ -629,7 +671,11 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   InputType55,
   InputType56,
   // types for pddcp::is_emplace_back_container<T> testing
-  InputType57, InputType58, InputType59, InputType60, InputType61, InputType62
+  InputType57, InputType58, InputType59, InputType60, InputType61, InputType62,
+  // types for pddcp::has_iterator<T> testing
+  InputType63, InputType64, InputType65, InputType66,
+  // types for pddcp::has_const_iterator<T> testing
+  InputType67, InputType68, InputType69, InputType70
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 
