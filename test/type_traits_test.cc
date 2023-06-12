@@ -464,14 +464,10 @@ public:
   push_back_container([[maybe_unused]] const std::vector<T>& values) {}
   auto push_back(const T& value) { return value; }
 // Clang correctly warns about value returned as copy, but it is intentional
-#ifdef __clang__
-PDDCP_GNU_WARNING_PUSH()
-PDDCP_GNU_WARNING_DISABLE(return-std-move)
-#endif  // __clang__
+PDDCP_CLANG_WARNING_PUSH()
+PDDCP_CLANG_WARNING_DISABLE(return-std-move)
   auto push_back(T&& value) { return value; }
-#ifdef __clang__
-PDDCP_GNU_WARNING_POP()
-#endif  // __clang__
+PDDCP_CLANG_WARNING_POP()
 };
 
 /**
@@ -656,6 +652,45 @@ using InputType70 = has_iterator_input<std::string, true>;
 using InputType71 = has_iterator_input<int, false>;
 
 /**
+ * Traits type helper for using `pddcp::const_iterator_t<T>`.
+ *
+ * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::const_iterator_t<T>` type
+ */
+template <typename T, typename U>
+struct const_iterator_t_helper {
+  static inline constexpr bool value = std::is_same_v<
+    pddcp::const_iterator_t<T>, U
+  >;
+};
+
+/**
+ * Helper for `pddcp::const_iterator_t<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::const_iterator_t<T>` type
+ */
+template <typename T, typename U>
+using const_iterator_t_input = std::pair<
+  const_iterator_t_helper<T, U>, std::true_type
+>;
+
+// types for pddcp::const_iterator_t<T> testing
+using InputType72 = const_iterator_t_input<
+  std::vector<int>, typename std::vector<int>::const_iterator
+>;
+using InputType73 = const_iterator_t_input<const char[88], void>;
+using InputType74 = const_iterator_t_input<
+  std::deque<std::string>, typename std::deque<std::string>::const_iterator
+>;
+using InputType75 = const_iterator_t_input<
+  std::wstring, typename std::wstring::const_iterator
+>;
+using InputType76 = const_iterator_t_input<const double*, void>;
+
+/**
  * Helper for `pddcp::has_const_iterator<T>` input creation.
  *
  * @tparam T input type
@@ -667,10 +702,10 @@ using has_const_iterator_input = std::pair<
 >;
 
 // types for pddcp::has_const_iterator<T> testing
-using InputType72 = has_const_iterator_input<std::vector<std::string>, true>;
-using InputType73 = has_const_iterator_input<const std::string*, false>;
-using InputType74 = has_const_iterator_input<std::wstring, true>;
-using InputType75 = has_const_iterator_input<double, false>;
+using InputType77 = has_const_iterator_input<std::vector<std::string>, true>;
+using InputType78 = has_const_iterator_input<const std::string*, false>;
+using InputType79 = has_const_iterator_input<std::wstring, true>;
+using InputType80 = has_const_iterator_input<double, false>;
 
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType50);
@@ -699,6 +734,11 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType72);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType73);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType74);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType75);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType76);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType77);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType78);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType79);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType80);
 
 // input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
@@ -716,8 +756,10 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   InputType63, InputType64, InputType65, InputType66, InputType67,
   // types for pddcp::has_iterator<T> testing
   InputType68, InputType69, InputType70, InputType71,
+  // types for pddcp::const_iterator_t<T> testing
+  InputType72, InputType73, InputType74, InputType75, InputType76,
   // types for pddcp::has_const_iterator<T> testing
-  InputType72, InputType73, InputType74, InputType75
+  InputType77, InputType78, InputType79, InputType80
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 
