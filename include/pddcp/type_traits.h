@@ -508,6 +508,38 @@ inline constexpr bool
 is_emplace_back_container_v = is_emplace_back_container<T>::value;
 
 /**
+ * Get the `iterator` type member of a type, `void` if no member exists.
+ *
+ * Useful in template metaprogramming when `T` may not have the `iterator` type
+ * member, as otherwise using `typename T::iterator` will cause a compile error
+ * if used on types without the `iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct iterator { using type = void; };
+
+/**
+ * Specialization providing `iterator` for types that have the type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct iterator<T, std::void_t<typename T::iterator>> {
+  using type = typename T::iterator;
+};
+
+/**
+ * Helper type for the `iterator` type member of a type.
+ *
+ * If the type has no `iterator` type member, the helper type is `void`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+using iterator_t = typename iterator<T>::type;
+
+/**
  * Check if a type has an `iterator` type member.
  *
  * Use `pddcp::is_iterable<T>` instead to check if a type is iterable, which
