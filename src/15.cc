@@ -19,10 +19,12 @@
 #include <numbers>
 #endif  // __cplusplus < 202002L
 
-#include <type_traits>
 #include <random>
+#include <type_traits>
 
 #include <gtest/gtest.h>
+
+#include "pddcp/warnings.h"
 
 namespace {
 
@@ -58,14 +60,10 @@ double mcpi(UIntType n_samples, Rng rng)
     if (x * x + y * y <= 1) n_inside++;
   }
 // MSVC complains about implicit conversion resulting in loss of data
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable: 5219)
-#endif  // _MSC_VER
+PDDCP_MSVC_WARNING_PUSH()
+PDDCP_MSVC_WARNING_DISABLE(5219)
   return 4. * (static_cast<double>(n_inside) / n_samples);
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif // _MSC_VER
+PDDCP_MSVC_WARNING_POP()
 }
 
 /**
