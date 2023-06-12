@@ -324,7 +324,7 @@ template <typename T, typename = void>
 struct value_type { using type = void; };
 
 /**
- * Specialization providing `value_type` for types that have the type member.
+ * Specialization providing `value_type` for types with the type member.
  *
  * @tparam T type
  */
@@ -520,7 +520,7 @@ template <typename T, typename = void>
 struct iterator { using type = void; };
 
 /**
- * Specialization providing `iterator` for types that have the type member.
+ * Specialization providing `iterator` for types with the type member.
  *
  * @tparam T type
  */
@@ -565,6 +565,39 @@ struct has_iterator<T, std::void_t<typename T::iterator>> : std::true_type {};
  */
 template <typename T>
 inline constexpr bool has_iterator_v = has_iterator<T>::value;
+
+/**
+ * Get the `const+_iterator` type member of a type, `void` if no member exists.
+ *
+ * Useful in template metaprogramming when `T` may not have the
+ * `const_iterator` type member, as otherwise using the type member
+ * `typename T::const_iterator` will cause a compile error if used on types
+ * without the expected `const_iterator` type member.
+ *
+ * @tparam T type
+ */
+template <typename T, typename = void>
+struct const_iterator { using type = void; };
+
+/**
+ * Specialization providing `const_iterator` for types with the type member.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct const_iterator<T, std::void_t<typename T::const_iterator>> {
+  using type = typename T::const_iterator;
+};
+
+/**
+ * Helper type for the `const_iterator` type member of a type.
+ *
+ * If the type has no `const_iterator` type member, the helper type is `void`.
+ *
+ * @tparam T type
+ */
+template <typename T>
+using const_iterator_t = typename const_iterator<T>::type;
 
 /**
  * Check if a type has a `const_iterator` type member.
