@@ -29,6 +29,6 @@
  * @param p Prefix char, e.g. `L` for wide string, `u` for `char16_t`
  * @param x Token to stringify
  */
-#define PDDCP_XSTRINGIFY_I(p, x) PDDCP_CONCAT(p, PDDCP_STRINGIFY(x))
+#define PDDCP_XSTRINGIFY(p, x) PDDCP_CONCAT(p, PDDCP_STRINGIFY(x))
 
 #endif  // PDDCP_COMMON_H_
