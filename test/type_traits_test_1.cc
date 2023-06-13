@@ -1,7 +1,7 @@
 /**
- * @file type_traits_test.cc
+ * @file type_traits_test_1.cc
  * @author Derek Huang
- * @brief type_traits.h unit tests
+ * @brief type_traits.h unit tests 1
  * @copyright MIT License
  */
 
@@ -9,7 +9,6 @@
 
 #include <array>
 #include <cstdint>
-#include <deque>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -20,54 +19,10 @@
 #include <gtest/gtest.h>
 
 #include "pddcp/enums.h"
-#include "pddcp/warnings.h"
+#include "pddcp/testing/common.h"
+#include "pddcp/testing/type_traits_test.h"
 
 namespace {
-
-/**
- * Test fixture class template for testing type traits classes.
- *
- * @tparam InputType `std::pair<Traits, TruthType>` where `Traits` is the type
- *   resulting from applying a traits template to a type and `TruthType` is
- *  `std::true_type` or `std::false_type`. See examples for helper type
- *  template definitions that provide simpler use than manual repetition.
- *
- * @note The `Traits` type is expected to be a `std::bool_constant<B>` subclass
- *  or at least contain the static constexpr boolean `value` member.
- */
-template <typename InputType>
-class TypeTraitsTest : public ::testing::Test {};
-
-// we use type-parametrized testing since we exceeded the 50-type limit for the
-// types that ::testing::Types<...> can support for typed tests
-TYPED_TEST_SUITE_P(TypeTraitsTest);
-
-/**
- * Test that a traits class works as expected.
- */
-TYPED_TEST_P(TypeTraitsTest, TraitsTest)
-{
-  EXPECT_EQ(TestFixture::expected_, TestFixture::actual_);
-}
-
-// unlike typed tests, need to individually register each test
-REGISTER_TYPED_TEST_SUITE_P(TypeTraitsTest, TraitsTest);
-
-/**
- * Macro for simplifying `TypeTraitsTest` specializations.
- *
- * @param traits_input `InputType` as described above
- */
-#define PDDCP_TYPE_TRAITS_TEST_CLASS(traits_input) \
-  template <> \
-  class TypeTraitsTest<traits_input> : public ::testing::Test { \
-  public: \
-    using traits_type = typename traits_input::first_type; \
-    using truth_type = typename traits_input::second_type; \
-  protected: \
-    static inline constexpr bool expected_ = truth_type::value; \
-    static inline constexpr bool actual_ = traits_type::value; \
-  }
 
 /**
  * A user-defined pair-like class template.
@@ -368,6 +323,12 @@ using InputType49 = innermost_value_type_depth_input<
   std::vector<std::vector<std::vector<std::wstring>>>, 4
 >;
 
+}  // namespace
+
+// PDDCP_TYPE_TRAITS_TEST_CLASS definition and typed test suite registration
+// need to happen within the pddcp testing namespace for proper name resolution
+PDDCP_TESTING_NAMESPACE_BEGIN
+
 // specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
@@ -452,315 +413,4 @@ using TypeTraitsTestTypes1 = ::testing::Types<
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types1, TypeTraitsTest, TypeTraitsTestTypes1);
 
-/**
- * A class implementing a container-like `push_back`.
- *
- * @tparam T value type
- */
-template <typename T>
-class push_back_container {
-public:
-  using value_type = T;
-  push_back_container([[maybe_unused]] const std::vector<T>& values) {}
-  auto push_back(const T& value) { return value; }
-// Clang correctly warns about value returned as copy, but it is intentional
-PDDCP_CLANG_WARNING_PUSH()
-PDDCP_CLANG_WARNING_DISABLE(return-std-move)
-  auto push_back(T&& value) { return value; }
-PDDCP_CLANG_WARNING_POP()
-};
-
-/**
- * First class incorrectly implementing `push_back`.
- *
- * This one is missing the `value_type` type member.
- *
- * @tparam T value type
- */
-template <typename T>
-class bad_push_back_container_1 {
-public:
-  bad_push_back_container_1() {}
-  auto push_back(const T& value) { return value; }
-};
-
-/**
- * Second class incorrectly implementing `push_back`.
- *
- * This one has incorrect `push_back` signatures.
- *
- * @tparam T value type
- */
-template <typename T>
-class bad_push_back_container_2 {
-public:
-  using value_type = T;
-  bad_push_back_container_2() {}
-  auto push_back() { return 1u; }
-  auto push_back(const T& a, [[maybe_unused]] const T& b) { return a; }
-};
-
-/**
- * Helper for `pddcp::is_push_back_container<T>` input creation.
- *
- * @tparam T input type
- * @tparam truth Expected truth given by the traits type
- */
-template <typename T, bool truth>
-using is_push_back_container_input = std::pair<
-  pddcp::is_push_back_container<T>, std::bool_constant<truth>
->;
-
-// types for pddcp::is_push_back_container<T> testing
-using InputType50 = is_push_back_container_input<std::vector<int>, true>;
-using InputType51 = is_push_back_container_input<int, false>;
-using InputType52 = is_push_back_container_input<
-  std::unordered_map<std::string, std::size_t>, false
->;
-using InputType53 = is_push_back_container_input<
-  push_back_container<std::vector<std::string>>, true
->;
-using InputType54 = is_push_back_container_input<
-  bad_push_back_container_1<std::unordered_map<std::string, int>>, false
->;
-using InputType55 = is_push_back_container_input<
-  bad_push_back_container_2<std::vector<int>>, false
->;
-using InputType56 = is_push_back_container_input<std::deque<int>, true>;
-
-/**
- * A class implementing a container-like `emplace_back`.
- *
- * @tparam T value type
- */
-template <typename T>
-class emplace_back_container {
-public:
-  using value_type = T;
-  emplace_back_container() {}
-  auto emplace_back(const T& value) { return value; }
-  auto emplace_back([[maybe_unused]] T&& value) { return 1; }
-};
-
-/**
- * First class incorrectly implementing `emplace_back`.
- *
- * This one is missing the `value_type` type member.
- *
- * @tparam T value type
- */
-template <typename T>
-class bad_emplace_back_container_1 {
-public:
-  bad_emplace_back_container_1() {}
-  auto emplace_back(const T& value) { return value; }
-};
-
-/**
- * Second class incorrectly implementing `emplace_back`.
- *
- * This one has incorrect `emplace_back` signatures.
- *
- * @tparam T value type
- */
-template <typename T>
-class bad_emplace_back_container_2 {
-public:
-  using value_type = T;
-  bad_emplace_back_container_2() {}
-  auto emplace_back() const { return 0; }
-  auto emplace_back(const T& a, [[maybe_unused]] const T& b) { return a; }
-};
-
-/**
- * Helper for `pddcp::is_emplace_back_container<T>` input creation.
- *
- * @tparam T input type
- * @tparam truth Expected truth given by the traits type
- */
-template <typename T, bool truth>
-using is_emplace_back_container_input = std::pair<
-  pddcp::is_emplace_back_container<T>, std::bool_constant<truth>
->;
-
-// types for pddcp::is_emplace_back_container<T> testing
-using InputType57 = is_emplace_back_container_input<std::vector<double>, true>;
-using InputType58 = is_emplace_back_container_input<double, false>;
-using InputType59 = is_emplace_back_container_input<
-  emplace_back_container<std::vector<std::string>>, true
->;
-using InputType60 = is_emplace_back_container_input<
-  bad_emplace_back_container_1<std::string>, false
->;
-using InputType61 = is_emplace_back_container_input<
-  std::deque<std::vector<double>>, true
->;
-using InputType62 = is_emplace_back_container_input<
-  std::unordered_map<std::string, std::size_t>, false
->;
-
-/**
- * Traits type helper for using `pddcp::iterator_t<T>`.
- *
- * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
- *
- * @tparam T Input type
- * @tparam U Expected `pddcp::iterator_t<T>` type
- */
-template <typename T, typename U>
-struct iterator_t_helper {
-  static inline constexpr bool value = std::is_same_v<pddcp::iterator_t<T>, U>;
-};
-
-/**
- * Helper for `pddcp::iterator_t<T>` input creation.
- *
- * @tparam T Input type
- * @tparam U Expected `pddcp::iterator_t<T>` type
- */
-template <typename T, typename U>
-using iterator_t_input = std::pair<iterator_t_helper<T, U>, std::true_type>;
-
-// types for pddcp::iterator_t<T> testing
-using InputType63 = iterator_t_input<
-  std::vector<double>, typename std::vector<double>::iterator
->;
-using InputType64 = iterator_t_input<
-  std::wstring, typename std::wstring::iterator
->;
-using InputType65 = iterator_t_input<double[40], void>;
-using InputType66 = iterator_t_input<
-  std::deque<std::string>, typename std::deque<std::string>::iterator
->;
-using InputType67 = iterator_t_input<const char*, void>;
-
-/**
- * Helper for `pddcp::has_iterator<T>` input creation.
- *
- * @tparam T input type
- * @tparam truth Expected truth given by the traits type
- */
-template <typename T, bool truth>
-using has_iterator_input = std::pair<
-  pddcp::has_iterator<T>, std::bool_constant<truth>
->;
-
-// types for pddcp::has_iterator<T> testing
-using InputType68 = has_iterator_input<std::vector<double>, true>;
-using InputType69 = has_iterator_input<double[20], false>;
-using InputType70 = has_iterator_input<std::string, true>;
-using InputType71 = has_iterator_input<int, false>;
-
-/**
- * Traits type helper for using `pddcp::const_iterator_t<T>`.
- *
- * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
- *
- * @tparam T Input type
- * @tparam U Expected `pddcp::const_iterator_t<T>` type
- */
-template <typename T, typename U>
-struct const_iterator_t_helper {
-  static inline constexpr bool value = std::is_same_v<
-    pddcp::const_iterator_t<T>, U
-  >;
-};
-
-/**
- * Helper for `pddcp::const_iterator_t<T>` input creation.
- *
- * @tparam T Input type
- * @tparam U Expected `pddcp::const_iterator_t<T>` type
- */
-template <typename T, typename U>
-using const_iterator_t_input = std::pair<
-  const_iterator_t_helper<T, U>, std::true_type
->;
-
-// types for pddcp::const_iterator_t<T> testing
-using InputType72 = const_iterator_t_input<
-  std::vector<int>, typename std::vector<int>::const_iterator
->;
-using InputType73 = const_iterator_t_input<const char[88], void>;
-using InputType74 = const_iterator_t_input<
-  std::deque<std::string>, typename std::deque<std::string>::const_iterator
->;
-using InputType75 = const_iterator_t_input<
-  std::wstring, typename std::wstring::const_iterator
->;
-using InputType76 = const_iterator_t_input<const double*, void>;
-
-/**
- * Helper for `pddcp::has_const_iterator<T>` input creation.
- *
- * @tparam T input type
- * @tparam truth Expected truth given by the traits type
- */
-template <typename T, bool truth>
-using has_const_iterator_input = std::pair<
-  pddcp::has_const_iterator<T>, std::bool_constant<truth>
->;
-
-// types for pddcp::has_const_iterator<T> testing
-using InputType77 = has_const_iterator_input<std::vector<std::string>, true>;
-using InputType78 = has_const_iterator_input<const std::string*, false>;
-using InputType79 = has_const_iterator_input<std::wstring, true>;
-using InputType80 = has_const_iterator_input<double, false>;
-
-// specialization creation using the input types
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType50);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType51);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType52);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType53);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType54);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType55);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType56);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType57);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType58);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType59);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType60);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType61);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType62);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType63);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType64);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType65);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType66);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType67);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType68);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType69);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType70);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType71);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType72);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType73);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType74);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType75);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType76);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType77);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType78);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType79);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType80);
-
-// input types and type-parametrized test suite instantiation
-using TypeTraitsTestTypes2 = ::testing::Types<
-  // types for pddcp::is_push_back_container<T> testing
-  InputType50,
-  InputType51,
-  InputType52,
-  InputType53,
-  InputType54,
-  InputType55,
-  InputType56,
-  // types for pddcp::is_emplace_back_container<T> testing
-  InputType57, InputType58, InputType59, InputType60, InputType61, InputType62,
-  // types for pddcp::iterator_t<T> testing
-  InputType63, InputType64, InputType65, InputType66, InputType67,
-  // types for pddcp::has_iterator<T> testing
-  InputType68, InputType69, InputType70, InputType71,
-  // types for pddcp::const_iterator_t<T> testing
-  InputType72, InputType73, InputType74, InputType75, InputType76,
-  // types for pddcp::has_const_iterator<T> testing
-  InputType77, InputType78, InputType79, InputType80
->;
-INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
-
-}  // namespace
+PDDCP_TESTING_NAMESPACE_END
