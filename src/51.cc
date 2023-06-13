@@ -47,9 +47,7 @@ std::vector<IntType> permute(const std::vector<IntType>& deck, Rng rng)
 #if __cplusplus >= 202002L
   using size_type = typename std::remove_cvref_t<decltype(deck)>::size_type;
 #else
-  using size_type = typename std::remove_const_t<
-    std::remove_reference_t<decltype(deck)>
-  >::size_type;
+  using size_type = typename std::decay_t<decltype(deck)>::size_type;
 #endif  // __cplusplus < 202002L
   // only integral types + Rng result type is convertible to size_type
   static_assert(std::is_integral_v<IntType>);
