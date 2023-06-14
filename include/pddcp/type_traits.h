@@ -737,6 +737,79 @@ template <typename T>
 inline constexpr std::size_t
 innermost_iterator_depth = innermost_iterator<T>::depth;
 
+/**
+ * Get the innermost `const_iterator` member of a type, `void` if none exists.
+ *
+ * The `type` member is an alias for the innermost `const_iterator` type member
+ * or `void` if the type has no `const_iterator` member while `depth` gives how
+ * many `const_iterator` members were iterated through to get `type`.
+ *
+ * For example, given `std::vector<std::vector<std::string>>` as the type, then
+ * `const_iterator` would be an iterator to `char`, the `value_type` of the
+ * `std::string`, and `depth` would be `3`, as we iterate through 3
+ * `const_iterator` members to arrive at the final innermost iterator type.
+ *
+ * @tparam T type
+ */
+template <typename T>
+class innermost_const_iterator {
+private:
+  using iterator_value_type = iterator_traits_value_type_t<const_iterator_t<T>>;
+public:
+  using type = std::conditional_t<
+    // base case: T has no const_iterator type member
+    !has_const_iterator_v<T>,
+    void,
+    std::conditional_t<
+      // base case: T has const_iterator whose value_type has const_iterator
+      !has_const_iterator_v<iterator_value_type>,
+      iterator_t<T>,
+      // otherwise, recurse into const_iterator of T by using iterator traits
+      typename innermost_const_iterator<iterator_value_type>::type
+    >
+  >;
+  static inline constexpr std::size_t depth = []
+  {
+    // we include the "u" suffix explicitly to suppress MSVC C4365 warning
+    if constexpr (!has_const_iterator_v<T>)
+      return 0u;
+    else
+      return 1u + innermost_const_iterator<iterator_value_type>::depth;
+  }();
+};
+
+/**
+ * `innermost_const_iterator<T>` specialization for `void`.
+ *
+ * The `void` specialization makes `innermost_const_iterator<void>` a complete
+ * type as otherwise no members will be accessible.
+ */
+template <>
+class innermost_const_iterator<void> {
+public:
+  using type = void;
+  static inline constexpr std::size_t depth = 0;
+};
+
+/**
+ * Helper type for the innermost `const_iterator` member of a type.
+ *
+ * If the type has no `const_iterator` type member, the helper type is `void`.
+ *
+ * @tparam T
+ */
+template <typename T>
+using innermost_const_iterator_t = typename innermost_const_iterator<T>::type;
+
+/**
+ * Helper for the depth of the innermost `const_iterator` member of a type.
+ *
+ * @tparam T
+ */
+template <typename T>
+inline constexpr std::size_t
+innermost_const_iterator_depth = innermost_const_iterator<T>::depth;
+
 }  // namespace pddcp
 
 #endif  // PDDCP_TYPE_TRAITS_H_
