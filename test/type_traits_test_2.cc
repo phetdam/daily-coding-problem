@@ -427,6 +427,7 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   InputType28, InputType29, InputType30, InputType31,
   // types for pddcp::iterator_traits_value_type_t<T> testing
   InputType32, InputType33, InputType34, InputType35, InputType36,
+  // types for pddcp::innermost_iterator_t<T> testing
   InputType37, InputType38, InputType39, InputType40
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
