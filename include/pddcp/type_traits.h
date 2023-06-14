@@ -631,10 +631,10 @@ inline constexpr bool has_const_iterator_v = has_const_iterator<T>::value;
 /**
  * Get the `value_type` type member of an iterator, `void` if no member exists.
  *
- * Useful in template metaprogramming when `std::iterator_traits<Iter>` may not
- * have the `value_type` type member, as otherwise using
- * `typename std::iterator_traits<Iter>::value_type` will cause a compile
- * error if used on iterators without the `value_type` type member.
+ * Useful in template metaprogramming when `std::iterator_traits<T>` may not
+ * have the `value_type` type member for iterator `T`, as otherwise using
+ * `typename std::iterator_traits<T>::value_type` will cause a compile error
+ * if used on iterators without the `value_type` type member.
  *
  * @tparam T iterator type
  */
@@ -680,10 +680,8 @@ using iterator_traits_value_type_t =
  */
 template <typename T>
 class innermost_iterator {
-  // helper type for the value_type of an iterator by using its traits type.
-  // this can be void if iterator_t<T> is void or has no traits value_type
+private:
   using iterator_value_type = iterator_traits_value_type_t<iterator_t<T>>;
-
 public:
   using type = std::conditional_t<
     // base case: T has no iterator type member
