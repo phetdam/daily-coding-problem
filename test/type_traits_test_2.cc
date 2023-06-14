@@ -74,7 +74,7 @@ public:
 /**
  * Helper for `pddcp::is_push_back_container<T>` input creation.
  *
- * @tparam T input type
+ * @tparam T Input type
  * @tparam truth Expected truth given by the traits type
  */
 template <typename T, bool truth>
@@ -146,7 +146,7 @@ public:
 /**
  * Helper for `pddcp::is_emplace_back_container<T>` input creation.
  *
- * @tparam T input type
+ * @tparam T Input type
  * @tparam truth Expected truth given by the traits type
  */
 template <typename T, bool truth>
@@ -208,7 +208,7 @@ using InputType18 = iterator_t_input<const char*, void>;
 /**
  * Helper for `pddcp::has_iterator<T>` input creation.
  *
- * @tparam T input type
+ * @tparam T Input type
  * @tparam truth Expected truth given by the traits type
  */
 template <typename T, bool truth>
@@ -264,7 +264,7 @@ using InputType27 = const_iterator_t_input<const double*, void>;
 /**
  * Helper for `pddcp::has_const_iterator<T>` input creation.
  *
- * @tparam T input type
+ * @tparam T Input type
  * @tparam truth Expected truth given by the traits type
  */
 template <typename T, bool truth>
@@ -278,13 +278,92 @@ using InputType29 = has_const_iterator_input<const std::string*, false>;
 using InputType30 = has_const_iterator_input<std::wstring, true>;
 using InputType31 = has_const_iterator_input<double, false>;
 
+/**
+ * Traits type helper for using `pddcp::iterator_traits_value_type_t<T>`.
+ *
+ * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::iterator_traits_value_type_t<T>` type
+ */
+template <typename T, typename U>
+struct iterator_traits_value_type_t_helper {
+  static inline constexpr bool value = std::is_same_v<
+    pddcp::iterator_traits_value_type_t<T>, U
+  >;
+};
+
+/**
+ * Helper for `pddcp::iterator_traits_value_type_t<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::iterator_traits_value_type_t<T>` type
+ */
+template <typename T, typename U>
+using iterator_traits_value_type_t_input = std::pair<
+  iterator_traits_value_type_t_helper<T, U>,
+  std::true_type
+>;
+
+// types for pddcp::iterator_traits_value_type_t<T> testing
+using InputType32 = iterator_traits_value_type_t_input<
+  typename std::string::iterator, char
+>;
+using InputType33 = iterator_traits_value_type_t_input<
+  typename std::vector<double>::iterator, double
+>;
+using InputType34 = iterator_traits_value_type_t_input<double[40], void>;
+// note that std::iterator_traits<T> has specialization for T*
+using InputType35 = iterator_traits_value_type_t_input<double*, double>;
+using InputType36 = iterator_traits_value_type_t_input<
+  typename std::deque<std::string>::iterator, std::string
+>;
+
+/**
+ * Traits type helper for using `pddcp::innermost_iterator_t<T>`.
+ *
+ * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_iterator_t<T>` type
+ */
+template <typename T, typename U>
+struct innermost_iterator_t_helper {
+  static inline constexpr bool value = std::is_same_v<
+    pddcp::innermost_iterator_t<T>, U
+  >;
+};
+
+/**
+ * Helper for `pddcp::innermost_iterator_t<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_iterator_t<T>` type
+ */
+template <typename T, typename U>
+using innermost_iterator_t_input = std::pair<
+  innermost_iterator_t_helper<T, U>, std::true_type
+>;
+
+// types for pddcp::innermost_iterator_t<T> testing
+using InputType37 = innermost_iterator_t_input<
+  std::vector<double>, typename std::vector<double>::iterator
+>;
+using InputType38 = innermost_iterator_t_input<double[40], void>;
+using InputType39 = innermost_iterator_t_input<
+  std::vector<std::string>, typename std::string::iterator
+>;
+using InputType40 = innermost_iterator_t_input<
+  std::vector<std::deque<std::wstring>>, typename std::wstring::iterator
+>;
+
 }  // namespace
 
 // PDDCP_TYPE_TRAITS_TEST_CLASS definition and typed test suite registration
 // need to happen within the pddcp testing namespace for proper name resolution
 PDDCP_TESTING_NAMESPACE_BEGIN
 
-// specialization creation using the input types
+// specialization creation using the Input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType3);
@@ -316,8 +395,17 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType28);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType29);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType30);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType31);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType32);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType33);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType34);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType35);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType36);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType38);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType39);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType40);
 
-// input types and type-parametrized test suite instantiation
+// Input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
   // types for pddcp::is_push_back_container<T> testing
   InputType1,
@@ -336,7 +424,10 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   // types for pddcp::const_iterator_t<T> testing
   InputType23, InputType24, InputType25, InputType26, InputType27,
   // types for pddcp::has_const_iterator<T> testing
-  InputType28, InputType29, InputType30, InputType31
+  InputType28, InputType29, InputType30, InputType31,
+  // types for pddcp::iterator_traits_value_type_t<T> testing
+  InputType32, InputType33, InputType34, InputType35, InputType36,
+  InputType37, InputType38, InputType39, InputType40
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 

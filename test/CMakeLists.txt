@@ -58,4 +58,5 @@ endif()
 target_link_libraries(pddcp_test PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(pddcp_test)
+# default DISCOVERY_TIMEOUT is 5 seconds and needed to be increased
+gtest_discover_tests(pddcp_test DISCOVERY_TIMEOUT 10)
