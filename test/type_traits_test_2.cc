@@ -357,6 +357,40 @@ using InputType40 = innermost_iterator_t_input<
   std::vector<std::deque<std::wstring>>, typename std::wstring::iterator
 >;
 
+/**
+ * Traits type helper for using `pddcp::innermost_iterator_depth<T>`.
+ *
+ * Solves same issue as to what `innermost_value_type_depth_helper<T, U>`.
+ *
+ * @tparam T Input type
+ * @tparam depth Expected `pddcp::innermost_iterator_depth<T>` value
+ */
+template <typename T, decltype(pddcp::innermost_iterator_depth<T>) depth>
+struct innermost_iterator_depth_helper {
+  static inline constexpr bool value = (
+    depth == pddcp::innermost_iterator_depth<T>
+  );
+};
+
+/**
+ * Helper for `pddcp::innermost_iterator_depth<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam depth Expected `pddcp::innermost_iterator_depth<T>` value
+ */
+template <typename T, decltype(pddcp::innermost_iterator_depth<T>) depth>
+using innermost_iterator_depth_input = std::pair<
+  innermost_iterator_depth_helper<T, depth>, std::true_type
+>;
+
+// types for pddcp::innermost_iterator_depth<T> testing
+using InputType41 = innermost_iterator_depth_input<std::vector<double>, 1>;
+using InputType42 = innermost_iterator_depth_input<double[40], 0>;
+using InputType43 = innermost_iterator_depth_input<std::vector<std::string>, 2>;
+using InputType44 = innermost_iterator_depth_input<
+  std::vector<std::deque<std::wstring>>, 3
+>;
+
 }  // namespace
 
 // PDDCP_TYPE_TRAITS_TEST_CLASS definition and typed test suite registration
@@ -404,6 +438,10 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType38);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType39);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType40);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType41);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType42);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType43);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType44);
 
 // Input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
@@ -428,7 +466,9 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   // types for pddcp::iterator_traits_value_type_t<T> testing
   InputType32, InputType33, InputType34, InputType35, InputType36,
   // types for pddcp::innermost_iterator_t<T> testing
-  InputType37, InputType38, InputType39, InputType40
+  InputType37, InputType38, InputType39, InputType40,
+  // types for pddcp::innermost_iterator_depth<T> testing
+  InputType41, InputType42, InputType43, InputType44
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 
