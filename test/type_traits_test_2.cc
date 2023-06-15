@@ -391,6 +391,46 @@ using InputType44 = innermost_iterator_depth_input<
   std::vector<std::deque<std::wstring>>, 3
 >;
 
+/**
+ * Traits type helper for using `pddcp::innermost_const_iterator_t<T>`.
+ *
+ * Solves an issue similar to what `value_type_t_helper<T, U>` solves.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_const_iterator_t<T>` type
+ */
+template <typename T, typename U>
+struct innermost_const_iterator_t_helper {
+  static inline constexpr bool value = std::is_same_v<
+    pddcp::innermost_const_iterator_t<T>, U
+  >;
+};
+
+/**
+ * Helper for `pddcp::innermost_const_iterator_t<T>` input creation.
+ *
+ * @tparam T Input type
+ * @tparam U Expected `pddcp::innermost_const_iterator_t<T>` type
+ */
+template <typename T, typename U>
+using innermost_const_iterator_t_input = std::pair<
+  innermost_const_iterator_t_helper<T, U>, std::true_type
+>;
+
+// types for pddcp::innermost_const_iterator_t<T> testing
+using InputType45 = innermost_const_iterator_t_input<
+  std::vector<double>, typename std::vector<double>::const_iterator
+>;
+using InputType46 = innermost_const_iterator_t_input<double[40], void>;
+using InputType47 = innermost_const_iterator_t_input<const double*, void>;
+using InputType48 = innermost_const_iterator_t_input<
+  std::vector<std::vector<std::wstring>>, typename std::wstring::const_iterator
+>;
+using InputType49 = innermost_const_iterator_t_input<
+  std::deque<std::vector<std::vector<std::string>>>,
+  typename std::string::const_iterator
+>;
+
 }  // namespace
 
 // PDDCP_TYPE_TRAITS_TEST_CLASS definition and typed test suite registration
@@ -442,6 +482,11 @@ PDDCP_TYPE_TRAITS_TEST_CLASS(InputType41);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType42);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType43);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType44);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType45);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType46);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType47);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType48);
+PDDCP_TYPE_TRAITS_TEST_CLASS(InputType49);
 
 // Input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes2 = ::testing::Types<
@@ -468,7 +513,9 @@ using TypeTraitsTestTypes2 = ::testing::Types<
   // types for pddcp::innermost_iterator_t<T> testing
   InputType37, InputType38, InputType39, InputType40,
   // types for pddcp::innermost_iterator_depth<T> testing
-  InputType41, InputType42, InputType43, InputType44
+  InputType41, InputType42, InputType43, InputType44,
+  // types for pddcp::innermost_const_iterator_t<T> testing
+  InputType45, InputType46, InputType47, InputType48, InputType49
 >;
 INSTANTIATE_TYPED_TEST_SUITE_P(Types2, TypeTraitsTest, TypeTraitsTestTypes2);
 

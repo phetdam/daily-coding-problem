@@ -763,7 +763,7 @@ public:
     std::conditional_t<
       // base case: T has const_iterator whose value_type has const_iterator
       !has_const_iterator_v<iterator_value_type>,
-      iterator_t<T>,
+      const_iterator_t<T>,
       // otherwise, recurse into const_iterator of T by using iterator traits
       typename innermost_const_iterator<iterator_value_type>::type
     >
