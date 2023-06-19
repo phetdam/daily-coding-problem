@@ -437,7 +437,7 @@ using InputType49 = innermost_const_iterator_t_input<
 // need to happen within the pddcp testing namespace for proper name resolution
 PDDCP_TESTING_NAMESPACE_BEGIN
 
-// specialization creation using the Input types
+// specialization creation using the input types
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
 PDDCP_TYPE_TRAITS_TEST_CLASS(InputType3);
