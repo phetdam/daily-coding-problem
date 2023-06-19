@@ -23,6 +23,8 @@ namespace pddcp {
 /**
  * Join a container of values into a string.
  *
+ * @note This function does work properly when `CharT` is not `char`.
+ *
  * @tparam Container *Container* with `value_type` compatible with `operator<<`
  * @tparam CharT Char type
  * @tparam Traits Char traits
