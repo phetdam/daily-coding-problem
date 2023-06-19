@@ -13,6 +13,8 @@
 
 #include <gtest/gtest.h>
 
+#include "pddcp/warnings.h"
+
 namespace {
 
 // convenience type aliases
@@ -55,18 +57,18 @@ INSTANTIATE_TEST_SUITE_P(
 #ifdef _MSC_VER
 #define PDDCP_PREFIX_TREE_TEST_SETUP \
   const auto& [prefix, values] = GetParam().first; \
-  _Pragma("warning (push)") \
-  _Pragma("warning (disable: 4189)") \
+  PDDCP_MSVC_WARNING_PUSH() \
+  PDDCP_MSVC_WARNING_DISABLE(4189) \
   const auto& true_autocomplete = GetParam().second; \
-  _Pragma("warning (pop)") \
+  PDDCP_MSVC_WARNING_POP() \
   auto trie = pddcp::trie::from(values)
 #else
 #define PDDCP_PREFIX_TREE_TEST_SETUP \
   const auto& [prefix, values] = GetParam().first; \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \
+  PDDCP_GNU_WARNING_PUSH() \
+  PDDCP_GNU_WARNING_DISABLE(unused-variable) \
   const auto& true_autocomplete = GetParam().second; \
-  _Pragma("GCC diagnostic pop") \
+  PDDCP_GNU_WARNING_POP() \
   auto trie = pddcp::trie::from(values)
 #endif  // _MSC_VER
 
