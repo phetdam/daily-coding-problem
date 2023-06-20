@@ -267,7 +267,7 @@ using InputType2 = pddcp::indexed_type<1, std::deque<double>>;
 using InputType3 = pddcp::indexed_type<2, std::list<unsigned int>>;
 
 /**
- * Helper macro defining each `DailyTest154` specialization.
+ * Helper macro defining each `DailyTest154` specializations.
  *
  * Each specialization has `input_` and `res_` and `bad_res_` static members
  * for the input container values and the expected vector of reversed values

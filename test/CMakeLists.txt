@@ -48,6 +48,7 @@ add_executable(
     matrix_test.cc
     prefix_tree_test.cc
     rtti_test.cc
+    string_test.cc
     type_traits_test_1.cc
     type_traits_test_2.cc
     type_traits_test_3.cc
