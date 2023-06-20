@@ -26,7 +26,14 @@ PDDCP_TESTING_NAMESPACE_BEGIN
  *  or at least contain the static constexpr boolean `value` member.
  */
 template <typename InputType>
-class TypeTraitsTest : public ::testing::Test {};
+class TypeTraitsTest : public ::testing::Test {
+public:
+  using traits_type = typename InputType::first_type;
+  using truth_type = typename InputType::second_type;
+protected:
+  static inline constexpr bool expected_ = truth_type::value;
+  static inline constexpr bool actual_ = traits_type::value;
+};
 
 // we use type-parametrized testing since we exceeded the 50-type limit for the
 // types that ::testing::Types<...> can support for typed tests
@@ -42,23 +49,6 @@ TYPED_TEST_P(TypeTraitsTest, TraitsTest)
 
 // unlike typed tests, need to individually register each test
 REGISTER_TYPED_TEST_SUITE_P(TypeTraitsTest, TraitsTest);
-
-/**
- * Macro for simplifying `TypeTraitsTest` specializations.
- *
- * @param traits_input `InputType` as described above
- */
-#define PDDCP_TYPE_TRAITS_TEST_CLASS(traits_input) \
-  template <> \
-  class PDDCP_TESTING_NAMESPACE::TypeTraitsTest<traits_input> \
-    : public ::testing::Test { \
-  public: \
-    using traits_type = typename traits_input::first_type; \
-    using truth_type = typename traits_input::second_type; \
-  protected: \
-    static inline constexpr bool expected_ = truth_type::value; \
-    static inline constexpr bool actual_ = traits_type::value; \
-  }
 
 PDDCP_TESTING_NAMESPACE_END
 

@@ -323,63 +323,6 @@ using InputType49 = innermost_value_type_depth_input<
   std::vector<std::vector<std::vector<std::wstring>>>, 4
 >;
 
-}  // namespace
-
-// PDDCP_TYPE_TRAITS_TEST_CLASS definition and typed test suite registration
-// need to happen within the pddcp testing namespace for proper name resolution
-PDDCP_TESTING_NAMESPACE_BEGIN
-
-// specialization creation using the input types
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType1);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType2);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType3);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType4);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType5);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType6);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType7);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType8);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType9);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType10);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType11);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType12);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType13);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType14);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType15);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType16);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType17);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType18);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType19);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType20);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType21);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType22);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType23);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType24);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType25);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType26);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType27);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType28);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType29);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType30);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType31);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType32);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType33);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType34);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType35);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType36);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType37);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType38);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType39);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType40);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType41);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType42);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType43);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType44);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType45);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType46);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType47);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType48);
-PDDCP_TYPE_TRAITS_TEST_CLASS(InputType49);
-
 // input types and type-parametrized test suite instantiation
 using TypeTraitsTestTypes1 = ::testing::Types<
   // types for pddcp::is_homogenous_pair<N, T> testing
@@ -411,6 +354,13 @@ using TypeTraitsTestTypes1 = ::testing::Types<
   // types for pddcp::innermost_value_type_depth<T> testing
   InputType46, InputType47, InputType48, InputType49
 >;
+
+}  // namespace
+
+// typed test suite registration done inside pddcp testing namespace to allow
+// unqualified TypeTraitsTest use in INSTANTIATE_TEST_SUITE_P
+PDDCP_TESTING_NAMESPACE_BEGIN
+
 INSTANTIATE_TYPED_TEST_SUITE_P(Types1, TypeTraitsTest, TypeTraitsTestTypes1);
 
 PDDCP_TESTING_NAMESPACE_END
