@@ -50,6 +50,7 @@ add_executable(
     rtti_test.cc
     type_traits_test_1.cc
     type_traits_test_2.cc
+    type_traits_test_3.cc
 )
 # use OpenMP if available
 if(OpenMP_CXX_FOUND)
