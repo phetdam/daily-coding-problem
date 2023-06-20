@@ -44,7 +44,7 @@
 #endif  // _MSC_VER
 
 /**
- * Indicate if we are compiling under C++20 or not.
+ * Indicate if we are compiling using C++20 or above.
  *
  * Always having the macro defined allows use in normal or constexpr ifs.
  */
@@ -55,7 +55,16 @@
 #endif  // PDDCP_CPLUSPLUS < 202002L
 
 /**
- * Enable some block of code when compiling with C++20.
+ * Indicate if we are compiling using exactly C++20.
+ */
+#if PDDCP_CPLUSPLUS == 202002L
+#define PDDCP_CPP20_EXACT 1
+#else
+#define PDDCP_CPP20_EXACT 0
+#endif  // PDDCP_CPLUSPLUS != 202002L
+
+/**
+ * Enable some block of code when compiling with C++20 or above.
  *
  * Use of variadic args is to allow chunks that contain commas.
  *
@@ -65,6 +74,18 @@
 #define PDDCP_CPP20_ENABLE(...) __VA_ARGS__
 #else
 #define PDDCP_CPP20_ENABLE(...)
+#endif  // !PDDCP_HAS_CPP20
+
+/**
+ * Use first expression if compiling with C++20 of above, else use fallback.
+ *
+ * @param cpp_20_expr Expression to use when compiling with C++20 or above
+ * @param fallback_expr Expression to use when compiling below C++20
+ */
+#if PDDCP_HAS_CPP20
+#define PDDCP_CPP20_CONDITIONAL(cpp_20_expr, fallback_expr) cpp_20_expr
+#else
+#define PDDCP_CPP20_CONDITIONAL(cpp_20_expr, fallback_expr) fallback_expr
 #endif  // !PDDCP_HAS_CPP20
 
 #endif  // PDDCP_COMMON_H_
