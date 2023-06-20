@@ -45,6 +45,8 @@
 
 /**
  * Indicate if we are compiling under C++20 or not.
+ *
+ * Always having the macro defined allows use in normal or constexpr ifs.
  */
 #if PDDCP_CPLUSPLUS >= 202002L
 #define PDDCP_HAS_CPP20 1

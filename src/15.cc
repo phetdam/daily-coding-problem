@@ -14,17 +14,18 @@
 #include <cmath>
 #include <cstdint>
 
-// C++20 header we could use for a pi constant
-#if __cplusplus >= 202002L
-#include <numbers>
-#endif  // __cplusplus < 202002L
-
 #include <random>
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
+#include "pddcp/common.h"
 #include "pddcp/warnings.h"
+
+// C++20 header we could use for a pi constant
+#if PDDCP_HAS_CPP20
+#include <numbers>
+#endif  // !PDDCP_HAS_CPP20
 
 namespace {
 
@@ -93,11 +94,11 @@ template <typename UIntType>
 class DailyTest15 : public ::testing::Test {
 protected:
 // if we use C++20, we can use the exact value of pi
-#if __cplusplus >= 202002L
+#if PDDCP_HAS_CPP20
   static constexpr double pi_ = std::numbers::pi;
 #else
   static inline const double pi_{4 * std::atan(1.)};
-#endif  // __cplusplus < 202002L
+#endif  // !PDDCP_HAS_CPP20
   // ballpark minimum of samples needed to get within current tol_
   static inline const UIntType n_samples_ = 200000;
   // up to 3 decimals places -> 1e-3 tolerance

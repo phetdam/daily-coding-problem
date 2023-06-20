@@ -25,6 +25,8 @@
 
 #include <gtest/gtest.h>
 
+#include "pddcp/common.h"
+
 namespace {
 
 /**
@@ -44,11 +46,11 @@ template <typename IntType, typename Rng>
 std::vector<IntType> permute(const std::vector<IntType>& deck, Rng rng)
 {
 // in C++20, we can use std::remove_cvref_t instead which is more concise
-#if __cplusplus >= 202002L
+#if PDDCP_HAS_CPP20
   using size_type = typename std::remove_cvref_t<decltype(deck)>::size_type;
 #else
   using size_type = typename std::decay_t<decltype(deck)>::size_type;
-#endif  // __cplusplus < 202002L
+#endif  // !PDDCP_HAS_CPP20
   // only integral types + Rng result type is convertible to size_type
   static_assert(std::is_integral_v<IntType>);
   static_assert(std::is_convertible_v<typename Rng::result_type, size_type>);
