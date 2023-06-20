@@ -14,6 +14,8 @@
 #include <tuple>
 #include <type_traits>
 
+#include "pddcp/common.h"
+
 namespace pddcp {
 
 /**
@@ -809,6 +811,45 @@ using innermost_const_iterator_t = typename innermost_const_iterator<T>::type;
 template <typename T>
 inline constexpr std::size_t
 innermost_const_iterator_depth = innermost_const_iterator<T>::depth;
+
+/**
+ * Get the char type of a string literal, `void` if not a string literal.
+ *
+ * @tparam T type
+ */
+template <typename T>
+struct literal_char { using type = void; };
+
+/**
+ * Specialization providing char type of a string literal.
+ *
+ * Note that `decltype(s)` of a string literal `s` is `const T(&)[N]`, where
+ * `T` is the character type and `N` is the string literal length + 1. If `T`
+ * is not a known character type, the `type` member will be `void`.
+ *
+ * @tparam T type
+ * @tparam N size
+ */
+template <typename T, std::size_t N>
+struct literal_char<const T(&)[N]> {
+  using type = std::conditional_t<
+    std::is_same_v<T, char> ||
+    PDDCP_CPP20_ENABLE(std::is_same_v<T, char8_t> ||)
+    std::is_same_v<T, wchar_t> ||
+    std::is_same_v<T, char16_t> ||
+    std::is_same_v<T, char32_t>,
+    T,
+    void
+  >;
+};
+
+/**
+ * Helper type for the char type of a string literal.
+ *
+ * @tparam T type
+ */
+template <typename T>
+using literal_char_t = typename literal_char<T>::type;
 
 }  // namespace pddcp
 
