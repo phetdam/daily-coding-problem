@@ -148,14 +148,25 @@ class StringIsPalindromeTest : public ::testing::Test {};
 using StringIsPalindromeType1 = pddcp::indexed_type<0, std::string>;
 using StringIsPalindromeType2 = pddcp::indexed_type<1, std::wstring>;
 using StringIsPalindromeType3 = pddcp::indexed_type<2, std::string>;
+using StringIsPalindromeType4 = pddcp::indexed_type<3, std::u16string>;
+using StringIsPalindromeType5 = pddcp::indexed_type<4, std::u32string>;
+using StringIsPalindromeType6 = pddcp::indexed_type<5, std::wstring>;
 
 // specializations for StringIsPalindromeTest
 PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType1, "totally", false);
 PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType2, L"abba", true);
 PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType3, "whatever", false);
+PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType4, u"aeiouoiea", true);
+PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType5, U"asdffdsa", true);
+PDDCP_STRING_IS_PALIDROME_TEST(StringIsPalindromeType6, L"burger", false);
 
 using StringIsPalindromeTestTypes = ::testing::Types<
-  StringIsPalindromeType1, StringIsPalindromeType2, StringIsPalindromeType3
+  StringIsPalindromeType1,
+  StringIsPalindromeType2,
+  StringIsPalindromeType3,
+  StringIsPalindromeType4,
+  StringIsPalindromeType5,
+  StringIsPalindromeType6
 >;
 TYPED_TEST_SUITE(StringIsPalindromeTest, StringIsPalindromeTestTypes);
 
