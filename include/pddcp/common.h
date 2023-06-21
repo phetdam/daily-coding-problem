@@ -77,7 +77,7 @@
 #endif  // !PDDCP_HAS_CPP20
 
 /**
- * Use first expression if compiling with C++20 of above, else use fallback.
+ * Use first expression if compiling with C++20 or above, else use fallback.
  *
  * @param cpp_20_expr Expression to use when compiling with C++20 or above
  * @param fallback_expr Expression to use when compiling below C++20
