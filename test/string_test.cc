@@ -8,6 +8,8 @@
 #include "pddcp/string.h"
 
 #include <deque>
+#include <forward_list>
+#include <list>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -78,6 +80,8 @@ using StringJoinType1 = pddcp::indexed_type<0, std::vector<unsigned int>>;
 using StringJoinType2 = pddcp::indexed_type<1, std::vector<std::string>>;
 using StringJoinType3 = pddcp::indexed_type<2, std::deque<double>>;
 using StringJoinType4 = pddcp::indexed_type<3, std::vector<unsigned int>>;
+using StringJoinType5 = pddcp::indexed_type<4, std::list<char>>;
+using StringJoinType6 = pddcp::indexed_type<5, std::forward_list<int>>;
 
 // specializations for StringJoinTest
 // TODO: add test cases for different string literal types (doesn't work now)
@@ -102,9 +106,26 @@ PDDCP_STRING_JOIN_TEST_EX(
   "1 wow 4 wow 15 wow 67 wow 88",
   " wow "
 );
+PDDCP_STRING_JOIN_TEST_EX(
+  StringJoinType5,
+  PDDCP_INIT_LIST('q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'),
+  "q w e r t y u i o p",
+  " "
+);
+PDDCP_STRING_JOIN_TEST_EX(
+  StringJoinType6,
+  PDDCP_INIT_LIST(1, 5, 1, 2, 3, 1, 4, 12, 15, 61, 9, 100),
+  "1, 5, 1, 2, 3, 1, 4, 12, 15, 61, 9, 100",
+  ", "
+);
 
 using StringJoinTestTypes = ::testing::Types<
-  StringJoinType1, StringJoinType2, StringJoinType3, StringJoinType4
+  StringJoinType1,
+  StringJoinType2,
+  StringJoinType3,
+  StringJoinType4,
+  StringJoinType5,
+  StringJoinType6
 >;
 TYPED_TEST_SUITE(StringJoinTest, StringJoinTestTypes);
 

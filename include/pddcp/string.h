@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -39,10 +40,9 @@ auto string_join(
   const std::basic_string<CharT, Traits, Alloc>& delim)
 {
   std::basic_stringstream<CharT, Traits, Alloc> stream;
-  auto n_values = values.size();
-  for (decltype(n_values) i = 0; i < n_values; i++) {
-    stream << values[i];
-    if (i == n_values - 1)
+  for (auto iter = values.begin(); iter != values.end(); iter++) {
+    stream << *iter;
+    if (std::distance(iter, values.end()) == 1)
       break;
     stream << delim;
   }
