@@ -12,11 +12,13 @@
 #include <list>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include "pddcp/common.h"
+#include "pddcp/enums.h"
 #include "pddcp/type_traits.h"
 #include "pddcp/utility.h"
 
@@ -143,7 +145,7 @@ TYPED_TEST(StringJoinTest, TypedTest)
 /**
  * Base test class template for `pddcp::is_palindrome` testing.
  *
- * @tparam IndexedType `pddcp::indexed_type<I, T>` with `T` an STL string
+ * @tparam IndexedType `pddcp::indexed_type<I, T>` with `T` an STL string type
  */
 template <typename IndexedType>
 class StringIsPalindromeTest : public ::testing::Test {};
@@ -197,6 +199,79 @@ TYPED_TEST_SUITE(StringIsPalindromeTest, StringIsPalindromeTestTypes);
 TYPED_TEST(StringIsPalindromeTest, TypedTest)
 {
   EXPECT_EQ(TestFixture::expected_, pddcp::is_palindrome(TestFixture::input_));
+}
+
+/**
+ * Base test class for `pddcp::levenshtein_distance` testing.
+ *
+ * @tparam IndexedType `pddcp::indexed_type<I, T>` with `T` an STL string type
+ */
+template <typename IndexedType>
+class StringLevenDistTest : public ::testing::Test {};
+
+/**
+ * Helper macro to define `StringLevenDistTest` specializations.
+ *
+ * @param input_type `pddcp::indexed_type<I, T>` specialization
+ * @param first First string literal
+ * @param second Second string literal
+ * @param expected Expected Levenshtein distance
+ * @param flags `pddcp::execution` flags, either `recursive` or `dynamic`
+ */
+#define PDDCP_STRING_LEVEN_DIST_TEST(input_type, first, second, expected, flags) \
+  template <> \
+  class StringLevenDistTest<input_type> : public ::testing::Test { \
+    static_assert( \
+      flags == pddcp::execution::recursive || \
+      flags == pddcp::execution::dynamic, \
+      "flags must be either pddcp::execution members recursive or dynamic" \
+    ); \
+  public: \
+    PDDCP_INDEXED_TYPE_HELPER_TYPES(input_type); \
+    using result_type = decltype( \
+      pddcp::levenshtein_distance( \
+        std::declval<element_type>(), std::declval<element_type>() \
+      ) \
+    ); \
+  protected: \
+    static inline const element_type first_{first}; \
+    static inline const element_type second_{second}; \
+    static inline constexpr result_type expected_ = expected; \
+    static inline constexpr pddcp::execution flags_ = flags; \
+  }
+
+// input types used for StringLevenDistTest
+using StringLevenDistType1 = pddcp::indexed_type<0, std::string>;
+using StringLevenDistType2 = pddcp::indexed_type<1, std::string>;
+using StringLevenDistType3 = pddcp::indexed_type<2, std::wstring>;
+
+// specializations for StringLevenDistTest
+PDDCP_STRING_LEVEN_DIST_TEST(
+  StringLevenDistType1, "cheese", "chabse", 2, pddcp::execution::recursive
+);
+PDDCP_STRING_LEVEN_DIST_TEST(
+  StringLevenDistType2, "burger", "borgar", 2, pddcp::execution::dynamic
+);
+PDDCP_STRING_LEVEN_DIST_TEST(
+  StringLevenDistType3, L"hello", L"halp", 3, pddcp::execution::dynamic
+);
+
+using StringLevenDistTestTypes = ::testing::Types<
+  StringLevenDistType1, StringLevenDistType2, StringLevenDistType3
+>;
+TYPED_TEST_SUITE(StringLevenDistTest, StringLevenDistTestTypes);
+
+/**
+ * Check that `pddcp::levenshtein_distance` works as expected.
+ */
+TYPED_TEST(StringLevenDistTest, TypedTest)
+{
+  EXPECT_EQ(
+    TestFixture::expected_,
+    pddcp::levenshtein_distance(
+      TestFixture::first_, TestFixture::second_, TestFixture::flags_
+    )
+  );
 }
 
 }  // namespace
