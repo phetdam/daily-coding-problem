@@ -244,6 +244,8 @@ class StringLevenDistTest : public ::testing::Test {};
 using StringLevenDistType1 = pddcp::indexed_type<0, std::string>;
 using StringLevenDistType2 = pddcp::indexed_type<1, std::string>;
 using StringLevenDistType3 = pddcp::indexed_type<2, std::wstring>;
+using StringLevenDistType4 = pddcp::indexed_type<3, std::basic_string<char16_t>>;
+using StringLevenDistType5 = pddcp::indexed_type<4, std::basic_string<char32_t>>;
 
 // specializations for StringLevenDistTest
 PDDCP_STRING_LEVEN_DIST_TEST(
@@ -255,9 +257,19 @@ PDDCP_STRING_LEVEN_DIST_TEST(
 PDDCP_STRING_LEVEN_DIST_TEST(
   StringLevenDistType3, L"hello", L"halp", 3, pddcp::execution::dynamic
 );
+PDDCP_STRING_LEVEN_DIST_TEST(
+  StringLevenDistType4, u"fiduciary", u"feud city", 5, pddcp::execution::dynamic
+);
+PDDCP_STRING_LEVEN_DIST_TEST(
+  StringLevenDistType5, U"lifetime", U"lifeline", 2, pddcp::execution::dynamic
+);
 
 using StringLevenDistTestTypes = ::testing::Types<
-  StringLevenDistType1, StringLevenDistType2, StringLevenDistType3
+  StringLevenDistType1,
+  StringLevenDistType2,
+  StringLevenDistType3,
+  StringLevenDistType4,
+  StringLevenDistType5
 >;
 TYPED_TEST_SUITE(StringLevenDistTest, StringLevenDistTestTypes);
 
