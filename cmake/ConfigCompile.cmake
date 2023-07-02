@@ -26,7 +26,9 @@ if(MSVC)
         # /Od applied by default when using Debug configuration
         $<$<NOT:$<CONFIG:Release>>:/DEBUG>
     )
-    # note: does not work correctly for Windows as test runner does not run.
+    # note: does not work correctly for Windows. it seems that programs using
+    # compiled with AddressSanitizer enabled that use Google Test TYPED_TEST
+    # will hang indefinitely with the CPU constantly spinning.
     # enable AddressSanitizer use
     if(ENABLE_ASAN)
         message(STATUS "AddressSanitizer (/fsanitize=address) enabled")
