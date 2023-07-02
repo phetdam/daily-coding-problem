@@ -26,6 +26,7 @@ if(MSVC)
         # /Od applied by default when using Debug configuration
         $<$<NOT:$<CONFIG:Release>>:/DEBUG>
     )
+    # note: does not work correctly for Windows as test runner does not run.
     # enable AddressSanitizer use
     if(ENABLE_ASAN)
         message(STATUS "AddressSanitizer (/fsanitize=address) enabled")

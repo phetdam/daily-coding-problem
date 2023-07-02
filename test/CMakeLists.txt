@@ -61,5 +61,10 @@ endif()
 target_link_libraries(pddcp_test PRIVATE GTest::gtest_main)
 
 include(GoogleTest)
-# default DISCOVERY_TIMEOUT is 5 seconds and needed to be increased
-gtest_discover_tests(pddcp_test DISCOVERY_TIMEOUT 10)
+# default DISCOVERY_TIMEOUT is 5 seconds and needed to be increased. when
+# compiling with ENABLE_ASAN the timeout needs to be increased even more
+if(ENABLE_ASAN)
+    gtest_discover_tests(pddcp_test DISCOVERY_TIMEOUT 30)
+else()
+    gtest_discover_tests(pddcp_test DISCOVERY_TIMEOUT 10)
+endif()
