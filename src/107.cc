@@ -31,8 +31,9 @@ namespace {
 using tree_type = pddcp::binary_tree<int>;
 // we have a separate tree_type and input_type because unique pointers are not
 // copyable, so passing a binary_tree<T> into ::testing::Values, which takes
-// parameters by copy, triggers a compile error.
-using input_type = tree_type*;
+// parameters by copy, triggers a compile error. therefore, we have to create
+// the trees in global scope and pass a const reference or pointer instead.
+using input_type = const tree_type&;
 using result_type = std::vector<int>;
 using pair_type = std::pair<input_type, result_type>;
 
@@ -41,39 +42,45 @@ using pair_type = std::pair<input_type, result_type>;
  */
 class DailyTest107 : public ::testing::TestWithParam<pair_type> {};
 
+/**
+ *    1
+ *   / \
+ *  2   3
+ *     / \
+ *    4   5
+ */
+const tree_type sample_tree{
+  1, new tree_type{2}, new tree_type{3, new tree_type{4}, new tree_type{5}}
+};
 INSTANTIATE_TEST_SUITE_P(
   SamplePairs,
   DailyTest107,
   ::testing::Values(
-    // not a memory leak; it is as if we just made some static binary tree
     pair_type{
-      new tree_type{
-        1,
-        new tree_type{2},
-        new tree_type{3, new tree_type{4}, new tree_type{5}}
-      },
+      sample_tree,
       {1, 2, 3, 4, 5}
     }
   )
 );
 
+/**
+ *     6
+ *    / \
+ *   1   9
+ *  /   / \
+ * 5   11  7
+ */
+const tree_type custom_tree{
+  6,
+  new tree_type{1, new tree_type{5}, nullptr},
+  new tree_type{9, new tree_type{11}, new tree_type{7}}
+};
 INSTANTIATE_TEST_SUITE_P(
   CustomPairs,
   DailyTest107,
   ::testing::Values(
-    /**
-     *     6
-     *    / \
-     *   1   9
-     *  /   / \
-     * 5   11  7
-     */
     pair_type{
-      new tree_type{
-        6,
-        new tree_type{1, new tree_type{5}, nullptr},
-        new tree_type{9, new tree_type{11}, new tree_type{7}}
-      },
+      custom_tree,
       {6, 1, 9, 5, 11, 7}
     }
   )

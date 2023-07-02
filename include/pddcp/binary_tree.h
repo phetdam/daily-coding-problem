@@ -16,6 +16,7 @@
 #include <optional>
 #include <ostream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace pddcp {
@@ -60,9 +61,9 @@ public:
    */
   binary_tree(
     T value,
-    std::unique_ptr<self_type>& left,
-    std::unique_ptr<self_type>& right)
-    : binary_tree{value, left.release(), right.release()}
+    std::unique_ptr<self_type>&& left,
+    std::unique_ptr<self_type>&& right)
+    : value_{value}, left_{std::move(left)}, right_{std::move(right)}
   {}
 
   // getters, including convenience getters for left + right values
