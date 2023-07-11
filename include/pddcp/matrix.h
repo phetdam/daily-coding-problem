@@ -437,7 +437,7 @@ public:
    *
    * If `value_type` is `bool`, this is the number of `true` elements.
    */
-  const auto size() const { return values_.size(); }
+  auto size() const { return values_.size(); }
 
   /**
    * Return const reference to the index-value map.
