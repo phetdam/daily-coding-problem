@@ -24,7 +24,6 @@ if(MSVC)
         # which is performance loss compared to storing in register
         /wd4738
         # /Od applied by default when using Debug configuration
-        $<$<NOT:$<CONFIG:Release>>:/DEBUG>
     )
     # note: does not work correctly for Windows. it seems that programs using
     # compiled with AddressSanitizer enabled that use Google Test TYPED_TEST
